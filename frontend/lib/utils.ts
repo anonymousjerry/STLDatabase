@@ -59,6 +59,135 @@ export const categoryMenuList = [
     src: "/headphone icon.png",
     href: "/shop/headphones"
   },
+  {
+    id: 11,
+    title: "Smart Phones",
+    src: "/smart phone icon.png",
+    href: "/shop/smart-phones"
+  },
+  {
+    id: 12,
+    title: "Tablets",
+    src: "/tablet icon.png",
+    href: "/shop/tablets"
+  },
+  {
+    id: 13,
+    title: "Mouses",
+    src: "/mouse icon.png",
+    href: "/shop/mouses"
+  },
+  {
+    id: 14,
+    title: "Cameras",
+    src: "/camera icon.png",
+    href: "/shop/cameras"
+  },
+  {
+    id: 15,
+    title: "Smart Watches",
+    src: "/smart watch.png",
+    href: "/shop/watches"
+  },
+  {
+    id: 16,
+    title: "Laptops",
+    src: "/laptop icon.png",
+    href: "/shop/laptops"
+  },
+  {
+    id: 17,
+    title: "PCs",
+    src: "/pc icon.png",
+    href: "/shop/computers"
+  },
+  {
+    id: 18,
+    title: "Printers",
+    src: "/printers icon.png",
+    href: "/shop/printers"
+  },
+  {
+    id: 19,
+    title: "PCs",
+    src: "/pc icon.png",
+    href: "/shop/computers"
+  },
+  {
+    id: 20,
+    title: "Printers",
+    src: "/printers icon.png",
+    href: "/shop/printers"
+  },
+];
+
+export const PlatformMenuList = [
+  {
+    id: 1,
+    title: "Printables",
+    src: "/PrintablesMark.png",
+    href: "https://www.printables.com"
+  },
+  {
+    id: 2,
+    title: "Thingiverse",
+    src: "/ThingiverseMark.png",
+    href: "https://www.thingiverse.com"
+  },
+  {
+    id: 3,
+    title: "YouMagine",
+    src: "/YouMagineMark.png",
+    href: "https://www.youmagine.com"
+  },
+  {
+    id: 4,
+    title: "Thangs",
+    src: "/ThangsMark.png",
+    href: "https://www.thangs.com"
+  },
+  {
+    id: 5,
+    title: "MyMiniFactory",
+    src: "/MyMiniFactoryMark.png",
+    href: "https://www.myminifactory.com"
+  },
+  {
+    id: 6,
+    title: "Cults3D",
+    src: "/Cults3DMark.png",
+    href: "https://www.cults3d.com"
+  },
+  {
+    id: 7,
+    title: "Pinshape",
+    src: "/PinshapeMark.png",
+    href: "https://www.pinshape.com"
+  },
+  {
+    id: 8,
+    title: "NIH3D",
+    src: "/NIH3DMark.png",
+    href: "https://3d.nih.gov"
+  },
+  {
+    id: 9,
+    title: "Sketchfab",
+    src: "/SketchfabMark.png",
+    href: "https://www.sketchfab.com"
+  },
+  {
+    id: 10,
+    title: "NIH3D",
+    src: "/NIH3DMark.png",
+    href: "https://3d.nih.gov"
+  },
+  {
+    id: 11,
+    title: "Sketchfab",
+    src: "/SketchfabMark.png",
+    href: "https://www.sketchfab.com"
+  },
 ];
 
 export const incentives = [

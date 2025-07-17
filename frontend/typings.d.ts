@@ -1,15 +1,15 @@
 interface Product {
   id: string;
-  slug: string;
   title: string;
+  platform: string;
+  category: string;
+  subcategory: string;
+  likes: number;
+  downloads: number;
+  views: number;
+  tags: string[];
+  thumbnailUrl: string;
   price: number;
-  rating: number;
-  description: string;
-  mainImage: string;
-  manufacturer: string;
-  categoryId: string;
-  category: {name: string}?;
-  inStock: number;
 }
 
 interface SingleProductPageProps {

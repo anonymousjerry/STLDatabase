@@ -20,10 +20,10 @@ interface CategoryItemProps {
 const CategoryItem = ({ title, children, href }: CategoryItemProps) => {
   return (
     <Link href={href}>
-      <div className="flex flex-col items-center gap-y-2 cursor-pointer bg-white py-5 text-black hover:bg-gray-100">
+      <div className="flex flex-col items-center aspect-square w-full justify-center cursor-pointer border-2  transition bg-white py-5 text-black hover:rounded-2xl  hover:border-[#b6e400] hover:shadow-[0_0_16px_0_rgba(0,0,0,0.32)]">
         {children}
 
-        <h3 className="font-semibold text-xl">{title}</h3>
+        <div className="font-semibold text-xl">{title}</div>
       </div>
     </Link>
   );

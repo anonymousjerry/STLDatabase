@@ -12,8 +12,10 @@
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import HeaderTop from "./HeaderTop";
+import HeaderMain from "./HeaderMain"; 
 import Image from "next/image";
 import SearchInput from "./SearchInput";
+import Navbar from "./Navbar";
 import Link from "next/link";
 import { FaBell } from "react-icons/fa6";
 
@@ -72,9 +74,11 @@ const Header = () => {
   }, [session?.user?.email, wishlist.length]);
 
   return (
-    <header className="bg-white">
+    <div className="bg-white flex flex-col">
       <HeaderTop />
-      {pathname.startsWith("/admin") === false && (
+      <Navbar />
+      <HeaderMain />
+      {/* {pathname.startsWith("/admin") === false && (
         <div className="h-32 bg-white flex items-center justify-between px-16 max-[1320px]:px-16 max-md:px-6 max-lg:flex-col max-lg:gap-y-7 max-lg:justify-center max-lg:h-60 max-w-screen-2xl mx-auto">
           <Link href="/">
             <img src="/logo v1 svg.svg" width={300} height={300} alt="singitronic logo" className="relative right-5 max-[1023px]:w-56" />
@@ -126,8 +130,8 @@ const Header = () => {
             </div>
           </div>
         </div>
-      )}
-    </header>
+      )} */}
+    </div>
   );
 };
 
