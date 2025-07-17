@@ -1,5 +1,5 @@
 import NextAuth from "next-auth";
-import { Account, User as AuthUser } from "next-auth";
+import {User as AuthUser } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -27,6 +27,7 @@ export const authOptions: any = {
             }),
           });
           const user = await res.json();
+          console.log(user)
           if (res.ok && user) return user;
           return null;
         } catch (error) {
@@ -37,11 +38,22 @@ export const authOptions: any = {
     })
     
   ],
+  session: {
+    strategy: "jwt",
+  },
+
   callbacks: {
-    async signIn({ user, account }: { user: AuthUser; account: Account }) {
-      if (account?.provider == "credentials") {
-        return true;
+    async jwt({ token, user }: {token:any, user:any}) {
+      if (user) {
+        token.accessToken = user.accessToken; // from backend
+        token.user = user;
       }
+      return token;
+    },
+    async session({ session, token }: {session:any, token:any}) {
+      session.user = token.user;
+      session.accessToken = token.accessToken;
+      return session;
     },
   },
 };

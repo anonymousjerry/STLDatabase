@@ -56,6 +56,7 @@ const FeaturedSite = () => {
                     src={item.src}
                     alt={item.title}
                     fill
+                    sizes="20"
                     className="object-contain"
                 />
                 </PlatformItem>

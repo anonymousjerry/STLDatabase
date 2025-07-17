@@ -10,12 +10,14 @@
 
 import React from "react";
 import ProductItem from "./ProductItem";
+// import axiosInstance from "@/lib/axios";
+// import { AxiosInstance } from "@/lib/axios-instance";
+import { publicApi } from "@/lib/axios";
 import Heading from "./Heading";
 
 const ProductsSection = async () => {
-  // sending API request for getting all products
-  const data = await fetch(`${process.env.NEXT_PUBLIC_BACKENDPART_URL}/models`);
-  const products = await data.json();
+  const response = await publicApi.get('/models');
+  const products = await response.data;
   return (
     <div className="flex flex-row pt-10 px-32 max-xl:px-20 max-lg:px-10 max-md:px-6 bg-gray-100">
         <div className="grid grid-cols-4 justify-items-center  gap-x-6  gap-y-8 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1">

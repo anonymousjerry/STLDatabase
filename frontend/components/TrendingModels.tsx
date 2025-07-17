@@ -7,17 +7,27 @@
 
 import React from "react";
 import { useState } from "react";
-import PlatformItem from "./PlatformItem";
-import Image from "next/image";
-import { PlatformMenuList } from "@/lib/utils";
 import { FaChevronLeft } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa6";
 import ProductItem from "./ProductItem";
+import { useEffect } from "react";
 
-const TrendingModels = async () => {
+const TrendingModels = () => {
     const [showAll, setShowAll] = useState(false);
-    const data = await fetch(`${process.env.NEXT_PUBLIC_BACKENDPART_URL}/models`);
-    const products = await data.json();
+    const [products, setProducts] = useState<Product[]>([]);
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKENDPART_URL}/models`);
+            const data = await res.json();
+            setProducts(data);
+        } catch (err) {
+            console.error("Error fetching trending models:", err);
+        }
+        };
+
+        fetchData();
+    }, []);
     const visibleProducts = showAll ? products : products.slice(0, 4);
     return (
         <div className="pt-10 px-32 max-xl:px-20 max-lg:px-10 max-md:px-6 bg-gray-100">

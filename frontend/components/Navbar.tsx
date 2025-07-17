@@ -10,12 +10,16 @@
 
 "use client";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import React, { useState, useRef, useEffect } from "react";
 import { FaUser, FaHeart, FaCar } from 'react-icons/fa';
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
+import toast from "react-hot-toast";
+import { signOut } from "next-auth/react";
 
 const Navbar = () => {
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [accountMenuOpen, setAccountMenuOpen] = useState<boolean>(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
@@ -31,6 +35,11 @@ const Navbar = () => {
   const isActive = (href: string) =>
     !isCategoryActive && (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
+  const handleLogout = () => {
+    toast.success("Logout Successful!")
+    setTimeout(() => signOut(), 1000)
+  }
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) {
@@ -40,6 +49,16 @@ const Navbar = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // useEffect(() => {
+  //   if (status === "authenticated" && session?.user) {
+  //     // axiosInstance.get("/protected-route")
+  //     //   .then((res) => console.log("Protected data:", res.data))
+  //     //   .catch((err) => console.error("Axios error:", err));
+  //     console.log(session.user.accesstoken)
+  //   }
+  // }, [session, status]);
+  // console.log(session?.user?.image)
 
 
   return (
@@ -144,7 +163,7 @@ const Navbar = () => {
             <div className="absolute right-0 mt-2 w-40 bg-white text-black shadow-lg rounded-md z-10">
               <a href="/login" className="block px-4 py-2 hover:bg-gray-100">Login</a>
               <a href="/register" className="block px-4 py-2 hover:bg-gray-100">Register</a>
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100">Logout</a>
+              <a href="#" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleLogout()}>Logout</a>
             </div>
           )}
         </div>
