@@ -14,6 +14,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { FaUser, FaHeart, FaCar } from 'react-icons/fa';
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
+import { signOut } from "next-auth/react";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const router = useRouter();
@@ -30,6 +32,12 @@ const Navbar = () => {
   ];
   const isActive = (href: string) =>
     !isCategoryActive && (href === '/' ? pathname === '/' : pathname.startsWith(href));
+
+  const handleLogOut = () => {
+    toast.success("Logout Successful!");
+    setTimeout(() => signOut(), 1000);
+  }
+  
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -144,7 +152,8 @@ const Navbar = () => {
             <div className="absolute right-0 mt-2 w-40 bg-white text-black shadow-lg rounded-md z-10">
               <a href="/login" className="block px-4 py-2 hover:bg-gray-100">Login</a>
               <a href="/register" className="block px-4 py-2 hover:bg-gray-100">Register</a>
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100">Logout</a>
+              {/* <div className="" onClick={() => handleLogOut}>Logout<div> */}
+              <a href="#" onClick={() => handleLogOut()} className="block px-4 py-2 hover:bg-gray-100">Logout</a>
             </div>
           )}
         </div>
