@@ -3,397 +3,397 @@ export const categoryMenuList = [
     id: 1,
     title: "Smart Phones",
     src: "/Categories/Action_Figures.png",
-    href: "/shop/smart-phones"
+    href: "/explore/smart-phones"
   },
   {
     id: 2,
     title: "Tablets",
     src: "/Categories/Anime.png",
-    href: "/shop/tablets"
+    href: "/explore/tablets"
   },
   {
     id: 3,
     title: "Mouses",
     src: "/Categories/Board_Game_Parts.png",
-    href: "/shop/mouses"
+    href: "/explore/mouses"
   },
   {
     id: 4,
     title: "Cameras",
     src: "/Categories/Christmas.png",
-    href: "/shop/cameras"
+    href: "/explore/cameras"
   },
   {
     id: 5,
     title: "Smart Watches",
     src: "/Categories/Drones.png",
-    href: "/shop/watches"
+    href: "/explore/watches"
   },
   {
     id: 6,
     title: "Laptops",
     src: "/Categories/Easter.png",
-    href: "/shop/laptops"
+    href: "/explore/laptops"
   },
   {
     id: 7,
     title: "PCs",
     src: "/Categories/Educational_Toys.png",
-    href: "/shop/computers"
+    href: "/explore/computers"
   },
   {
     id: 8,
     title: "Printers",
     src: "/Categories/Fantasy_Miniatures.png",
-    href: "/shop/printers"
+    href: "/explore/printers"
   },
   {
     id: 9,
     title: "Earbuds",
     src: "/Categories/Fidget_Toys.png",
-    href: "/shop/earbuds"
+    href: "/explore/earbuds"
   },
   {
     id: 10,
     title: "Head Phones",
     src: "/Categories/Furniture_Accessories.png",
-    href: "/shop/headphones"
+    href: "/explore/headphones"
   },
   {
     id: 11,
     title: "Smart Phones",
     src: "/Categories/Gaming_Characters.png",
-    href: "/shop/smart-phones"
+    href: "/explore/smart-phones"
   },
   {
     id: 12,
     title: "Tablets",
     src: "/Categories/Halloween.png",
-    href: "/shop/tablets"
+    href: "/explore/tablets"
   },
   {
     id: 13,
     title: "Mouses",
     src: "/Categories/Valentine_Day.png",
-    href: "/shop/mouses"
+    href: "/explore/mouses"
   },
   {
     id: 14,
     title: "Cameras",
     src: "/Categories/Superheroes.png",
-    href: "/shop/cameras"
+    href: "/explore/cameras"
   },
   {
     id: 15,
     title: "Smart Watches",
     src: "/Categories/Kitchen_Tools.png",
-    href: "/shop/watches"
+    href: "/explore/watches"
   },
   {
     id: 16,
     title: "Laptops",
     src: "/Categories/Lighting_Fixtures.png",
-    href: "/shop/laptops"
+    href: "/explore/laptops"
   },
   {
     id: 17,
     title: "PCs",
     src: "/Categories/Miniature_Bases.png",
-    href: "/shop/computers"
+    href: "/explore/computers"
   },
   {
     id: 18,
     title: "Printers",
     src: "/Categories/Movie_Props.png",
-    href: "/shop/printers"
+    href: "/explore/printers"
   },
   {
     id: 19,
     title: "PCs",
     src: "/Categories/Musical_Instruments.png",
-    href: "/shop/computers"
+    href: "/explore/computers"
   },
   {
     id: 20,
     title: "Printers",
     src: "/Categories/NewYear.png",
-    href: "/shop/printers"
+    href: "/explore/printers"
   },
   {
     id: 21,
     title: "Smart Phones",
     src: "/Categories/Photography_Gear.png",
-    href: "/shop/smart-phones"
+    href: "/explore/smart-phones"
   },
   {
     id: 22,
     title: "Tablets",
     src: "/Categories/Plant_Pots.png",
-    href: "/shop/tablets"
+    href: "/explore/tablets"
   },
   {
     id: 23,
     title: "Mouses",
     src: "/Categories/RC_Parts.png",
-    href: "/shop/mouses"
+    href: "/explore/mouses"
   },
   {
     id: 24,
     title: "Cameras",
     src: "/Categories/Sci-Fi_Miniatures.png",
-    href: "/shop/cameras"
+    href: "/explore/cameras"
   },
   {
     id: 25,
     title: "Smart Watches",
     src: "/Categories/Spinning_Tops.png",
-    href: "/shop/watches"
+    href: "/explore/watches"
   },
   {
     id: 26,
     title: "Laptops",
     src: "/Categories/Star_Wars.png",
-    href: "/shop/laptops"
+    href: "/explore/laptops"
   },
   {
     id: 27,
     title: "PCs",
     src: "/Categories/abstract_objects.png",
-    href: "/shop/computers"
+    href: "/explore/computers"
   },
   {
     id: 28,
     title: "Printers",
     src: "/Categories/armor.png",
-    href: "/shop/printers"
+    href: "/explore/printers"
   },
   {
     id: 29,
     title: "Earbuds",
     src: "/Categories/bags&purses.png",
-    href: "/shop/earbuds"
+    href: "/explore/earbuds"
   },
   {
     id: 30,
     title: "Head Phones",
     src: "/Categories/bathroom_items.png",
-    href: "/shop/headphones"
+    href: "/explore/headphones"
   },
   {
     id: 31,
     title: "Smart Phones",
     src: "/Categories/bins.png",
-    href: "/shop/smart-phones"
+    href: "/explore/smart-phones"
   },
   {
     id: 32,
     title: "Tablets",
     src: "/Categories/boxes&containers.png",
-    href: "/shop/tablets"
+    href: "/explore/tablets"
   },
   {
     id: 33,
     title: "Mouses",
     src: "/Categories/bracelets.png",
-    href: "/shop/mouses"
+    href: "/explore/mouses"
   },
   {
     id: 34,
     title: "Cameras",
     src: "/Categories/calibration_tools.png",
-    href: "/shop/cameras"
+    href: "/explore/cameras"
   },
   {
     id: 35,
     title: "PCs",
     src: "/Categories/classroom_aids.png",
-    href: "/shop/computers"
+    href: "/explore/computers"
   },
   {
     id: 36,
     title: "Printers",
     src: "/Categories/drawers.png",
-    href: "/shop/printers"
+    href: "/explore/printers"
   },
   {
     id: 37,
     title: "Earbuds",
     src: "/Categories/earrings.png",
-    href: "/shop/earbuds"
+    href: "/explore/earbuds"
   },
   {
     id: 38,
     title: "Head Phones",
     src: "/Categories/exercise_equipments.png",
-    href: "/shop/headphones"
+    href: "/explore/headphones"
   },
   {
     id: 39,
     title: "Smart Phones",
     src: "/Categories/FDM_printers.png",
-    href: "/shop/smart-phones"
+    href: "/explore/smart-phones"
   },
   {
     id: 40,
     title: "Tablets",
     src: "/Categories/gadgets.png",
-    href: "/shop/tablets"
+    href: "/explore/tablets"
   },
   {
     id: 41,
     title: "Mouses",
     src: "/Categories/geography_models.png",
-    href: "/shop/mouses"
+    href: "/explore/mouses"
   },
   {
     id: 42,
     title: "Cameras",
     src: "/Categories/helmets.png",
-    href: "/shop/cameras"
+    href: "/explore/cameras"
   },
   {
     id: 43,
     title: "PCs",
     src: "/Categories/hooks&mounts.png",
-    href: "/shop/computers"
+    href: "/explore/computers"
   },
   {
     id: 44,
     title: "Printers",
     src: "/Categories/lamps&lighting.png",
-    href: "/shop/printers"
+    href: "/explore/printers"
   },
   {
     id: 45,
     title: "Earbuds",
     src: "/Categories/masks.png",
-    href: "/shop/earbuds"
+    href: "/explore/earbuds"
   },
   {
     id: 46,
     title: "Head Phones",
     src: "/Categories/math_models.png",
-    href: "/shop/headphones"
+    href: "/explore/headphones"
   },
   {
     id: 47,
     title: "Smart Phones",
     src: "/Categories/medical_accessories.png",
-    href: "/shop/smart-phones"
+    href: "/explore/smart-phones"
   },
   {
     id: 48,
     title: "Tablets",
     src: "/Categories/necklaces.png",
-    href: "/shop/tablets"
+    href: "/explore/tablets"
   },
   {
     id: 49,
     title: "Mouses",
     src: "/Categories/phone_accessories.png",
-    href: "/shop/mouses"
+    href: "/explore/mouses"
   },
   {
     id: 50,
     title: "Cameras",
     src: "/Categories/pill_organizers.png",
-    href: "/shop/cameras"
+    href: "/explore/cameras"
   },
   {
     id: 51,
     title: "PCs",
     src: "/Categories/printer_mods.png",
-    href: "/shop/computers"
+    href: "/explore/computers"
   },
   {
     id: 52,
     title: "Printers",
     src: "/Categories/puzzle_games.png",
-    href: "/shop/printers"
+    href: "/explore/printers"
   },
   {
     id: 53,
     title: "Earbuds",
     src: "/Categories/resin_printers.png",
-    href: "/shop/earbuds"
+    href: "/explore/earbuds"
   },
   {
     id: 54,
     title: "Head Phones",
     src: "/Categories/rings.png",
-    href: "/shop/headphones"
+    href: "/explore/headphones"
   },
   {
     id: 55,
     title: "Smart Phones",
     src: "/Categories/science_tools.png",
-    href: "/shop/smart-phones"
+    href: "/explore/smart-phones"
   },
   {
     id: 56,
     title: "Tablets",
     src: "/Categories/sculptures.png",
-    href: "/shop/tablets"
+    href: "/explore/tablets"
   },
   {
     id: 57,
     title: "Mouses",
     src: "/Categories/sports.png",
-    href: "/shop/mouses"
+    href: "/explore/mouses"
   },
   {
     id: 58,
     title: "Cameras",
     src: "/Categories/tabletop_accessories.png",
-    href: "/shop/cameras"
+    href: "/explore/cameras"
   },
   {
     id: 59,
     title: "PCs",
     src: "/Categories/terrain_scenary.png",
-    href: "/shop/computers"
+    href: "/explore/computers"
   },
   {
     id: 60,
     title: "Printers",
     src: "/Categories/tool_holders.png",
-    href: "/shop/printers"
+    href: "/explore/printers"
   },
   {
     id: 61,
     title: "Earbuds",
     src: "/Categories/tools.png",
-    href: "/shop/earbuds"
+    href: "/explore/earbuds"
   },
   {
     id: 62,
     title: "Head Phones",
     src: "/Categories/vases.png",
-    href: "/shop/headphones"
+    href: "/explore/headphones"
   },
   {
     id: 63,
     title: "Smart Phones",
     src: "/Categories/wall_art.png",
-    href: "/shop/smart-phones"
+    href: "/explore/smart-phones"
   },
   {
     id: 64,
     title: "Tablets",
     src: "/Categories/weapons.png",
-    href: "/shop/tablets"
+    href: "/explore/tablets"
   },
   {
     id: 65,
     title: "Mouses",
     src: "/Categories/wellness_tools.png",
-    href: "/shop/mouses"
+    href: "/explore/mouses"
   },
   {
     id: 66,
     title: "Cameras",
     src: "/Categories/engineering_parts.png",
-    href: "/shop/cameras"
+    href: "/explore/cameras"
   },
 ];
 

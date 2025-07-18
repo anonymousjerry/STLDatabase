@@ -8,11 +8,11 @@ export default function Home() {
     <>
     <Categories />
     <FeaturedSite />
-    <TrendingModels />
+    {/* <TrendingModels /> */}
     {/* <Hero /> */}
     {/* <IntroducingSection /> */}
     {/* <CategoryMenu /> */}
-    <ProductsSection />
+    {/* <ProductsSection /> */}
     </>
   );
 }
