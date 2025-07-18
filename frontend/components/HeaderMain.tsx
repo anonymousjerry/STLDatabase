@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import SearchInput from "./SearchInput";
 import DropdownButton from "./Dropdown";
+import SearchBar from "./SearchBar";
 
 const HeaderMain = () => {
 
@@ -44,7 +45,7 @@ const HeaderMain = () => {
                     </span>{" "}
                 </div>
             </div>
-            <div className="flex w-full gap-2.5 bg-white rounded-lg px-[47px] py-[39px]">
+            {/* <div className="flex w-full gap-2.5 bg-white rounded-lg px-[47px] py-[39px]">
               <div className="basis-1/5">
                 <DropdownButton
                   initialContent="All"
@@ -66,7 +67,8 @@ const HeaderMain = () => {
               <div className="basis-3/5">
                 <SearchInput />
               </div>
-            </div>
+            </div> */}
+            <SearchBar />
         </div>
     );
 };
