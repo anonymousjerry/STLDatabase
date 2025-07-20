@@ -73,7 +73,7 @@ const Header = () => {
     <div className="bg-white flex flex-col">
       <HeaderTop />
       <Navbar />
-      <HeaderMain />
+      {/* <HeaderMain /> */}
     </div>
   );
 };

@@ -8,21 +8,33 @@
 // Output: section title and category items
 // *********************
 "use client"
-import React from "react";
+
+import React, { useEffect } from "react";
 import CategoryItem from "./CategoryItem";
 import Image from "next/image";
-import { categoryMenuList } from "@/lib/utils";
 import { useState } from "react";
+import { categoryMenuList } from "@/lib/utils";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
+import { getSubCategories } from "@/lib/categoryApi";
+import { subCategoryList } from "@/utils/categoryFormat";
 
 const Categories = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [subcategories, setSubCategories] = useState([]);
+  // useEffect(() => {
+  //   getSubCategories().then(setSubCategories).catch(console.error)
+  // }, [])
+
+  // const categoryMenuList = subCategoryList(subcategories)
+  // console.log("category", categoryMenuList);
+
   const [direction, setDirection] = useState<"next" | "prev">("next");
   const itemsPerPage = 18;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedItems = categoryMenuList.slice(startIndex, endIndex);
   const totalPages = Math.ceil(categoryMenuList.length / itemsPerPage);
+
 
   const [fadekey, setFadeKey] = useState(0);
 

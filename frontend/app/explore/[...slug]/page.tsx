@@ -8,6 +8,7 @@ import {
   Products,
   SortBy,
 } from "@/components";
+import SearchBar from "@/components/SearchBar";
 import React from "react";
 
 // improve readabillity of category text, for example category text "smart-watches" will be "smart watches"
@@ -22,11 +23,11 @@ const improveCategoryText = (text: string): string => {
 };
 
 const ExplorePage = (slug: any) => {
-  
   return (
-    <div className="text-black bg-white">
-      <div className=" max-w-screen-2xl mx-auto px-10 max-sm:px-5">
+    <div className="flex flex-col px-32 sm:px-10 xl:px-32 bg-gray-100">
+      {/* <div className=" max-w-screen-2xl mx-auto px-10 max-sm:px-5"> */}
         <Breadcrumb />
+        <SearchBar />
         {/* <div className="grid grid-cols-[200px_1fr] gap-x-10 max-md:grid-cols-1 max-md:gap-y-5">
           <Filters />
           <div>
@@ -44,7 +45,7 @@ const ExplorePage = (slug: any) => {
             <Pagination />
           </div>
         </div> */}
-      </div>
+      {/* </div> */}
     </div>
   );
 };

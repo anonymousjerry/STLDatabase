@@ -12,6 +12,37 @@ interface Product {
   price: number;
 }
 
+// interface Model {
+//   id: String;
+//   title: String;
+//   // description: String;
+//   // sourceSite: SourceSite;
+//   // sourceSiteId: String;
+//   // category: Category;
+//   // categoryId: String;
+//   // subCategory: String;
+//   // subCategoryId: String;
+//   tags: String[];
+//   likes: number;
+//   // deleted: Boolean;
+//   downloads: number;
+//   // thumbnailUrl: String;
+//   // sourceUrl: String;
+//   imagesUrl: String;
+//   // createdAt: DateTime;
+//   // updatedAt: getDefaultAutoSelectFamilyAttemptTimeout;
+// }
+
+interface Model {
+  id: string;
+  title: string;
+  tags: string[];
+  likes: number;
+  price: string;
+  downloads: number;
+  imageUrl: string;
+}
+
 interface SingleProductPageProps {
   params: {
     productSlug: string;

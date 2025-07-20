@@ -10,25 +10,21 @@ import { useState } from "react";
 import { FaChevronLeft } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa6";
 import ProductItem from "./ProductItem";
+import { modelLists } from "@/lib/utils";
 import { useEffect } from "react";
+import { getModels } from "@/lib/modelsApi";
+import ModelItem from "./ModelItem";
 
 const TrendingModels = () => {
     const [showAll, setShowAll] = useState(false);
-    const [products, setProducts] = useState<Product[]>([]);
-    useEffect(() => {
-        const fetchData = async () => {
-        try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKENDPART_URL}/models`);
-            const data = await res.json();
-            setProducts(data);
-        } catch (err) {
-            console.error("Error fetching trending models:", err);
-        }
-        };
+    // const [models, setModels] = useState([]);
 
-        fetchData();
-    }, []);
-    const visibleProducts = showAll ? products : products.slice(0, 4);
+    // useEffect(() => {
+    //     getModels().then(setModels).catch(console.error);
+    // }, [])
+    // const PlatformMenuList = platformList(platforms);
+
+    const visibleProducts = showAll ? modelLists : modelLists.slice(0, 4);
     return (
         <div className="pt-10 px-32 max-xl:px-20 max-lg:px-10 max-md:px-6 bg-gray-100">
         <div className="flex flex-col bg-white rounded-[32px] px-11 max-md:px-6">
@@ -36,7 +32,7 @@ const TrendingModels = () => {
                 <div className="flex text-[#0e162e] py-5  font-['Inter-Bold',_sans-serif] text-2xl font-bold">
                     TRENDING MODELS
                 </div>
-                {products.length > 4 && (
+                {modelLists.length > 4 && (
                     <div className="flex flex-row items-center justify-end">
                         <button
                             onClick={() => setShowAll((prev) => !prev)}
@@ -58,13 +54,13 @@ const TrendingModels = () => {
                             
                         </button>
                     </div>
-                    )}
+                )}
             </div>
 
             <div className="grid grid-cols-4 max-xl:grid-cols-3 max-lg:grid-cols-2 max-md:grid-cols-1 max-sm:grid-cols-1 gap-6 pb-7">
-            {visibleProducts.map((product: Product) => (
-            <ProductItem key={product.id} product={product} color="white" />
-          ))}
+                {visibleProducts.map((model: Model) => (
+                    <ModelItem key={model.id} model={model} color="white" />
+                ))}
             </div>
             
         </div>

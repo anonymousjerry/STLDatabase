@@ -11,6 +11,7 @@ const config: Config = {
       colors: {
         'custom-yellow':'#FED700',
         'custom-bgcolor': '#0E162E',
+        'custom-maincolor': "#4A457A"
       },
       keyframes: {
         slideInLeft: {

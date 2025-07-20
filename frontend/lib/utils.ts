@@ -14,7 +14,7 @@ export const categoryMenuList = [
   {
     id: 3,
     title: "Mouses",
-    src: "/Categories/Board_Game_Parts.png",
+    src: "/Categories/Board_Game_Part.png",
     href: "/explore/mouses"
   },
   {
@@ -116,7 +116,7 @@ export const categoryMenuList = [
   {
     id: 20,
     title: "Printers",
-    src: "/Categories/NewYear.png",
+    src: "/Categories/New_Year.png",
     href: "/explore/printers"
   },
   {
@@ -140,13 +140,13 @@ export const categoryMenuList = [
   {
     id: 24,
     title: "Cameras",
-    src: "/Categories/Sci-Fi_Miniatures.png",
+    src: "/Categories/scifi_Miniatures.png",
     href: "/explore/cameras"
   },
   {
     id: 25,
     title: "Smart Watches",
-    src: "/Categories/Spinning_Tops.png",
+    src: "/Categories/Spinning_Tools.png",
     href: "/explore/watches"
   },
   {
@@ -170,7 +170,7 @@ export const categoryMenuList = [
   {
     id: 29,
     title: "Earbuds",
-    src: "/Categories/bags&purses.png",
+    src: "/Categories/bags_purse.png",
     href: "/explore/earbuds"
   },
   {
@@ -188,7 +188,7 @@ export const categoryMenuList = [
   {
     id: 32,
     title: "Tablets",
-    src: "/Categories/boxes&containers.png",
+    src: "/Categories/boxes_containers.png",
     href: "/explore/tablets"
   },
   {
@@ -224,7 +224,7 @@ export const categoryMenuList = [
   {
     id: 38,
     title: "Head Phones",
-    src: "/Categories/exercise_equipments.png",
+    src: "/Categories/exercise_equipment.png",
     href: "/explore/headphones"
   },
   {
@@ -254,13 +254,13 @@ export const categoryMenuList = [
   {
     id: 43,
     title: "PCs",
-    src: "/Categories/hooks&mounts.png",
+    src: "/Categories/hooks_mounts.png",
     href: "/explore/computers"
   },
   {
     id: 44,
     title: "Printers",
-    src: "/Categories/lamps&lighting.png",
+    src: "/Categories/lamps_lighting.png",
     href: "/explore/printers"
   },
   {
@@ -392,7 +392,7 @@ export const categoryMenuList = [
   {
     id: 66,
     title: "Cameras",
-    src: "/Categories/engineering_parts.png",
+    src: "/Categories/engineering_part.png",
     href: "/explore/cameras"
   },
 ];
@@ -401,68 +401,116 @@ export const PlatformMenuList = [
   {
     id: 1,
     title: "Printables",
-    src: "/PrintablesMark.png",
+    src: "/Platforms/Printables.png",
     href: "https://www.printables.com"
   },
   {
     id: 2,
     title: "Thingiverse",
-    src: "/ThingiverseMark.png",
+    src: "/Platforms/Thingiverse.png",
     href: "https://www.thingiverse.com"
   },
   {
     id: 3,
     title: "YouMagine",
-    src: "/YouMagineMark.png",
+    src: "/Platforms/YouMagine.png",
     href: "https://www.youmagine.com"
   },
   {
     id: 4,
     title: "Thangs",
-    src: "/ThangsMark.png",
+    src: "/Platforms/Thangs.png",
     href: "https://www.thangs.com"
   },
   {
     id: 5,
     title: "MyMiniFactory",
-    src: "/MyMiniFactoryMark.png",
+    src: "/Platforms/MyMiniFactory.png",
     href: "https://www.myminifactory.com"
   },
   {
     id: 6,
     title: "Cults3D",
-    src: "/Cults3DMark.png",
+    src: "/Platforms/Cults3D.png",
     href: "https://www.cults3d.com"
   },
   {
     id: 7,
     title: "Pinshape",
-    src: "/PinshapeMark.png",
+    src: "/Platforms/Pinshape.png",
     href: "https://www.pinshape.com"
   },
   {
     id: 8,
     title: "NIH3D",
-    src: "/NIH3DMark.png",
+    src: "/Platforms/NIH3D.png",
     href: "https://3d.nih.gov"
   },
   {
     id: 9,
     title: "Sketchfab",
-    src: "/SketchfabMark.png",
+    src: "/Platforms/Sketchfab.png",
     href: "https://www.sketchfab.com"
   },
   {
     id: 10,
     title: "NIH3D",
-    src: "/NIH3DMark.png",
+    src: "/Platforms/NIH3D.png",
     href: "https://3d.nih.gov"
   },
   {
     id: 11,
     title: "Sketchfab",
-    src: "/SketchfabMark.png",
+    src: "/Platforms/Sketchfab.png",
     href: "https://www.sketchfab.com"
+  },
+];
+
+export const modelLists = [
+  {
+    id: "1",
+    title: "Dragon action figure",
+    tags: ["Toys", "Action figure"],
+    downloads: 48,
+    likes: 135,
+    price: "7.00",
+    imageUrl: "https://media.printables.com/media/prints/148a776a-6c63-4a41-aaf9-6714199a1b9e/images/10056262_ca7e4ba5-9389-43c5-9e70-7ee1e75f27fb_3d1aeccc-bf77-466f-b154-59c1c7eff103/thumbs/inside/640x480/jpg/3.webp"
+  },
+  {
+    id: "2",
+    title: "German soldier ww2",
+    tags: ["Toys", "Tabletop"],
+    downloads: 72,
+    likes: 6,
+    price: "20.00",
+    imageUrl: "https://media.printables.com/media/prints/fa96f7b9-2bfa-4334-84ff-e72b5800f043/images/10176264_57fa53d4-500b-44d2-8f8d-b67211683f37_f650cd6f-68b6-4a12-be30-0c3599c35f2e/thumbs/inside/640x480/jpg/04.webp"
+  },
+  {
+    id: "3",
+    title: "Double_Duck_You",
+    tags: ["Toys", "Animal"],
+    downloads: 1,
+    likes: 132,
+    price: "FREE",
+    imageUrl: "https://media.printables.com/media/prints/70ee9cdf-77a4-46e9-86f8-6dca20a61e2b/images/9662824_7a498208-87b1-4a70-b01a-f9b84eb92e8f_c81730a5-0263-408c-ad7f-35a22e1ba87d/thumbs/inside/640x480/gif/earplugcase.webp"
+  },
+  {
+    id: "4",
+    title: "Cat Pencil Holder",
+    tags: ["Toys", "Animal"],
+    downloads: 1,
+    likes: 132,
+    price: "5.99",
+    imageUrl: "https://media.printables.com/media/prints/fcc663c4-f55d-4f3a-aab2-66228afa9694/images/9866256_5b9a39c8-a5d7-48f7-af1b-6ad5388ef063_783227f4-3dbc-4cb1-a9fb-1175a1908390/thumbs/inside/640x480/jpg/130_color.webp"
+  },
+  {
+    id: "5",
+    title: "Red Brigade Sniper",
+    tags: ["Creatures", "Action figure"],
+    downloads: 128,
+    likes: 32,
+    price: "35.75",
+    imageUrl: "https://media.printables.com/media/prints/794dd285-d21c-4302-b349-3d07aeb15cde/images/9862371_d7ff835d-00ee-447d-b4b1-61025b5eca14_5bac197c-3263-4583-8d6f-2e0ad5a6390d/thumbs/inside/640x480/jpg/v139.webp"
   },
 ];
 
