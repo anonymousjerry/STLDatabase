@@ -2,21 +2,20 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-const getAllCategories = async (req, res) => {
+const getAllSubcategories = async (req, res) => {
     try {
-        const categories = await prisma.sTLProduct.findMany({
+        const categories = await prisma.subCategory.findMany({
             select: {
-                category: true
-            },
-            distinct: ['category']
+                name: true
+            }
         })
 
-        const categoryList = categories.map((item) => item.category);
-        res.status(200).json(categoryList);
+        const subcategoryList = categories.map((item) => item.name);
+        res.status(200).json(subcategoryList);
     } catch(err) {
         console.error("Error fetching categories: ", err);
         res.status(500).json({ error: 'Internal server error' });
     }
 }
 
-module.exports = { getAllCategories };
+module.exports = { getAllSubcategories };

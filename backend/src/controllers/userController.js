@@ -6,13 +6,11 @@ const prisma = new PrismaClient();
 
 const register = async (req, res) => {
     const {email, password, role} = req.body;
-    console.log(email, password, role);
 
     try {
         const hashed = await hashPassword(password);
         const user = await prisma.user.create({
             data: {
-                // name,
                 email,
                 password: hashed,
                 role,
@@ -38,7 +36,10 @@ const login = async (req, res) => {
     if (!valid) return res.status(401).json({ message: 'Invalid credential!' });
 
     const token = jwt.sign({ userName: user.name, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d'});
-    res.status(200).json(token);
+    res.status(200).json({
+        email : user.email,
+        token : token   
+    });
 }
 
 module.exports = { register, login };
