@@ -21,10 +21,6 @@ import { FaRegUser } from "react-icons/fa6";
 const HeaderTop = () => {
   const { data: session }: any = useSession();
 
-  const handleLogout = () => {
-    setTimeout(() => signOut(), 1000);
-    toast.success("Logout successful!");
-  }
   return (
     <div
       className="grid grid-cols-2 max-md:grid-cols-1 px-32 h-[46px] max-lg:px-5 max-lg:h-16 max-sm:px-2 items-center text-white bg-custom-bgcolor"
@@ -94,32 +90,6 @@ const HeaderTop = () => {
       </div>
     </div>
 
-    //     {/* <ul className="flex items-center gap-x-5 h-full max-[370px]:text-sm max-[370px]:gap-x-2 font-semibold">
-    //       {!session ? ( 
-    //       <>
-    //       <li className="flex items-center">
-    //         <Link href="/login" className="flex items-center gap-x-2 font-semibold">
-    //           <FaRegUser className="text-white" />
-    //           <span>Login</span>
-    //         </Link>
-    //       </li>
-    //       <li className="flex items-center">
-    //         <Link href="/register" className="flex items-center gap-x-2 font-semibold">
-    //           <FaRegUser className="text-white" />
-    //           <span>Register</span>
-    //         </Link>
-    //       </li>
-    //       </>
-    //       ) :  (<>
-    //       <span className="ml-10 text-base">{session.user?.email}</span>
-    //       <li className="flex items-center">
-    //         <button onClick={() => handleLogout()} className="flex items-center gap-x-2 font-semibold">
-    //           <FaRegUser className="text-white" />
-    //           <span>Log out</span>
-    //         </button>
-    //       </li>
-    //       </>)}
-    //     </ul> */}
   );
 };
 
