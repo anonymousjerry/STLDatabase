@@ -8,11 +8,12 @@
 // Output: Product item component that contains product image, title, link to the single product page, price, button...
 // *********************
 
-import Image from "next/image";
 import React from "react";
-import Link from "next/link";
-import ProductItemRating from "./ProductItemRating";
-import { FaHeart, FaDownload } from 'react-icons/fa';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { FaCartShopping, } from "react-icons/fa6";
+import { FaRegHeart } from 'react-icons/fa';
+import { HiDownload, HiOutlineFolderDownload } from 'react-icons/hi';
+import { FiShoppingCart } from 'react-icons/fi';
 
 const ModelItem = ({
   model,
@@ -65,50 +66,59 @@ const ModelItem = ({
     //     <p>View product</p>
     //   </Link>
     // </div>
-    <div className="flex flex-col w-full bg-white rounded-xl shadow-md overflow-hidden relative">
+    <div className="flex flex-col w-full bg-white shadow-lg rounded-3xl border border-gray-200 overflow-hidden relative">
       {/* Like Button (top right) */}
-      <button className="absolute top-2 right-2 bg-white bg-opacity-70 p-2 rounded-full hover:bg-opacity-100 transition">
-        <FaHeart className="text-gray-600" />
+      <button className="absolute top-2 right-2 border-white border-2 p-2 rounded-lg hover:bg-opacity-100 transition">
+        <FaRegHeart className="text-gray-600" color="white" size={20} />
       </button>
 
       {/* Image */}
-      <img src={`${model.imageUrl}`} alt={`${model.title}`} className="flex w-full h-48 object-cover" />
+      <img src={model.imageUrl} alt={model.title} className="flex w-full h-48 object-cover" />
 
       {/* Details */}
-      <div className="flex flex-col p-4 gap-2">
+      <div className="flex flex-col px-3 py-4 space-y-1">
         {/* Title */}
-        <h2 className="text-lg font-medium text-gray-800">{model.title}</h2>
-        <div className="flex flex-row gap-3">
-            {model.tags.map((tag: String) => (
-                <div className="bg-custom-maincolor font-light text-white py-1 px-1">{tag}</div>
-            ))}
-        </div>
+        <h2 className="font-medium text-lg text-[#505050]">{model.title}</h2>
+
+        {/* Tag */}
+        {/* <div className="flex gap-2 flex-wrap">
+            {model.tags.map((tag: String, index: number) => 
+                <span
+                  key = {tag.toString() + index}
+                  className="bg-custom-maincolor text-sm  text-white py-[1px] px-2 rounded-md"
+                >
+                  {tag}
+                </span>
+            )}
+        </div> */}
 
         {/* Meta Info */}
-        <div className="flex items-center justify-between text-sm text-gray-600 ">
-            <div className="flex items-center gap-2">
-                <FaDownload className="text-base" />
+        <div className="flex text-sm text-[#505050] justify-between ">
+            <div className="flex items-center gap-1">
+                <HiOutlineFolderDownload className="text-base" size={24} />
                 <span>{model.downloads} files</span>
             </div>
-            <div className="flex items-center gap-2">
-                <FaHeart className="text-base" />
+            <div className="flex items-center gap-1">
+                <FaRegHeart className="text-base" />
                 <span>{model.likes} likes</span>
             </div>
-            {model.price === "FREE" ?
-                <div className="text-right items-center text-[#4A457A] font-bold text-[25px]">
-                    {model.price}
-                </div>
-                :<div className="text-right text-[#4A457A] font-bold text-[25px]">
-                    ${model.price}
-                </div>
-            }
+            <div className="text-custom-maincolor font-semibold text-2xl">
+              {model.price === "FREE" ? "Free" : `$${model.price}`}
+            </div>
         </div>
         
-        <div className="flex">
-            <button>
-                asdf
-            </button>
-        </div>
+        {/* <div className="flex items-center gap-2 pb-2">
+          <button aria-label="Like" className="flex items-center justify-center w-10 h-10 border border-custom-maincolor rounded-xl hover:bg-[#f0f0f0]">
+            <FaRegHeart className="text-custom-maincolor" size={24} />
+          </button>
+          <button className="flex-1 flex items-center justify-center gap-2 bg-custom-maincolor text-white rounded-xl py-2 font-semibold hover:bg-[#3a3663]">
+            <HiDownload/>
+            Download
+          </button>
+          <button aria-label="Like" className="flex items-center justify-center w-10 h-10 border border-custom-maincolor rounded-xl hover:bg-[#f0f0f0]">
+            <FiShoppingCart className="text-custom-maincolor" size={24} />
+          </button>
+        </div> */}
 
       </div>
     </div>
