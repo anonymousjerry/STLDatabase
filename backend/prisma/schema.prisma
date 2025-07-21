@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  username   String
+  email      String   @unique
+  password   String
+  role       String   @default("user")
+  likes      Like[]
+  favourites Favourite[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Model {
+  id             String   @id @default(cuid())
+  title          String
+  description    String
+  sourceSite     SourceSite? @relation(fields: [sourceSiteId], references: [id])
+  sourceSiteId   String?
+  category       Category @relation(fields: [categoryId], references: [id])
+  categoryId     String
+  subCategory    SubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId  String
+  tags           String[]
+  likes          Like[]
+  favourites     Favourite[]
+  deleted        Boolean @default(false)
+  downloads      Int      @default(0)
+  thumbnailUrl   String
+  sourceUrl      String
+  imagesUrl      String[]
+  price          String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model SourceSite {
+  id      String @id @default(cuid())
+  name    String
+  url     String @unique
+  models  Model[]
+}
+
+model Category {
+  id            String @id @default(cuid())
+  name          String @unique
+  models        Model[]
+  subCategories SubCategory[]
+}
+
+model SubCategory {
+  id         String  @id @default(cuid())
+  name       String  @unique
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+  models     Model[]
+}
+
+model Like {
+  id      String @id @default(cuid())
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  model   Model  @relation(fields: [modelId], references: [id])
+  modelId String
+
+  @@unique([userId, modelId])
+}
+
+model Favourite {
+  id      String @id @default(cuid())
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  model   Model  @relation(fields: [modelId], references: [id])
+  modelId String
+
+  @@unique([userId, modelId])
+}
