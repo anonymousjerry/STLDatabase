@@ -46,7 +46,7 @@ const Categories = () => {
   
   return (
     <div className="pt-10 px-52 sm:px-10 xl:px-52 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
-      <div className="flex flex-col relative bg-custom-light-containercolor  rounded-[32px] overflow-visible pb-10 px-0.5 max-md:px-6">
+      <div className="flex flex-col relative bg-custom-light-containercolor  rounded-[32px] overflow-visible max-md:px-6">
         <div className="flex text-custom-light-titlecolor px-11 py-5 text-center font-['Inter-Bold',_sans-serif] text-xl sm:text-2xl font-bold">
           TOP CATEGORIES
         </div>
@@ -62,21 +62,21 @@ const Categories = () => {
           // `}
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 xl:grid-cols-9"
         >
-            {paginatedItems.map((item) => (
-              <CategoryItem title={item.title} key={item.id} href={item.href}>
+            {paginatedItems.map((item, index) => (
+              <CategoryItem title={item.title} key={item.id} href={item.href} className ={index === 9 ? "rounded-bl-[32px]" : index === 17 ? "rounded-br-[32px]" : ""}>
                 <Image src={item.src} width={120} height={95} alt={item.title} />
               </CategoryItem>
             ))}
         </div>
         <button
-          className="absolute -right-4 right- top-[54%] -translate-y-1/2 z-10 bg-white shadow p-2 rounded-full border border-custom-light-maincolor"
+          className="absolute -right-4 right- top-[59%] -translate-y-1/2 z-10 bg-white shadow p-2 rounded-full border border-custom-light-maincolor"
           onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
           disabled={currentPage === totalPages}
         >
           <FaChevronRight size={20} className="text-custom-light-maincolor" />
         </button>
         <button
-          className="absolute -left-4 top-[54%] -translate-y-1/2 z-10 bg-white shadow p-2 rounded-full border border-custom-light-maincolor"
+          className="absolute -left-4 top-[59%] -translate-y-1/2 z-10 bg-white shadow p-2 rounded-full border border-custom-light-maincolor"
           onClick={() => handlePageChange(Math.min(currentPage - 1, totalPages))}
           disabled={currentPage === 1}
         >
