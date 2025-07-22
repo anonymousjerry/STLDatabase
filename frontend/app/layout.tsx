@@ -28,8 +28,8 @@ export default async function RootLayout({
     <html lang="en" data-theme="light">
       <body className={inter.className}>
       <SessionProvider session={session}>
-        <Header />
         <Providers>
+        <Header />
         {children}
         </Providers>
         <Footer />
