@@ -24,7 +24,7 @@ const improveCategoryText = (text: string): string => {
 
 const ExplorePage = (slug: any) => {
   return (
-    <div className="flex flex-col px-32 sm:px-10 xl:px-32 bg-gray-100">
+    <div className="flex flex-col px-52 sm:px-10 xl:px-52 bg-gray-100">
       {/* <div className=" max-w-screen-2xl mx-auto px-10 max-sm:px-5"> */}
         <Breadcrumb />
         <SearchBar />

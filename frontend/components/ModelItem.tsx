@@ -66,7 +66,7 @@ const ModelItem = ({
     //     <p>View product</p>
     //   </Link>
     // </div>
-    <div className="flex flex-col w-full bg-white shadow-lg rounded-3xl border border-gray-200 overflow-hidden relative">
+    <div className="flex flex-col w-full bg-custom-light-containercolor  shadow-lg rounded-3xl border border-gray-200 overflow-hidden relative">
       {/* Like Button (top right) */}
       <button className="absolute top-2 right-2 border-white border-2 p-2 rounded-lg hover:bg-opacity-100 transition">
         <FaRegHeart className="text-gray-600" color="white" size={20} />
@@ -76,16 +76,16 @@ const ModelItem = ({
       <img src={model.imageUrl} alt={model.title} className="flex w-full h-48 object-cover" />
 
       {/* Details */}
-      <div className="flex flex-col px-3 py-4 space-y-1">
+      <div className="flex flex-col px-3 py-2 text-custom-light-maincolor">
         {/* Title */}
-        <h2 className="font-medium text-lg text-[#505050]">{model.title}</h2>
+        <h2 className="font-medium text-lg" >{model.title}</h2>
 
         {/* Tag */}
         {/* <div className="flex gap-2 flex-wrap">
             {model.tags.map((tag: String, index: number) => 
                 <span
                   key = {tag.toString() + index}
-                  className="bg-custom-maincolor text-sm  text-white py-[1px] px-2 rounded-md"
+                  className="bg-custom-light-maincolor text-sm  text-white py-[1px] px-2 rounded-md"
                 >
                   {tag}
                 </span>
@@ -93,7 +93,7 @@ const ModelItem = ({
         </div> */}
 
         {/* Meta Info */}
-        <div className="flex text-sm text-[#505050] justify-between ">
+        <div className="flex text-sm justify-between ">
             <div className="flex items-center gap-1">
                 <HiOutlineFolderDownload className="text-base" size={24} />
                 <span>{model.downloads} files</span>
@@ -102,21 +102,21 @@ const ModelItem = ({
                 <FaRegHeart className="text-base" />
                 <span>{model.likes} likes</span>
             </div>
-            <div className="text-custom-maincolor font-semibold text-2xl">
+            <div className="font-semibold text-2xl">
               {model.price === "FREE" ? "Free" : `$${model.price}`}
             </div>
         </div>
         
         {/* <div className="flex items-center gap-2 pb-2">
-          <button aria-label="Like" className="flex items-center justify-center w-10 h-10 border border-custom-maincolor rounded-xl hover:bg-[#f0f0f0]">
-            <FaRegHeart className="text-custom-maincolor" size={24} />
+          <button aria-label="Like" className="flex items-center justify-center w-10 h-10 border border-custom-light-maincolor rounded-xl hover:bg-[#f0f0f0]">
+            <FaRegHeart className="text-custom-light-maincolor" size={24} />
           </button>
-          <button className="flex-1 flex items-center justify-center gap-2 bg-custom-maincolor text-white rounded-xl py-2 font-semibold hover:bg-[#3a3663]">
+          <button className="flex-1 flex items-center justify-center gap-2 bg-custom-light-maincolor text-white rounded-xl py-2 font-semibold hover:bg-[#3a3663]">
             <HiDownload/>
             Download
           </button>
-          <button aria-label="Like" className="flex items-center justify-center w-10 h-10 border border-custom-maincolor rounded-xl hover:bg-[#f0f0f0]">
-            <FiShoppingCart className="text-custom-maincolor" size={24} />
+          <button aria-label="Like" className="flex items-center justify-center w-10 h-10 border border-custom-light-maincolor rounded-xl hover:bg-[#f0f0f0]">
+            <FiShoppingCart className="text-custom-light-maincolor" size={24} />
           </button>
         </div> */}
 

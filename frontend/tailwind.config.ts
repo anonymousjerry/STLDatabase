@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: 'class',
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,9 +10,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'custom-yellow':'#FED700',
-        'custom-bgcolor': '#0E162E',
-        'custom-maincolor': "#4A457A"
+        'custom-light-yellow':'#FED700',
+        'custom-light-maincolor': "#4E4D8D",
+        'custom-dark-maincolor': "#cfcaff",
+        'custom-light-secondcolor': "#f3f4f6",
+        'custom-dark-secondcolor': "#1f2937",
+        'custom-light-titlecolor': "#0e162e",
+        'custom-dark-titlecolor': "#e5e7eb",
+        'custom-light-textcolor': '#505050',
+        'custom-dark-textcolor': '#D1D5DB',
+        'custom-light-containercolor': '#FFFFFF',
+        'custom-dark-containercolor': '#111827',
       },
       keyframes: {
         slideInLeft: {

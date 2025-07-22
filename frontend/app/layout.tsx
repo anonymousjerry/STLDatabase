@@ -5,6 +5,7 @@ import { Footer, Header } from "@/components";
 import SessionProvider from "@/utils/SessionProvider";
 import Providers from "@/Providers";
 import { getServerSession } from "next-auth";
+import { ThemeProvider } from "@/context/ThemeContext";
 import 'svgmap/dist/svgMap.min.css';
 
 
@@ -25,15 +26,17 @@ export default async function RootLayout({
 
   const session = await getServerSession();
   return (
-    <html lang="en" data-theme="light">
+    <html lang="en">
       <body className={inter.className}>
-      <SessionProvider session={session}>
-        <Providers>
-        <Header />
-        {children}
-        </Providers>
-        <Footer />
-      </SessionProvider>
+        <ThemeProvider>
+          <SessionProvider session={session}>
+            <Providers>
+            <Header />
+            {children}
+            </Providers>
+            <Footer />
+          </SessionProvider>
+        </ThemeProvider>
         </body>
     </html>
   );

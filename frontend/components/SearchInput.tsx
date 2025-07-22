@@ -23,12 +23,12 @@ const SearchInput = () => {
       {/* Left box with label and input placeholder */}
       <div className="flex flex-col basis-4/5 items-start justify-start shrink-0  relative ">
         <div
-          className="text-[#505050] font-semibold font-[Inter-SemiBold] text-lg text-left relative self-stretch"
+          className="text-custom-light-textcolor  font-semibold font-[Inter-SemiBold] text-lg text-left relative self-stretch "
         >
           3D STL models
         </div>
         <div
-          className="bg-white rounded-xl border border-[#4e4d80] pt-3 pr-2.5 pb-3 pl-2.5 flex items-center justify-start self-stretch shrink-0 h-12 relative cursor-text
+          className="bg-white  rounded-xl border border-[#4e4d80] pt-3 pr-2.5 pb-3 pl-2.5 flex items-center justify-start self-stretch shrink-0 h-12 relative cursor-text
                     focus-within:border-green-600 focus-within:ring-1 focus-within:ring-green-600 transition"
           onClick={() => {
             const input = document.getElementById('search-input');
@@ -41,7 +41,7 @@ const SearchInput = () => {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search by keyword or tag"
-            className="flex-grow bg-transparent border-none outline-none focus:border-none focus:ring-0 focus:outline-none text-lg font-medium font-[Inter-Medium]"
+            className="flex-grow bg-transparent border-none outline-none focus:border-none focus:ring-0 focus:outline-none text-lg font-medium font-[Inter-Medium] text-gray-700 dark:text-gray-200"
           />
         </div>
       </div>

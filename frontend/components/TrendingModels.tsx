@@ -26,10 +26,10 @@ const TrendingModels = () => {
 
     const visibleProducts = showAll ? modelLists : modelLists.slice(0, 4);
     return (
-        <div className="pt-10 px-32 max-xl:px-20 max-lg:px-10 max-md:px-6 bg-gray-100">
-        <div className="flex flex-col bg-white rounded-[32px] px-11 max-md:px-6">
+        <div className="pt-10 px-52 max-xl:px-20 max-lg:px-10 max-md:px-6 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
+        <div className="flex flex-col bg-custom-light-containercolor rounded-[32px] px-11 max-md:px-6">
             <div className="grid grid-cols-2">
-                <div className="flex text-[#0e162e] py-5  font-['Inter-Bold',_sans-serif] text-2xl font-bold">
+                <div className="flex text-custom-light-titlecolor  py-5  font-['Inter-Bold',_sans-serif] text-2xl font-bold">
                     TRENDING MODELS
                 </div>
                 {modelLists.length > 4 && (
@@ -40,15 +40,15 @@ const TrendingModels = () => {
                         >
                             {showAll ? 
                                 <div className="flex items-center">
-                                    <div className="text-[#4e4d80] text-center font-['Inter-SemiBold',_sans-serif] text-lg font-semibold">Show less</div>
+                                    <div className="text-custom-light-maincolor  text-center font-['Inter-SemiBold',_sans-serif] text-lg font-semibold">Show less</div>
                                     
-                                    <FaChevronLeft className="text-gray-700 text-sx  ml-2" />
+                                    <FaChevronLeft className="text-gray-700  text-sx  ml-2" />
                                 </div>
                             :
                                 <div className="flex items-center">
-                                    <div className="text-[#4e4d80] text-center font-['Inter-SemiBold',_sans-serif] text-lg font-semibold">See all</div>
+                                    <div className="text-custom-light-maincolor  text-center font-['Inter-SemiBold',_sans-serif] text-lg font-semibold">See all</div>
                                     
-                                    <FaChevronRight className="text-gray-700 text-sx  ml-2" />
+                                    <FaChevronRight className="text-gray-700  text-sx  ml-2" />
                                 </div>
                             }
                             

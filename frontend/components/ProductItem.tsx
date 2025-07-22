@@ -11,7 +11,6 @@
 import Image from "next/image";
 import React from "react";
 import Link from "next/link";
-import ProductItemRating from "./ProductItemRating";
 import { FaHeart, FaDownload } from 'react-icons/fa';
 
 const ProductItem = ({
@@ -89,7 +88,7 @@ const ProductItem = ({
             <FaHeart className="text-base" />
             <span>{product.likes} likes</span>
           </div>
-          <div className="text-right text-[#4A457A] font-bold text-lg">
+          <div className="text-right text-custom-light-maincolor dark:text-custom-dark-maincolor font-bold text-lg">
             {/* {product.price === 0 ? "Free" : `$${product.price.toFixed(2)}`} */}
             Free
           </div>
