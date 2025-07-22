@@ -17,8 +17,14 @@ import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { signOut } from "next-auth/react";
 import toast from "react-hot-toast";
+import Modal from "./Modal";
+import RegisterForm from "./RegisterForm";
+import LoginForm from "./LoginForm";
+import { useModal } from "@/context/ModalContext";
 
 const Navbar = () => {
+
+  const {openModal} = useModal();
   const { data: session, status } = useSession();
   const router = useRouter();
   const [accountMenuOpen, setAccountMenuOpen] = useState<boolean>(false);
@@ -162,11 +168,12 @@ const Navbar = () => {
 
           {accountMenuOpen && (
             <div className="absolute right-0 mt-2 w-40 bg-white text-black shadow-lg rounded-md z-10">
-              <a href="/login" className="block px-4 py-2 hover:bg-gray-100">Login</a>
-              <a href="/register" className="block px-4 py-2 hover:bg-gray-100">Register</a>
+              <button onClick={() => openModal('login')} className="block px-4 py-2 hover:bg-gray-100">Login</button>
+              <button onClick={() => openModal('register')} className="block px-4 py-2 hover:bg-gray-100">Register</button>
               <a href="#" className="block px-4 py-2 hover:bg-gray-100">Logout</a>
             </div>
           )}
+
         </div>
       </div>
     </nav>
