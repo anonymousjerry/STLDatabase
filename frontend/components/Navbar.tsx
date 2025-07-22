@@ -69,7 +69,7 @@ const Navbar = () => {
 
 
   return (
-    <nav className="bg-custom-maincolor px-32 py-4  grid grid-cols-3 max-md:grid-cols-1 items-center justify-between text-white">
+    <nav className="bg-custom-light-maincolor px-52 py-4  grid grid-cols-3 max-md:grid-cols-1 items-center justify-between text-white">
       {/* Logo + Navigation */}
       <div className="flex items-center space-x-80">
         <Link href="/">

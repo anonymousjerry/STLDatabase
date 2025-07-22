@@ -36,14 +36,14 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
   };
 
   return (
-    <div className=" flex-col flex relative w-full  text-left" ref={dropdownRef}>
+    <div className=" flex-col flex relative w-full text-left " ref={dropdownRef}>
       {/* Label */}
-      <div className="text-[#505050] text-left font-['Inter-SemiBold',_sans-serif] text-lg font-semibold relative self-stretch">{label}</div>
+      <div className="text-custom-light-textcolor  text-left font-['Inter-SemiBold',_sans-serif] text-lg font-semibold relative self-stretch">{label}</div>
 
       {/* Dropdown button */}
       <button
         onClick={() => setOpen(!open)}
-        className="bg-[#ffffff] rounded-xl border-solid border-[#4e4d80] border pt-3 pr-2.5 pb-3 pl-2.5 flex flex-row items-center justify-between shrink-0  h-12 relative"
+        className="bg-white  rounded-xl border-solid border-[#4e4d80]  border pt-3 pr-2.5 pb-3 pl-2.5 flex flex-row items-center justify-between shrink-0  h-12 relative"
       >
         <span className="text-left font-['Inter-Medium',_sans-serif] text-lg font-medium relative">{selected}</span>
         <span
@@ -59,7 +59,7 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
       {open && (
   <div
     className={`
-      absolute left-0 mt-[78px] bg-white border rounded shadow-lg z-10 text-black
+      absolute left-0 mt-[78px] bg-white  border rounded shadow-lg z-10 text-black
       transition-all duration-200 ease-out
       opacity-100 scale-100
       origin-top
@@ -72,7 +72,7 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
         <li
           key={item}
           onClick={() => handleSelect(item)}
-          className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+          className="px-4 py-2 hover:bg-gray-100  cursor-pointer"
         >
           {item}
         </li>

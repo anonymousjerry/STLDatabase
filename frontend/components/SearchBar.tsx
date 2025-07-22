@@ -24,7 +24,7 @@ const SearchBar = () => {
     };
 
     return(
-        <div className="flex w-full gap-2.5 bg-white rounded-lg px-[47px] py-[39px]">
+        <div className="flex w-full gap-2.5 bg-custom-light-containercolor  rounded-lg px-[47px] py-[39px]">
               <div className="basis-1/5">
                 <DropdownButton
                   initialContent="All"
