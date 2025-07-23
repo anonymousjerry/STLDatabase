@@ -4,3 +4,18 @@ export const getModels = async () => {
     const response = await axiosInstance.get('/models');
     return response.data;
 }
+
+export const getTrendingModels = async () => {
+    const response = await axiosInstance.get('/trendingmodels');
+    return response.data;
+}
+
+export const getDailyModels = async () => {
+    const response = await axiosInstance.get('/dailymodels');
+    return response.data;
+}
+
+export const searchModels = async (query: string) => {
+    const response = await axiosInstance.get(`/models/search?q=${query}`);
+    return response.data;
+}

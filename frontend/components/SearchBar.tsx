@@ -1,8 +1,12 @@
 "use client"
 
 import React from "react"
+import { useState, useEffect } from "react"
 import DropdownButton from "./Dropdown"
 import SearchInput from "./SearchInput"
+import { getSubCategories } from "@/lib/categoryApi"
+import { getPlatforms } from "@/lib/platformApi"
+
 
 const SearchBar = () => {
     const categories = [
@@ -19,9 +23,20 @@ const SearchBar = () => {
         '🛠️ Tools',
         '🐾 Pets',
     ];
+
+    // const [platforms, setPlatforms] = useState([]);
+    // const [categories, setCategories] = useState([]);
+
+    // useEffect(() => {
+ //         getPlatforms().then(setPlatforms).catch(console.error);
+    //     getSubCategories().then(setCategories).catch(console.error);
+    // }, [])
+    // const platformArray = platforms.map(([platform]) => platform);
+    // const categoryArray = categories.map(([category]) => category);
     const handleSelect = (item: string) => {
         console.log('Selected:', item);
     };
+
 
     return(
         <div className="flex w-full gap-2.5 bg-custom-light-containercolor  rounded-lg px-[47px] py-[39px]">

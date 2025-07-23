@@ -20,4 +20,5 @@ const platformList = (platforms: string[]): PlatformItem[] => {
     }));
 }
 
+
 export {platformList};

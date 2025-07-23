@@ -27,7 +27,7 @@ const FeaturedSite = () => {
 
     const visibleItems = showAll ? PlatformMenuList : PlatformMenuList.slice(0, 9);
     return (
-        <div className="pt-10 px-52 max-xl:px-20 max-lg:px-10 max-md:px-6 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
+        <div className="pt-6 px-52 max-xl:px-20 max-lg:px-10 max-md:px-6 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
         <div className="flex flex-col bg-custom-light-containercolor rounded-[32px] px-11 max-md:px-6">
             <div className="grid grid-cols-2">
                 <div className="flex text-custom-light-titlecolor py-5  font-['Inter-Bold',_sans-serif] text-2xl font-bold">

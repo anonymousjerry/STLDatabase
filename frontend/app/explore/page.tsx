@@ -5,7 +5,7 @@ import React from "react"
 
 const ExploreMainPage = () => {
     return(
-        <div className="flex pt-5">
+        <div className="flex pt-5 pb-60">
             <SearchBar />
         </div>
     )
