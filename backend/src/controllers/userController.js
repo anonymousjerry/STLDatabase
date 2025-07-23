@@ -5,12 +5,13 @@ const { hashPassword, comparePassword } = require('../utils/hash');
 const prisma = new PrismaClient();
 
 const register = async (req, res) => {
-    const {email, password, role} = req.body;
+    const {username, email, password, role} = req.body;
 
     try {
         const hashed = await hashPassword(password);
         const user = await prisma.user.create({
             data: {
+                username,
                 email,
                 password: hashed,
                 role,

@@ -35,7 +35,7 @@ model Model {
   deleted        Boolean @default(false)
   downloads      Int      @default(0)
   thumbnailUrl   String
-  sourceUrl      String
+  sourceUrl      String @unique
   imagesUrl      String[]
   price          String
   createdAt      DateTime @default(now())
