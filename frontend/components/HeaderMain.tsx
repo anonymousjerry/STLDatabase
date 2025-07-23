@@ -6,25 +6,6 @@ import DropdownButton from "./Dropdown";
 import SearchBar from "./SearchBar";
 
 const HeaderMain = () => {
-
-    const [accountMenuOpen, setAccountMenuOpen] = useState<boolean>(false);
-    const categories = [
-        '🎮 Gaming',
-        '🎨 Art',
-        '🏠 Home & Living',
-        '🛠️ Tools',
-        '🐾 Pets',
-    ];
-    const platforms = [
-        '🎮 Gaming',
-        '🎨 Art',
-        '🏠 Home & Living',
-        '🛠️ Tools',
-        '🐾 Pets',
-    ];
-    const handleSelect = (item: string) => {
-        console.log('Selected:', item);
-    };
     return (
         <div className="bg-[url('/Header_bg.png')] bg-cover bg-center flex flex-col gap-8 items-start justify-start shrink-0 h-[441px]  relative px-52 py-8 ">
             <div className="flex flex-col gap-2 items-start justify-start shrink-0 relative">

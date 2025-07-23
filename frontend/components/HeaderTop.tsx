@@ -88,10 +88,10 @@ const HeaderTop = () => {
             Eng
           </div>
         </div>
-        <div>|</div>
+        {/* <div>|</div>
         <div className="flex flex-row items-center gap-1">
           <ThemeToggleButton />
-        </div>
+        </div> */}
       </div>
     </div>
 

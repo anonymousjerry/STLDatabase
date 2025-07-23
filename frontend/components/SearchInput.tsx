@@ -9,7 +9,7 @@ const SearchInput = () => {
   const searchProducts = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchInput.trim() !== '') {
-      router.push(`/search?search=${encodeURIComponent(searchInput)}`);
+      router.push(`/explore?search=${encodeURIComponent(searchInput)}`);
       setSearchInput('');
     }
   };
