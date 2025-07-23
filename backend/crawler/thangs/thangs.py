@@ -4,10 +4,14 @@ import random
 import os
 import csv
 from get_thangsinfo import get_info
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from ai_enricher import enrich_data
 
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
 
-results = []
+data = []
+result = []
 
 async def scrape_thangs():
     async with async_playwright() as p:
@@ -19,7 +23,7 @@ async def scrape_thangs():
         )
 
         try:
-            await page.goto("https://thangs.com/category/3D%20Printers/Anker", timeout=60000, wait_until="domcontentloaded")
+            await page.goto("https://thangs.com/category/Seasonal/Ramadan", timeout=60000, wait_until="domcontentloaded")
         except PlaywrightTimeoutError:
             print(f"Attempt failed to load: ")
 
@@ -37,14 +41,8 @@ async def scrape_thangs():
             scroll_count += 1
             print(f"Scrolled {scroll_count} times...")
 
-        await page.wait_for_selector('[data-testid="3d-printers-nav-link"]')
-        category = await page.locator('[data-testid="3d-printers-nav-link"]').nth(1).inner_text()
-
-        await page.wait_for_selector('a[class*="CategoryNav_Link_active"]')
-        subcategory = await page.locator('a[class*="CategoryNav_Link_active"]').nth(1).inner_text()
-
-        await page.wait_for_selector('a[href^="/designer/"][href*="/3d-model/"]')
-        anchors = await page.locator('a[href^="/designer/"][href*="/3d-model/"]').all()
+        await page.wait_for_selector('section[class*="ModelCard"][class*="ModelCard_white"] a[href^="/designer/"][href*="/3d-model/"]')
+        anchors = await page.locator('section[class*="ModelCard"][class*="ModelCard_white"] a[href^="/designer/"][href*="/3d-model/"]').all()
 
         urls = []
         for anchor in anchors:
@@ -53,24 +51,33 @@ async def scrape_thangs():
                 urls.append("https://thangs.com" + href)
 
         print(f"Found {len(urls)} URLs:")
-        for i in range(2):
-            result = ["thangs.com", category, subcategory]
-            result += await get_info(urls[i])
-            results.append(result)
 
-        
-        filename = "thangs_models.csv"
-        file_exists = os.path.isfile(filename)
-        headers = ["Platform",  "category", "subcategory", "title", "likes", "tags", "thumbnail_url"]
+        for url in urls:
+            merged_info = {}
+            info = await get_info(url)
 
-        with open('thangs_models.csv', mode='a', newline='', encoding='utf-8') as file:
-            writer = csv.writer(file)
-            if not file_exists:
-                writer.writerow(headers)
-            writer.writerows(results)
+            for item in info:
+                merged_info.update(item)
+            merged_info["source_url"] = url
+            merged_info["platform"] = "Thangs"
+            data.append(merged_info)
 
-        print(len(anchors))
+        for d in data:
+            res = enrich_data(d)
+            result.append(res)
+    
         await browser.close()
+    write_csv()
+
+def write_csv():
+    headers = ["platform", "title", "description", "category", "subcategory", "source_url", "thumbnail_url", "tags", "image_urls", "price"]
+
+    with open("thangs.csv", "w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=headers)
+        writer.writeheader()
+        for row in result:
+            complete_row = { key: row.get(key, "") for key in headers}
+            writer.writerow(complete_row)
 
         
 

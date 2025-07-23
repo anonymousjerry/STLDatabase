@@ -3,6 +3,10 @@ import asyncio
 from get_info import get_info
 import random
 import csv
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from ai_enricher import enrich_data
 
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
 
@@ -39,7 +43,7 @@ async def scrape_pinshape():
 
         pins = await page.query_selector_all('li.pin')
 
-        results = []
+        urls = []
 
         for pin in pins:
             try:
@@ -49,34 +53,37 @@ async def scrape_pinshape():
                 href = await href_el.get_attribute("href")
                 src = await src_el.get_attribute("src")
 
-                results.append(["https://pinshape.com" + href, src])
+                urls.append(["https://pinshape.com" + href, src])
             except Exception as e:
                 print("Error extracting pin data: ", e)
         
-        for i in range(len(results)):
-        # for i in range(10):
+        # for i in range(len(results)):
+        for i in range(15):
             merged_info = {}
-            info = await get_info(results[i][0])
+            info = await get_info(urls[i][0])
 
             for item in info:
                 merged_info.update(item)
-            merged_info["source_url"] = results[i][0]
-            merged_info["thumbnail_url"] = results[i][1]
+            merged_info["source_url"] = urls[i][0]
+            merged_info["thumbnail_url"] = urls[i][1]
             data.append(merged_info)
+        
+        for d in data:
+            res = enrich_data(d)
+            results.append(res)
 
         await browser.close()
     write_csv()
 
 def write_csv():
-    headers = ["title", "description", "source_url", "thumbnail_url", "tags", "image_urls", "price"]
+    headers = ["platform", "title", "description", "category", "subcategory", "source_url", "thumbnail_url", "tags", "image_urls", "price"]
 
     with open("pinshape.csv", "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers)
         writer.writeheader()
-        for row in data:
-            writer.writerow(row)
-
-        
+        for row in results:
+            complete_row = { key: row.get(key, "") for key in headers}
+            writer.writerow(complete_row)
 
 if __name__ == "__main__":
     asyncio.run(scrape_pinshape())
