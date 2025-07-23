@@ -9,7 +9,7 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import PlatformItem from "./PlatformItem";
 import Image from "next/image";
-import { PlatformMenuList } from "@/lib/utils";
+// import { PlatformMenuList } from "@/lib/utils";
 import { FaChevronLeft } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa6";
 import { getPlatforms } from "@/lib/platformApi";
@@ -19,11 +19,11 @@ const FeaturedSite = () => {
     const [showAll, setShowAll] = useState(false);
     const [platforms, setPlatforms] = useState([]);
 
-    // useEffect(() => {
-    //     getPlatforms().then(setPlatforms).catch(console.error);
-    // }, [])
+    useEffect(() => {
+        getPlatforms().then(setPlatforms).catch(console.error);
+    }, [])
 
-    // const PlatformMenuList = platformList(platforms);
+    const PlatformMenuList = platformList(platforms);
 
     const visibleItems = showAll ? PlatformMenuList : PlatformMenuList.slice(0, 9);
     return (

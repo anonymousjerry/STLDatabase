@@ -123,7 +123,7 @@ const Navbar = () => {
         </button>
 
           {/* Dropdown box */}
-          {categoryOpen && (
+          {/* {categoryOpen && (
             <div className="absolute top-10 left-0 w-48 bg-white border rounded shadow-md p-4 z-50">
               <ul className="space-y-2 text-black">
                 <li className="cursor-pointer hover:text-green-600">🎮 Gaming</li>
@@ -133,7 +133,7 @@ const Navbar = () => {
                 <li className="cursor-pointer hover:text-green-600">🐾 Pets</li>
               </ul>
             </div>
-          )}
+          )} */}
         </div>
         {[...links.slice(2)].map(link => (
           <Link
@@ -166,13 +166,13 @@ const Navbar = () => {
             Account ▼
           </button>
 
-          {accountMenuOpen && (
+          {/* {accountMenuOpen && (
             <div className="absolute right-0 mt-2 w-40 bg-white text-black shadow-lg rounded-md z-10">
               <button onClick={() => openModal('login')} className="block px-4 py-2 hover:bg-gray-100">Login</button>
               <button onClick={() => openModal('register')} className="block px-4 py-2 hover:bg-gray-100">Register</button>
               <a href="#" className="block px-4 py-2 hover:bg-gray-100">Logout</a>
             </div>
-          )}
+          )} */}
 
         </div>
       </div>

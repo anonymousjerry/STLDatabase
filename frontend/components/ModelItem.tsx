@@ -73,7 +73,7 @@ const ModelItem = ({
       </button>
 
       {/* Image */}
-      <img src={model.imageUrl} alt={model.title} className="flex w-full h-48 object-cover" />
+      <img src={model.thumbnailUrl} alt={model.title} className="flex w-full h-48 object-cover" />
 
       {/* Details */}
       <div className="flex flex-col px-3 py-2 text-custom-light-maincolor">
@@ -100,10 +100,10 @@ const ModelItem = ({
             </div>
             <div className="flex items-center gap-1">
                 <FaRegHeart className="text-base" />
-                <span>{model.likes} likes</span>
+                <span>{model.likes} 0 likes</span>
             </div>
             <div className="font-semibold text-2xl">
-              {model.price === "FREE" ? "Free" : `$${model.price}`}
+              {model.price === "FREE" ? "Free" : `${model.price}`}
             </div>
         </div>
         

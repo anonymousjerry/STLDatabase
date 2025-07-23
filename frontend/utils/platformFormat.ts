@@ -16,7 +16,7 @@ const platformList = (platforms: string[]): PlatformItem[] => {
         id: index + 1,
         title: platform[0],
         src: `/Platforms/${slugify(platform[0])}.png`,
-        href: platform[1]
+        href: `/explore/${slugify(platform[0])}`
     }));
 }
 
