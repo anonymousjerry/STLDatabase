@@ -12,18 +12,18 @@ import { FaChevronRight } from "react-icons/fa6";
 import ProductItem from "./ProductItem";
 import { modelLists } from "@/lib/utils";
 import { useEffect } from "react";
-import { getDailyModels } from "@/lib/modelsApi";
+import { getDailyModels, getModels } from "@/lib/modelsApi";
 import ModelItem from "./ModelItem";
 
 const DailyDiscover = () => {
     const [showAll, setShowAll] = useState(false);
-    // const [dailyModels, setDailyModels] = useState([]);
+    const [dailyModels, setDailyModels] = useState([]);
 
-    // useEffect(() => {
-    //     getDailyModels().then(setDailyModels).catch(console.error);
-    // }, [])
-//  const visibleProducts = showAll ? dailyModels : dailyModels.slice(0, 4);
-    const visibleProducts = showAll ? modelLists : modelLists.slice(0, 4);
+    useEffect(() => {
+        getModels().then(setDailyModels).catch(console.error);
+    }, [])
+    const visibleProducts = showAll ? dailyModels : dailyModels.slice(0, 4);
+    // const visibleProducts = showAll ? modelLists : modelLists.slice(0, 4);
     return (
         <div className="pt-10 px-52 max-xl:px-20 max-lg:px-10 max-md:px-6 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
         <div className="flex flex-col bg-custom-light-containercolor rounded-[32px] px-11 max-md:px-6">

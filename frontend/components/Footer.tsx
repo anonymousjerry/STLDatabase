@@ -50,35 +50,35 @@ const Footer = () => {
             <Image
               src={"/mark1.png"}
               alt="in"
-              width={25}
+              width={24}
               height={24}
               className="cursor-pointer"
             />
             <Image
               src={"/mark2 (2).png"}
               alt="in"
-              width={25}
+              width={24}
               height={24}
               className="cursor-pointer"
             />
             <Image
               src={"/mark3 (2).png"}
               alt="in"
-              width={25}
+              width={24}
               height={24}
               className="cursor-pointer"
             />
             <Image
               src={"/mark4 (2).png"}
               alt="in"
-              width={25}
+              width={24}
               height={24}
               className="cursor-pointer"
             />
             <Image
               src={"/mark5 (2).png"}
               alt="in"
-              width={25}
+              width={24}
               height={24}
               className="cursor-pointer"
             />

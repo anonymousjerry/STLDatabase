@@ -16,6 +16,11 @@ export const getDailyModels = async () => {
 }
 
 export const searchModels = async (query: string) => {
-    const response = await axiosInstance.get(`/models/search?q=${query}`);
+    const response = await axiosInstance.get(`/models?q=${query}`);
+    return response.data;
+}
+
+export const searchModelsByCategories = async (query: string) => {
+    const response = await axiosInstance.get(`/models?q=${query}`);
     return response.data;
 }

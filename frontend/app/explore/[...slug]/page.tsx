@@ -3,13 +3,11 @@ export const revalidate = 0;
 
 import {
   Breadcrumb,
-  Filters,
-  Pagination,
-  Products,
-  SortBy,
 } from "@/components";
 import SearchBar from "@/components/SearchBar";
+import { searchModelsByCategories } from "@/lib/modelsApi";
 import React from "react";
+import ModelItem from "@/components/ModelItem";
 
 // improve readabillity of category text, for example category text "smart-watches" will be "smart watches"
 const improveCategoryText = (text: string): string => {
@@ -22,9 +20,12 @@ const improveCategoryText = (text: string): string => {
   }
 };
 
-const ExplorePage = (slug: any) => {
+const ExplorePage = async (slug: any) => {
+  const param = slug?.params?.slug[0]
+  const results = await searchModelsByCategories(param);
+  console.log(results)
   return (
-    <div className="flex flex-col px-52 sm:px-10 xl:px-52 bg-gray-100">
+    <div className="flex flex-col px-52 sm:px-10 xl:px-52 pb-60 bg-gray-100">
       {/* <div className=" max-w-screen-2xl mx-auto px-10 max-sm:px-5"> */}
         <Breadcrumb />
         <SearchBar />
@@ -46,6 +47,18 @@ const ExplorePage = (slug: any) => {
           </div>
         </div> */}
       {/* </div> */}
+      <div className="pt-3">
+        <h1 className="text-2xl mb-4">Results ({param}) - {results.length()} models</h1>
+        {results.length === 0 ? (
+            <p>No results found.</p>
+        ) : (
+            <div className="grid grid-cols-4 justify-between  gap-x-12  gap-y-8 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1">
+                {results.map((model: Model) => (
+                    <ModelItem key={model.id} model={model} color="white" />
+                ))}
+            </div>
+        )}
+        </div>
     </div>
   );
 };

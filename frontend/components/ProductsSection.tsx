@@ -15,19 +15,20 @@ import React from "react";
 // import { AxiosInstance } from "@/lib/axios-instance";
 import { getModels } from "@/lib/modelsApi";
 import ModelItem from "./ModelItem";
-import { modelLists } from "@/lib/utils";
+// import { modelLists } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 const ProductsSection = () => {
-//   const [models, setModels] = useState([]);
+  const [models, setModels] = useState([]);
 
-//   useEffect(() => {
-//     getModels().then(setModels).catch(console.error)
-//   }, [])
+  useEffect(() => {
+    getModels().then(setModels).catch(console.error)
+  }, [])
 
   return (
     <div className="py-10 px-52 max-xl:px-20 max-lg:px-10 max-md:px-6 bg-gray-100 ">
         <div className="grid grid-cols-4 justify-between  gap-x-12  gap-y-8 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1">
-            {modelLists.map((model: Model) => (
+            {models.map((model: Model) => (
                 <ModelItem key={model.id} model={model} color="white" />
             ))}
         </div>

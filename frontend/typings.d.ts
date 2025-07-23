@@ -36,11 +36,20 @@ interface Product {
 interface Model {
   id: string;
   title: string;
+  description: string;
+  sourceSiteId: string;
+  categoryId: string;
+  subCategoryId: string;
   tags: string[];
   likes: number;
+  deleted: Boolean;
   price: string;
   downloads: number;
-  imageUrl: string;
+  imagesUrl: string[];
+  thumbnailUrl: string;
+  sourceUrl: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface SingleProductPageProps {
