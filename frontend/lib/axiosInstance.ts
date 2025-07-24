@@ -1,7 +1,4 @@
 import axios from 'axios'
-import {IAuthTokens} from '@/types/token.api'
-import {parseCookies, setCookie} from 'nookies'
-import { getSession } from 'next-auth/react'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
@@ -11,42 +8,26 @@ export const axiosInstance = axios.create({
     'Content-Type': 'application/json'
   }
 })
+// Add token to request headers
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-// export const publicApi = axios.create({
-//   baseURL: BASE_URL,
-//   headers: {
-//     'Content-Type': 'application/json',
-//   },
-// });
-
-// // Private instance – auth required
-// export const privateApi = axios.create({
-//   baseURL: BASE_URL,
-//   headers: {
-//     'Content-Type': 'application/json',
-//   },
-// });
-
-// privateApi.interceptors.request.use(
-//   async (config) => {
-//     const session = await getSession();
-//     if (session?.accessToken) {
-//       config.headers.Authorization = `Bearer ${session.accessToken}`;
-//     }
-//     return config;
-//   },
-//   (error) => Promise.reject(error)
-// );
-
-// privateApi.interceptors.response.use(
-//   (response) => response, // just return if successful
-//   (error) => {
-//     if (error.response?.status === 401) {
-//       // Unauthorized — token might be expired
-//       // You could call signOut() from 'next-auth/react' here or redirect
-//       console.warn("Unauthorized! Token might be expired.");
-//       // signOut();
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+// Handle global responses
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Optionally redirect to login or signout
+      console.warn('Unauthorized. Redirecting...');
+    }
+    return Promise.reject(error);
+  }
+);

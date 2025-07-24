@@ -18,7 +18,7 @@ export const authOptions: any = {
       },
       async authorize(credentials) {
         try {
-          const res = await fetch(`${process.env.NEXT__URL}/users/login`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -27,7 +27,7 @@ export const authOptions: any = {
             }),
           });
           const user = await res.json();
-          console.log(user)
+          console.log("asdfasdfasdf", user)
           if (res.ok && user) return user;
           return null;
         } catch (error) {
