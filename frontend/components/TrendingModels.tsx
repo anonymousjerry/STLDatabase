@@ -20,7 +20,8 @@ const TrendingModels = () => {
     const [trendingModels, setTrendingModels] = useState([]);
 
     useEffect(() => {
-        getModels().then(setTrendingModels).catch(console.error);
+        getTrendingModels().then(setTrendingModels).catch(console.error);
+        // getModels().then(setTrendingModels).catch(console.error);
     }, [])
 
     const visibleProducts = showAll ? trendingModels : trendingModels.slice(0, 4);
