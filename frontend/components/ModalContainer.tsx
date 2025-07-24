@@ -1,6 +1,6 @@
 import Modal from "./Modal";
-import LoginForm from "./LoginForm";
-import RegisterForm from "./RegisterForm";
+// import LoginForm from "./LoginForm";
+// import RegisterForm from "./RegisterForm";
 import { useModal } from "@/context/ModalContext";
 
 const ModalContainer = () => {
@@ -8,8 +8,9 @@ const ModalContainer = () => {
 
     return (
         <Modal isOpen={!!modalType} onClose={closeModal}>
-            {modalType === 'login' && <LoginForm />}
-            {modalType === 'register' && <RegisterForm />}
+            {/* {modalType === 'login' && <LoginForm />}
+            {modalType === 'register' && <RegisterForm />} */}
+            <></>
         </Modal>
     );
 };

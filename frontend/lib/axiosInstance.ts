@@ -3,7 +3,7 @@ import {IAuthTokens} from '@/types/token.api'
 import {parseCookies, setCookie} from 'nookies'
 import { getSession } from 'next-auth/react'
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKENDPART_URL
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
