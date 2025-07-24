@@ -62,7 +62,11 @@ const Categories = () => {
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 xl:grid-cols-9"
         >
             {paginatedItems.map((item, index) => (
-              <CategoryItem title={item.title} key={item.id} href={item.href} className ={index === 9 ? "rounded-bl-[32px]" : index === 17 ? "rounded-br-[32px]" : ""}>
+              <CategoryItem 
+                key={item.id}
+                title={item.title}
+                className ={index === 9 ? "rounded-bl-[32px]" : index === 17 ? "rounded-br-[32px]" : ""}
+              >
                 <Image src={item.src} width={120} height={95} alt={item.title} />
               </CategoryItem>
             ))}
