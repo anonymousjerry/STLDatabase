@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import SearchInput from "./SearchInput";
-import DropdownButton from "./Dropdown";
+import React from "react";
 import SearchBar from "./SearchBar";
 
 const HeaderMain = () => {
+
     return (
         <div className="bg-[url('/Header_bg.png')] bg-cover bg-center flex flex-col gap-8 items-start justify-start shrink-0 h-[441px]  relative px-52 py-8 ">
             <div className="flex flex-col gap-2 items-start justify-start shrink-0 relative">

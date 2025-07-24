@@ -2,7 +2,6 @@ type PlatformItem = {
     id: number;
     title: string;
     src: string;
-    href: string;
 };
 
 const platformList = (platforms: string[]): PlatformItem[] => {
@@ -16,7 +15,6 @@ const platformList = (platforms: string[]): PlatformItem[] => {
         id: index + 1,
         title: platform[0],
         src: `/Platforms/${slugify(platform[0])}.png`,
-        href: `/explore/${slugify(platform[0])}`
     }));
 }
 

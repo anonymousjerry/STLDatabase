@@ -17,10 +17,8 @@ import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { signOut } from "next-auth/react";
 import toast from "react-hot-toast";
-import Modal from "./Modal";
-import RegisterForm from "./RegisterForm";
-import LoginForm from "./LoginForm";
 import { useModal } from "@/context/ModalContext";
+import { useSearch } from "@/context/SearchContext";
 
 const Navbar = () => {
 
@@ -67,26 +65,40 @@ const Navbar = () => {
   // }, [session, status]);
   // console.log(session?.user?.image)
 
+  const {
+      setSelectedPlatform,
+      setSelectedCategory,
+      setSearchInput
+  } = useSearch();
+
+  const resetSearch = (href: string) => {
+      setSelectedPlatform('All');
+      setSelectedCategory('All');
+      setSearchInput('');
+      router.push(href);
+  };
+
 
   return (
     <nav className="bg-custom-light-maincolor px-52 py-4  grid grid-cols-3 max-md:grid-cols-1 items-center justify-between text-white">
       {/* Logo + Navigation */}
-      <div className="flex items-center space-x-80">
-        <Link href="/">
+      <div className="flex items-center space-x-80" onClick={() => resetSearch("/")}>
+        {/* <Link href="/"> */}
           <img
             src="/logo.png"
             alt="Logo"
             className="cursor-pointer"
           />
-        </Link>
+        {/* </Link> */}
       </div>
 
       <div className="hidden md:flex gap-6">
         {[...links.slice(0, 2)].map(link => (
-          <Link
+          <div
             key={link.href}
-            href={link.href}
-            className={`relative hover:text-green-600 transition ${
+            // href={link.href}
+            onClick={() => resetSearch(link.href)}
+            className={`relative cursor-pointer hover:text-green-600 transition ${
               isActive(link.href) ? ' font-medium' : ''
             }`}
           >
@@ -94,7 +106,7 @@ const Navbar = () => {
             {isActive(link.href) && (
               <span className="absolute left-0 -bottom-1 w-full h-1 bg-green-500 rounded"></span>
             )}
-          </Link>
+          </div>
         ))}
         <div ref={categoryRef} className="relative">
           <button
