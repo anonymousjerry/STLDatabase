@@ -27,7 +27,6 @@ export const authOptions: any = {
             }),
           });
           const user = await res.json();
-          console.log("asdfasdfasdf", user)
           if (res.ok && user) return user;
           return null;
         } catch (error) {

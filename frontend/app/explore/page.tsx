@@ -20,6 +20,7 @@ const ExploreMainPage = async ({ searchParams }: ExplorePageProps) => {
         sourcesite: sourcesite || "",
         category: category || "",
     });
+    console.log(models)
 
   return (
     <div className="flex flex-col pt-5 pb-60">

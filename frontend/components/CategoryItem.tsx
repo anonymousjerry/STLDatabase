@@ -33,9 +33,6 @@ const CategoryItem = ({ title, children, className }: CategoryItemProps) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSelectedCategory(title);
-    console.log('Search triggered:', {
-      category: title,
-    });
 
     const queryParams = new URLSearchParams();
 

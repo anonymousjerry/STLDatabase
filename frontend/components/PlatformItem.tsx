@@ -15,9 +15,6 @@ const PlatformItem = ({ title, children }: PlatformItemProps) => {
   const handleSearch = (e: React.FormEvent) => {
       e.preventDefault();
       setSelectedPlatform(title);
-      console.log('Search triggered:', {
-        platform: title,
-      });
   
       const queryParams = new URLSearchParams();
   

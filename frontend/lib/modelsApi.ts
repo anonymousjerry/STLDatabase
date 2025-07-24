@@ -7,10 +7,17 @@ type SearchParams = {
   category?: string;
 };
 
-export const getModels = async () => {
-    const response = await axiosInstance.get('/models');
-    return response.data;
-}
+// export const getModels = async () => {
+//     const response = await axiosInstance.get('/models');
+//     return response.data;
+// }
+
+export const getModels = async (page: number = 1, limit: number = 12) => {
+    console.log(page)
+  const response = await axiosInstance.get(`/models?page=${page}&limit=${limit}`);
+  console.log(response.data.models)
+  return response.data.models;
+};
 
 export const getTrendingModels = async () => {
     const response = await axiosInstance.get('/models/trending');
@@ -18,7 +25,7 @@ export const getTrendingModels = async () => {
 }
 
 export const getDailyModels = async () => {
-    const response = await axiosInstance.get('/dailymodels');
+    const response = await axiosInstance.get('/models/trending');
     return response.data;
 }
 
@@ -37,10 +44,9 @@ export const searchModels = async ({key, sourcesite, category}: SearchParams) =>
     else if (category && category === 'All')
         params.append('category', '');
 
-    console.log("parmas", params);
 
     const response = await axiosInstance.get(`/models?${params.toString()}`);
-    return response.data;
+    return response.data.models;
 }
 
 export const likeModel = async(modelId: string, userId: string, token: string) => {
