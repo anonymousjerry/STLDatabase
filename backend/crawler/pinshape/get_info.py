@@ -32,13 +32,13 @@ async def get_info(url):
             tag_locator = page.locator('div.tags a.tag')
             tags = await tag_locator.all_inner_texts()
             tags = [tag.strip() for tag in tags if tag.strip()]
-            carousel_locator = page.locator('div.article-image img')
-            carousel_urls = await carousel_locator.evaluate_all(
-                '(elements) => elements.map(img => img.getAttribute("src"))'
-            )
+            # carousel_locator = page.locator('div.article-image img')
+            # carousel_urls = await carousel_locator.evaluate_all(
+            #     '(elements) => elements.map(img => img.getAttribute("src"))'
+            # )
 
-            # Optional: prepend "https:" if URLs start with "//"
-            carousel_urls = [f"https:{url}" if url.startswith("//") else url for url in carousel_urls]
+            # # Optional: prepend "https:" if URLs start with "//"
+            # carousel_urls = [f"https:{url}" if url.startswith("//") else url for url in carousel_urls]
 
             thumbnail_locator = page.locator('div.owl-dot img')
             thumbnail_urls = await thumbnail_locator.evaluate_all(
@@ -48,9 +48,17 @@ async def get_info(url):
             # Normalize URLs (prepend "https:" if needed)
             thumbnail_urls = [f"https:{url}" if url.startswith("//") else url for url in thumbnail_urls]
 
+            filtered_thumbnail_urls = [thumbnail_url for thumbnail_url in thumbnail_urls if '/shape_file/' not in thumbnail_url]
+
+            carousel_urls = [
+                url.replace('horizontal_thumbnail_', 'container_')
+                for url in filtered_thumbnail_urls
+            ]
+
             image_urls = []
             for i in range(len(carousel_urls)):
-                image_urls.append([carousel_urls[i], thumbnail_urls[i]])
+                image_urls.append([carousel_urls[i], filtered_thumbnail_urls[i]])
+            # print(image_urls)
 
             info.append({"title" : title})
             info.append({"description" : description})
@@ -66,7 +74,11 @@ async def get_info(url):
             await browser.close()
 
 if __name__ == "__main__":
-    url = 'https://pinshape.com/items/9800-3d-printed-phone-holder-phone-stand'
+    url = 'https://pinshape.com/items/34605-3d-printed-fully-3d-printed-fidget-spinner'
     result = asyncio.run(get_info(url))
 
     print(result)
+    merged_info = {}
+    for item in result:
+        merged_info.update(item)
+    print(merged_info)

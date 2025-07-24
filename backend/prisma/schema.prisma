@@ -27,8 +27,8 @@ model Model {
   sourceSiteId   String?
   category       Category @relation(fields: [categoryId], references: [id])
   categoryId     String
-  subCategory    SubCategory @relation(fields: [subCategoryId], references: [id])
-  subCategoryId  String
+  subCategory    SubCategory? @relation(fields: [subCategoryId], references: [id])
+  subCategoryId  String?
   tags           String[]
   likes          Like[]
   favourites     Favourite[]

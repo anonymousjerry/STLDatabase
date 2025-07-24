@@ -43,6 +43,6 @@ async def get_info(url):
             await browser.close()
 
 if __name__ == "__main__":
-    url = 'https://www.printables.com/model/1331354-goalie-stick-knobs'
+    url = 'https://www.printables.com/model/1339721-filament-clip-klip-na-filament'
     result = asyncio.run(get_info(url))
     print(result)

@@ -39,8 +39,8 @@ def main():
         ("Thingiverse", "https://www.thingiverse.com"),
         ("Thangs", "https://www.thangs.com"),
         ("Makerworld", "https://www.makerworld.com"),
-        ("Pinshpe", "https://pinshape.com/"),
-        ("cgtrader", "https://www.cgtrader.com/"),
+        ("Pinshape", "https://pinshape.com/"),
+        ("CGTrader", "https://www.cgtrader.com/"),
         ("MyMiniFactory", "https://www.myminifactory.com"),
         ("Cults3D", "https://cults3d.com"),
         ("YouMagine", "https://www.youmagine.com")

@@ -57,8 +57,9 @@ async def scrape_pinshape():
             except Exception as e:
                 print("Error extracting pin data: ", e)
         
-        # for i in range(len(results)):
-        for i in range(15):
+        
+        # for i in range(len(urls)):
+        for i in range(10):
             merged_info = {}
             info = await get_info(urls[i][0])
 
@@ -66,6 +67,8 @@ async def scrape_pinshape():
                 merged_info.update(item)
             merged_info["source_url"] = urls[i][0]
             merged_info["thumbnail_url"] = urls[i][1]
+            merged_info["platform"] = "Pinshape"
+            print(merged_info)
             data.append(merged_info)
         
         for d in data:

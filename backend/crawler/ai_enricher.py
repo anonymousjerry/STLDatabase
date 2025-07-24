@@ -2,7 +2,6 @@ import openai
 from dotenv import load_dotenv
 import os
 import json
-
 load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -56,7 +55,9 @@ def enrich_data(data):
         - Source URL: {data['source_url']}
 
         1. Rewrite description simply and make it enticing product description.
-        2. Choose one category from this list: {subcategories}
+        2. Choose exactly one subcategory from this list (copy-paste, do NOT modify or invent). 
+           You must choose exactly one string from this Python list (case-sensitive, no alterations): {subcategories}
+           If the subcategory is not in the list, your output will be discarded. So double-check it matches exactly, character for character.
         3. Generate a list of 10~15 relevant tags. Include the original tags: [{data['tags']}]
 
         Respond in this JSON format:
@@ -75,7 +76,8 @@ def enrich_data(data):
 
     result = json.loads(response.choices[0].message.content)
     subcategory = result['subcategory']
-    category = subcategory_to_category.get(subcategory, "Uncategorized")
+    category = subcategory_to_category.get(subcategory, "Other")
+
 
     enriched = {
         **data,
@@ -85,3 +87,10 @@ def enrich_data(data):
         "tags" : ",".join(result["tags"])
     }
     return enriched
+
+# enrich_data({
+#     "title" : "abc",
+#     "description" : "what is that?",
+#     "source_url" : "https://thangs.com/designer/DaveMakesStuff/3d-model/Eid%20Gift%20Box-1044794",
+#     "tags" : "box, gift"
+# })
