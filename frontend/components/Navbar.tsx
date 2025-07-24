@@ -23,7 +23,7 @@ import { useSearch } from "@/context/SearchContext";
 const Navbar = () => {
 
   const {openModal} = useModal();
-  const { data: session, status } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const router = useRouter();
   const [accountMenuOpen, setAccountMenuOpen] = useState<boolean>(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
@@ -41,8 +41,11 @@ const Navbar = () => {
 
   const handleLogOut = () => {
     toast.success("Logout Successful!");
-    setTimeout(() => signOut(), 1000);
+    setTimeout(() => {
+      signOut({callbackUrl: '/'})
+    }, 1000);
   }
+  console.log(sessionStatus)
   
 
   useEffect(() => {
@@ -178,13 +181,16 @@ const Navbar = () => {
             Account ▼
           </button>
 
-          {/* {accountMenuOpen && (
+          {accountMenuOpen && (
             <div className="absolute right-0 mt-2 w-40 bg-white text-black shadow-lg rounded-md z-10">
-              <button onClick={() => openModal('login')} className="block px-4 py-2 hover:bg-gray-100">Login</button>
+              {/* <button onClick={() => openModal('login')} className="block px-4 py-2 hover:bg-gray-100">Login</button>
               <button onClick={() => openModal('register')} className="block px-4 py-2 hover:bg-gray-100">Register</button>
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100">Logout</a>
+              <button onClick={handleLogOut} className="block px-4 py-2 hover:bg-gray-100">Logout</button> */}
+              <a href="/login" className="block px-4 py-2 hover:bg-gray-100">Login</a>
+              <a href="/register" className="block px-4 py-2 hover:bg-gray-100">Register</a>
+              <button onClick={handleLogOut} className="block px-4 py-2 hover:bg-gray-100">Logout</button>
             </div>
-          )} */}
+          )}
 
         </div>
       </div>
