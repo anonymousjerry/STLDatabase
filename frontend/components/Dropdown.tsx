@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 
 interface DropdownButtonProps {
@@ -43,6 +42,7 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
 
       {/* Dropdown button */}
       <button
+        type='button'
         onClick={() => setOpen(!open)}
         className="bg-white  rounded-xl border-solid border-[#4e4d80]  border pt-3 pr-2.5 pb-3 pl-2.5 flex flex-row items-center justify-between shrink-0  h-12 relative"
       >

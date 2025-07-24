@@ -6,6 +6,7 @@ import SessionProvider from "@/utils/SessionProvider";
 import Providers from "@/Providers";
 import { getServerSession } from "next-auth";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { SearchProvider } from "@/context/SearchContext";
 import 'svgmap/dist/svgMap.min.css';
 
 
@@ -30,11 +31,13 @@ export default async function RootLayout({
       <body className={inter.className}>
         <ThemeProvider>
           <SessionProvider session={session}>
-            <Providers>
-            <Header />
-            {children}
-            </Providers>
-            <Footer />
+            <SearchProvider>
+              <Providers>
+              <Header />
+              {children}
+              </Providers>
+              <Footer />
+            </SearchProvider>
           </SessionProvider>
         </ThemeProvider>
         </body>

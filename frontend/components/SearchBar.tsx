@@ -6,6 +6,7 @@ import DropdownButton from "./Dropdown";
 import SearchInput from "./SearchInput";
 import { getSubCategories } from "@/lib/categoryApi";
 import { getPlatforms } from "@/lib/platformApi";
+import { useSearch } from "@/context/SearchContext";
 
 const SearchBar = () => {
   const router = useRouter();
@@ -13,9 +14,14 @@ const SearchBar = () => {
   const [platforms, setPlatforms] = useState<string[][]>([]);
   const [categories, setCategories] = useState<string[]>([]);
 
-  const [selectedPlatform, setSelectedPlatform] = useState("All");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [searchInput, setSearchInput] = useState("");
+  const {
+    selectedPlatform,
+    selectedCategory,
+    searchInput,
+    setSelectedPlatform,
+    setSelectedCategory,
+    setSearchInput,
+  } = useSearch();
 
   useEffect(() => {
     getPlatforms().then(setPlatforms).catch(console.error);
@@ -24,21 +30,24 @@ const SearchBar = () => {
 
   const platformArray = platforms.map(([platform]) => platform);
 
-  // Build query string and navigate
-  // const sendSearchRequest = (keyword: string, platform: string, category: string) => {
-  //   const params = new URLSearchParams();
-  //   if (keyword.trim() !== "") params.set("q", keyword.trim());
-  //   if (platform !== "All") params.set("platform", platform);
-  //   if (category !== "All") params.set("category", category);
-
-  //   router.push(`/explore?${params.toString()}`);
-  // };
-
   // On form submit (search button clicked)
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("click search button")
-    // sendSearchRequest(searchInput, selectedPlatform, selectedCategory);
+    console.log('Search triggered:', {
+      platform: selectedPlatform,
+      category: selectedCategory,
+      keyword: searchInput,
+    });
+
+    const queryParams = new URLSearchParams();
+
+    if (selectedPlatform && selectedPlatform !== 'All')
+      queryParams.set('sourcesite', selectedPlatform);
+    if (selectedCategory && selectedCategory !== 'All')
+      queryParams.set('category', selectedCategory);
+    if (searchInput) queryParams.set('key', searchInput);
+
+    router.push(`/explore?${queryParams.toString()}`);
   };
 
   return (
@@ -48,24 +57,41 @@ const SearchBar = () => {
     >
       <div className="basis-1/5">
         <DropdownButton
-          initialContent="All"
+          initialContent={selectedPlatform}
           label="platform"
           list={platformArray}
-          onSelect={setSelectedPlatform}
+          onSelect={(value) => setSelectedPlatform(value)}
         />
       </div>
 
       <div className="basis-1/5">
         <DropdownButton
-          initialContent="All"
+          initialContent={selectedCategory}
           label="categories"
           list={categories}
           onSelect={setSelectedCategory}
         />
       </div>
 
-      <div className="basis-3/5">
-        <SearchInput value={searchInput} onChange={setSearchInput} />
+      <div className="basis-3/5 flex  gap-2">
+        <div className="basis-4/5">
+          <SearchInput value={searchInput} onChange={setSearchInput} />
+        </div>
+        <button
+          type="submit"
+          // onClick={handleSearch}
+          className="bg-[#4e4d80] rounded-xl basis-1/5 pr-2.5 pl-2.5 mt-7 flex flex-row gap-2 items-center justify-center shrink-0 h-12 relative hover:bg-[#3d3c66] transition"
+        >
+          <div className="text-white font-[Inter-Medium] text-lg font-medium text-left relative select-none">
+            Search
+          </div>
+          <img
+            className="shrink-0 w-6 h-6 relative overflow-visible"
+            src="/search.png"
+            alt="search icon"
+            draggable={false}
+          />
+        </button>
       </div>
     </form>
   );
