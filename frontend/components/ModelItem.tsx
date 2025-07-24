@@ -33,7 +33,6 @@ const ModelItem = ({
   const [likesCount, setLikesCount] = useState(model.likes?.length ?? 0);
   const isDisabled = status !== 'authenticated';
   const sourceSiteName = model.sourceSite?.name ?? "";
-  console.log(sourceSiteName)
 
   const slugify = (text: string): string =>
     text
@@ -123,8 +122,9 @@ const ModelItem = ({
         <Image
           src={`/Platforms/${slugify(sourceSiteName)}.png`}
           alt={sourceSiteName}
-          width="40"
-          height="40"
+          width={40}
+          height={40}
+          
         />
       </div>
 

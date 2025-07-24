@@ -89,7 +89,6 @@ const ProductItem = ({
             <span>{product.likes} likes</span>
           </div>
           <div className="text-right text-custom-light-maincolor dark:text-custom-dark-maincolor font-bold text-lg">
-            {/* {product.price === 0 ? "Free" : `$${product.price.toFixed(2)}`} */}
             Free
           </div>
         </div>

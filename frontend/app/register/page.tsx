@@ -11,7 +11,6 @@ const RegisterPage = () => {
   const [error, setError] = useState("");
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
-  console.log(sessionStatus)
 
   useEffect(() => {
     // chechking if user has already registered redirect to home page
@@ -50,7 +49,6 @@ const RegisterPage = () => {
     }
 
     try {
-        console.log(username, email, password)
         // sending API request for registering user
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/register`, {
             method: "POST",

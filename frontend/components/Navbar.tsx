@@ -45,7 +45,6 @@ const Navbar = () => {
       signOut({callbackUrl: '/'})
     }, 1000);
   }
-  console.log(sessionStatus)
   
 
   useEffect(() => {

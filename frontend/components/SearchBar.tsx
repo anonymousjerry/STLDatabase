@@ -33,11 +33,6 @@ const SearchBar = () => {
   // On form submit (search button clicked)
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Search triggered:', {
-      platform: selectedPlatform,
-      category: selectedCategory,
-      keyword: searchInput,
-    });
 
     const queryParams = new URLSearchParams();
 

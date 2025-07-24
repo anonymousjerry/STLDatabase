@@ -20,7 +20,7 @@ const DailyDiscover = () => {
     const [dailyModels, setDailyModels] = useState([]);
 
     useEffect(() => {
-        getModels().then(setDailyModels).catch(console.error);
+        getDailyModels().then(setDailyModels).catch(console.error);
     }, [])
     const visibleProducts = showAll ? dailyModels : dailyModels.slice(0, 4);
     // const visibleProducts = showAll ? modelLists : modelLists.slice(0, 4);
