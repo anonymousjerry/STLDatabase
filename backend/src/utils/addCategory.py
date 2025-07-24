@@ -36,7 +36,7 @@ def add_category(name):
 def main():
     categories = [
         "Toys & Miniatures", "Art & Decorations", "Home & Living", "Tools & Functional Parts", "Tech & Devices", "Fashion & Accessories",
-        "Seasonal & Holidays", "Educational & Scientific", "3D Printers & Mods"
+        "Seasonal & Holidays", "Educational & Scientific", "3D Printers & Mods", "Other"
     ]
 
     for category in categories:
