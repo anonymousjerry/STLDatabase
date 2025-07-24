@@ -12,7 +12,7 @@ export const getModels = async () => {
 }
 
 export const getTrendingModels = async () => {
-    const response = await axiosInstance.get('/trendingmodels');
+    const response = await axiosInstance.get('/models/trending');
     return response.data;
 }
 
