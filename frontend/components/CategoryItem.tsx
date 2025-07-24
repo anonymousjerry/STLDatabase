@@ -34,13 +34,13 @@ const CategoryItem = ({ title, children, className }: CategoryItemProps) => {
     e.preventDefault();
     setSelectedCategory(title);
     console.log('Search triggered:', {
-      category: selectedCategory,
+      category: title,
     });
 
     const queryParams = new URLSearchParams();
 
-    if (selectedCategory && selectedCategory !== 'All')
-      queryParams.set('category', selectedCategory);
+    if (title && title !== 'All')
+      queryParams.set('category', title);
 
     router.push(`/explore?${queryParams.toString()}`);
   };

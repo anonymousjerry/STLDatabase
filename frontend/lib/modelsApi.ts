@@ -36,7 +36,7 @@ export const searchModels = async ({key, sourcesite, category}: SearchParams) =>
     else if (category && category === 'All')
         params.append('category', '');
 
-    console.log(params);
+    console.log("parmas", params);
 
     const response = await axiosInstance.get(`/models?${params.toString()}`);
     return response.data;

@@ -60,7 +60,7 @@ const FeaturedSite = () => {
 
             <div className="grid grid-cols-9 max-xl:grid-cols-6 max-lg:grid-cols-4 max-md:grid-cols-3 max-sm:grid-cols-2 gap-6 pb-7">
             {visibleItems.map((item) => (
-                <PlatformItem title={item.title} key={item.id} href={item.href}>
+                <PlatformItem title={item.title} key={item.id}>
                 <Image
                     src={item.src}
                     alt={item.title}
