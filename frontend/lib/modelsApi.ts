@@ -1,5 +1,6 @@
 import { axiosInstance } from "./axiosInstance";
 
+
 type SearchParams = {
   key?: string;
   sourcesite?: string;
@@ -39,5 +40,21 @@ export const searchModels = async ({key, sourcesite, category}: SearchParams) =>
     console.log("parmas", params);
 
     const response = await axiosInstance.get(`/models?${params.toString()}`);
+    return response.data;
+}
+
+export const likeModel = async(modelId: string, userId: string, token: string) => {
+    const response = await axiosInstance.post(
+        `/models/like`,
+        {
+            userId: userId,
+            modelId: modelId,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        }
+    )
     return response.data;
 }

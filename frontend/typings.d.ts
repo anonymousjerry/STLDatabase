@@ -33,6 +33,30 @@ interface Product {
 //   // updatedAt: getDefaultAutoSelectFamilyAttemptTimeout;
 // }
 
+
+interface Like {
+  id: string;
+  userId: string;
+  modelId: string;
+}
+
+interface SourceSite {
+  id: string;
+  name: string;
+  url: string;
+}
+
+interface SubCategory {
+  id: string;
+  name: string;
+  categoryId: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+}
+
 interface Model {
   id: string;
   title: string;
@@ -40,8 +64,10 @@ interface Model {
   sourceSiteId: string;
   categoryId: string;
   subCategoryId: string;
+  category: Category;
+  subCategory: SubCategory;
   tags: string[];
-  likes: number;
+  likes: Like[];
   deleted: Boolean;
   price: string;
   downloads: number;
@@ -50,7 +76,9 @@ interface Model {
   sourceUrl: string;
   createdAt: string;
   updatedAt: string;
+  sourceSite: SourceSite;
 }
+
 
 interface SingleProductPageProps {
   params: {

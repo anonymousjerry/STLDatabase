@@ -21,8 +21,12 @@ const improveCategoryText = (text: string): string => {
 };
 
 const ExplorePage = async ({ params }: { params: { slug: string[] } }) => {
-  const param = params.slug?.[0]
-  console.log(param)
+  const slug = params.slug; // no await
+  const [category, subCategory, title] = slug || [];
+
+  console.log("Category:", category);
+  console.log("subCategory:", subCategory);
+  console.log("Title:", title);
   // const results = await searchModelsByCategories(param);
   // console.log(results)
   return (
