@@ -81,7 +81,7 @@ async def scrape_pinshape():
 def write_csv():
     headers = ["platform", "title", "description", "category", "subcategory", "source_url", "thumbnail_url", "tags", "image_urls", "price"]
 
-    with open("pinshape.csv", "w", newline="", encoding="utf-8") as csvfile:
+    with open("pinshape.csv", "a", newline="", encoding="utf-8") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers)
         writer.writeheader()
         for row in results:

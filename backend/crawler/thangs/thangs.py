@@ -91,7 +91,7 @@ async def scrape_thangs():
 def write_csv(result):
     headers = ["platform", "title", "description", "category", "subcategory", "source_url", "thumbnail_url", "tags", "image_urls", "price"]
 
-    with open("thangs.csv", "w", newline="", encoding="utf-8") as csvfile:
+    with open("thangs.csv", "a", newline="", encoding="utf-8") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers)
         writer.writeheader()
         for row in result:
