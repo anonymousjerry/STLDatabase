@@ -30,7 +30,11 @@ const ProductsSection = () => {
       const newModels: Model[] = await getModels(page); // Pass page param if needed
 
       if (Array.isArray(newModels) && newModels.length > 0) {
-        setModels((prevModels) => [...prevModels, ...newModels]);
+        setModels((prevModels) => {
+          const seen = new Set(prevModels.map((m) => m.id));
+          const filtered = newModels.filter((m) => !seen.has(m.id));
+          return [...prevModels, ...filtered];
+        });
         setPage((prevPage) => prevPage + 1);
       } else {
         setHasMore(false);

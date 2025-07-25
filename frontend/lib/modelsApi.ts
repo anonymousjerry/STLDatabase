@@ -21,12 +21,12 @@ export const getModels = async (page: number = 1, limit: number = 12) => {
 
 export const getTrendingModels = async () => {
     const response = await axiosInstance.get('/models/trending');
-    return response.data;
+    return response.data.models;
 }
 
 export const getDailyModels = async () => {
     const response = await axiosInstance.get('/models/trending');
-    return response.data;
+    return response.data.models;
 }
 
 
