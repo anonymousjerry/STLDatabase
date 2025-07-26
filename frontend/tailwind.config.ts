@@ -33,8 +33,8 @@ const config: Config = {
         },
       },
       animation: {
-        'slide-in-left': 'slideInLeft 0.5s ease-in-out forwards',
-        'slide-in-right': 'slideInRight 0.5s ease-in-out forwards',
+        'slide-in-left': 'slideInLeft 0.6s ease-in-out forwards',
+        'slide-in-right': 'slideInRight 0.6s ease-in-out forwards',
       },
     },
   },  

@@ -1,14 +1,5 @@
-// *********************
-// Role of the component: Category Item that will display category icon, category name and link to the category
-// Name of the component: CategoryItem.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <CategoryItem title={title} href={href} ><Image /></CategoryItem>
-// Input parameters: CategoryItemProps interface
-// Output: Category icon, category name and link to the category
-// *********************
+"use client";
 
-"use client"
 import { useSearch } from "@/context/SearchContext";
 import { useRouter } from "next/navigation";
 import React, { type ReactNode } from "react";
@@ -16,41 +7,43 @@ import React, { type ReactNode } from "react";
 interface CategoryItemProps {
   children: ReactNode;
   title: string;
-  className: string;
+  className?: string;
 }
 
-const CategoryItem = ({ title, children, className }: CategoryItemProps) => {
-  const {setSelectedCategory, selectedCategory} = useSearch()
+const CategoryItem = ({ title, children, className = "" }: CategoryItemProps) => {
+  const { setSelectedCategory } = useSearch();
   const router = useRouter();
-  const classNamelocal = `
-    ${className}
-    flex flex-col gap-2 py-3 px-1 
-    items-center aspect-square w-full h-[140px] sm:h-[160px] 
-    cursor-pointer border-[1px] border-[#C8C8C833] 
-    transition bg-custom-light-containercolor 
-    text-black hover:rounded-2xl  hover:border-[#b6e400] hover:shadow-[0_0_16px_0_rgba(0,0,0,0.32)]
-  `
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSelectedCategory(title);
 
     const queryParams = new URLSearchParams();
-
-    if (title && title !== 'All')
-      queryParams.set('category', title);
+    if (title && title !== "All") {
+      queryParams.set("category", title);
+    }
 
     router.push(`/explore?${queryParams.toString()}`);
   };
 
   return (
-    <div 
-      className={classNamelocal}
-      onClick={handleSearch}  
+    <div
+      onClick={handleSearch}
+      role="button"
+      title={title}
+      className={`
+        group cursor-pointer transition-all duration-200 ease-in-out
+        flex flex-col items-center justify-center text-center
+        aspect-square w-full h-[140px] sm:h-[160px] px-2 py-3 gap-2
+        border border-[#C8C8C833] bg-custom-light-containercolor text-black
+        hover:rounded-2xl hover:border-[#b6e400] hover:shadow-[0_0_16px_rgba(0,0,0,0.32)]
+        ${className}
+      `}
     >
-      <div className="flex ">
-        {children}
+      <div className="flex items-center justify-center">{children}</div>
+      <div className="text-[18px] leading-5 font-medium text-custom-light-textcolor break-words">
+        {title}
       </div>
-      <div className="flex items-center justify-center text-center font-medium text-[18px] text-custom-light-textcolor  text-wrap leading-5 break-words">{title}</div>
     </div>
   );
 };

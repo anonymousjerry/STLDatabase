@@ -53,7 +53,7 @@ const SearchBar = () => {
       <div className="basis-1/5">
         <DropdownButton
           initialContent={selectedPlatform}
-          label="platform"
+          label="Platform"
           list={platformArray}
           onSelect={(value) => setSelectedPlatform(value)}
         />
@@ -62,7 +62,7 @@ const SearchBar = () => {
       <div className="basis-1/5">
         <DropdownButton
           initialContent={selectedCategory}
-          label="categories"
+          label="Categories"
           list={categories}
           onSelect={setSelectedCategory}
         />

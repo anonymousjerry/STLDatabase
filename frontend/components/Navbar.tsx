@@ -39,6 +39,7 @@ const Navbar = () => {
   const isActive = (href: string) =>
     !isCategoryActive && (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
+
   const handleLogOut = () => {
     toast.success("Logout Successful!");
     setTimeout(() => {
@@ -56,16 +57,6 @@ const Navbar = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  // useEffect(() => {
-  //   if (status === "authenticated" && session?.user) {
-  //     // axiosInstance.get("/protected-route")
-  //     //   .then((res) => console.log("Protected data:", res.data))
-  //     //   .catch((err) => console.error("Axios error:", err));
-  //     console.log(session.user.accesstoken)
-  //   }
-  // }, [session, status]);
-  // console.log(session?.user?.image)
 
   const {
       setSelectedPlatform,
@@ -175,22 +166,37 @@ const Navbar = () => {
           <button
             onClick={() => setAccountMenuOpen(!accountMenuOpen)}
             className="flex items-center bg-lime-400 text-black font-semibold px-4 py-2 rounded-full hover:bg-lime-500"
+            aria-haspopup="true"
+            aria-expanded={accountMenuOpen}
           >
             <FaUser className="mr-2" />
-            Account ▼
+            {sessionStatus === "authenticated" && session?.user?.username
+              ? session.user.username
+              : "Account"} ▼
           </button>
 
           {accountMenuOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white text-black shadow-lg rounded-md z-10">
-              {/* <button onClick={() => openModal('login')} className="block px-4 py-2 hover:bg-gray-100">Login</button>
-              <button onClick={() => openModal('register')} className="block px-4 py-2 hover:bg-gray-100">Register</button>
-              <button onClick={handleLogOut} className="block px-4 py-2 hover:bg-gray-100">Logout</button> */}
-              <a href="/login" className="block px-4 py-2 hover:bg-gray-100">Login</a>
-              <a href="/register" className="block px-4 py-2 hover:bg-gray-100">Register</a>
-              <button onClick={handleLogOut} className="block px-4 py-2 hover:bg-gray-100">Logout</button>
+            <div className="absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-xl shadow-xl z-50 ring-1 ring-gray-200 animate-fade-in overflow-hidden">
+              <a
+                href="/login"
+                className="block px-5 py-2 text-lg hover:bg-gray-100 hover:text-blue-600 transition-colors duration-150"
+              >
+                🔐 Login
+              </a>
+              <a
+                href="/register"
+                className="block px-5 py-2 text-lg hover:bg-gray-100 hover:text-green-600 transition-colors duration-150"
+              >
+                📝 Register
+              </a>
+              <button
+                onClick={handleLogOut}
+                className="w-full text-left px-5 py-2 text-lg hover:bg-gray-100 hover:text-red-600 transition-colors duration-150"
+              >
+                🚪 Logout
+              </button>
             </div>
           )}
-
         </div>
       </div>
     </nav>

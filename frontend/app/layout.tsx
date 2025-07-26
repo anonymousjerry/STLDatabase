@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Footer, Header } from "@/components";
 import SessionProvider from "@/utils/SessionProvider";
 import Providers from "@/Providers";
 import { getServerSession } from "next-auth";
@@ -33,10 +32,8 @@ export default async function RootLayout({
           <SessionProvider session={session}>
             <SearchProvider>
               <Providers>
-              <Header />
               {children}
               </Providers>
-              <Footer />
             </SearchProvider>
           </SessionProvider>
         </ThemeProvider>

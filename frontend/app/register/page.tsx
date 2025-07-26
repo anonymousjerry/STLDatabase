@@ -1,16 +1,22 @@
 "use client";
-import CustomButton from "@/components/CustomButton"; 
-import SectionTitle from "@/components/SectionTitle";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { FaGoogle, FaApple, FaGithub } from "react-icons/fa6";
+import { signIn } from "next-auth/react";
 
 const RegisterPage = () => {
   const [error, setError] = useState("");
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
+
+  const providers = [
+    { name: "google", Icon: FaGoogle },
+    { name: "apple", Icon: FaApple },
+    { name: "github", Icon: FaGithub },
+  ];
 
   useEffect(() => {
     // chechking if user has already registered redirect to home page
@@ -82,147 +88,90 @@ const RegisterPage = () => {
     return <h1>Loading...</h1>;
   }
   return (
-    <div className="bg-white">
-      <SectionTitle title="Register" path="Home | Register" />
-      <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8 bg-white">
-        <div className="flex justify-center flex-col items-center">
-          <h2 className="mt-6 text-center text-2xl leading-9 tracking-tight text-gray-900">
-            Sign up on our website
-          </h2>
-        </div>
+    <div className="bg-white h-screen">
+      <div className="inset-0 h-full bg-custom-light-secondcolor flex items-center justify-center py-20">
+        <div className="basis-1/4 bg-gradient-to-b from-white to-[#f4f7fb] rounded-[40px] p-6 border-[5px] border-white shadow-[0_30px_30px_-20px_rgba(133,189,215,0.88)] m-5">
+             <div className="text-center font-black text-[30px] text-[#1089d3]">Sign Up</div>
+                 <form className="mt-5" onSubmit={handleSubmit}>
+                     <input
+                        placeholder="Name"
+                        id="name"
+                        name="name"
+                        type="text"
+                        required
+                        className="w-full bg-white border-none px-5 py-4 rounded-[20px] shadow-[0_10px_10px_-5px_#cff0ff] placeholder:text-gray-400 focus:outline-none focus:border-x-2 focus:border-[#12b1d1]"
+                    />
+                    <input
+                        placeholder="E-mail"
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        className="w-full bg-white border-none px-5 py-4 rounded-[20px] mt-4 shadow-[0_10px_10px_-5px_#cff0ff] placeholder:text-gray-400 focus:outline-none focus:border-x-2 focus:border-[#12b1d1]"
+                    />
+                    <input
+                        placeholder="Password"
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        className="w-full bg-white border-none px-5 py-4 rounded-[20px] mt-4 shadow-[0_10px_10px_-5px_#cff0ff] placeholder:text-gray-400 focus:outline-none focus:border-x-2 focus:border-[#12b1d1]"
+                    />
+                    <input
+                        placeholder="Confirm Password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        required
+                        className="w-full bg-white border-none px-5 py-4 rounded-[20px] mt-4 shadow-[0_10px_10px_-5px_#cff0ff] placeholder:text-gray-400 focus:outline-none focus:border-x-2 focus:border-[#12b1d1]"
+                    />
+                    <span className="block mt-2 ml-2 text-xs text-[#0099ff]">
+                        <a href="#">Forgot Password ?</a>
+                    </span>
+                    <input
+                        defaultValue="Sign Up"
+                        type="submit"
+                        className="block w-full font-bold bg-gradient-to-r from-[#1089d3] to-[#12b1d1] text-white py-4 mt-5 rounded-[20px] shadow-[0_20px_10px_-15px_rgba(133,189,215,0.88)] border-none transition-transform duration-200 ease-in-out hover:scale-[1.03] hover:shadow-[0_23px_10px_-20px_rgba(133,189,215,0.88)] active:scale-95 active:shadow-[0_15px_10px_-10px_rgba(133,189,215,0.88)]"
+                    />
+                </form>
 
-        <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-[480px]">
-          <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div>
-                <label
-                  htmlFor="username"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Name
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="username"
-                    name="username"
-                    type="text"
-                    required
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
+                <div className="flex ml-2 items-center mt-5">
+                    <span className="text-xs text-gray-400">Already have and account?</span>
+                    <button
+                        onClick={() => router.replace('/login')}
+                        className="ml-2 text-sm text-[#0099ff] hover:underline"
+                    >
+                        Sign In
+                    </button>
                 </div>
-              </div>
 
-              {/* <div>
-                <label
-                  htmlFor="lastname"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Lastname
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="lastname"
-                    name="lastname"
-                    type="text"
-                    required
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
+                <div className="mt-6">
+                    <span className="block text-center text-[10px] text-gray-400">Or Sign in with</span>
+                    <div className="flex justify-center gap-4 mt-1">
+                        {providers.map(({ name, Icon }) => (
+                          <button
+                            key={name}
+                            onClick={() => signIn(name)}
+                            className="bg-gradient-to-br from-black to-gray-500 
+                                      border-4 border-white p-1.5 rounded-full 
+                                      w-10 aspect-square grid place-content-center 
+                                      shadow-[0_12px_10px_-8px_rgba(133,189,215,0.88)] 
+                                      transition-transform duration-200 ease-in-out 
+                                      hover:scale-110 active:scale-90"
+                          >
+                            <Icon className="text-white w-4 h-4" />
+                          </button>
+                        ))}
+                    </div>
                 </div>
-              </div> */}
-
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Email address
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Password
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="confirmpassword"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Confirm password
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="confirmpassword"
-                    name="confirmpassword"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
-                  />
-                  <label
-                    htmlFor="remember-me"
-                    className="ml-3 block text-sm leading-6 text-gray-900"
-                  >
-                    Accept our terms and privacy policy
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <CustomButton
-                  buttonType="submit"
-                  text="Sign up"
-                  paddingX={3}
-                  paddingY={1.5}
-                  customWidth="full"
-                  textSize="sm"
-                />
-
-                <p className="text-red-600 text-center text-[16px] my-4">
-                  {error && error}
-                </p>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
+                <span className="block text-center mt-4 text-[#0099ff] text-[9px]">
+                    <a href="#">Learn user licence agreement</a>
+                </span>
+            </div>
+        {/* </div> */}
     </div>
+    </div>
+
   );
 };
 

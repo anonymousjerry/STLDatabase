@@ -23,3 +23,27 @@
       ),
       linear-gradient(-45deg, white 50%, #3B82F6 50.99%);
 }
+
+@layer utilities {
+  .grid-rounded-bottom {
+    /* xl: 9 columns, last row 10-18 */
+    @apply xl:[&>:nth-child(10)]:rounded-bl-[32px];
+    @apply xl:[&>:nth-child(18)]:rounded-br-[32px];
+
+    /* lg: 6 columns (same as md), last row 7-12 */
+    @apply lg:[&>:nth-child(7)]:rounded-bl-[32px];
+    @apply lg:[&>:nth-child(12)]:rounded-br-[32px];
+
+    /* md: 6 columns, last row 7-12 */
+    @apply md:[&>:nth-child(7)]:rounded-bl-[32px];
+    @apply md:[&>:nth-child(12)]:rounded-br-[32px];
+
+    /* sm: 3 columns, last row 4-6 */
+    @apply sm:[&>:nth-child(4)]:rounded-bl-[32px];
+    @apply sm:[&>:nth-child(6)]:rounded-br-[32px];
+
+    /* base: 2 columns, last row 17-18 */
+    @apply [&>:nth-child(17)]:rounded-bl-[32px];
+    @apply [&>:nth-child(18)]:rounded-br-[32px];
+  }
+}

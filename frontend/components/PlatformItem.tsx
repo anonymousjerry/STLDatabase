@@ -1,4 +1,3 @@
-import Link from "next/link";
 import React, { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useSearch } from "@/context/SearchContext";
@@ -9,31 +8,55 @@ interface PlatformItemProps {
 }
 
 const PlatformItem = ({ title, children }: PlatformItemProps) => {
-
-  const {setSelectedPlatform, selectedPlatform} = useSearch()
+  const { setSelectedPlatform } = useSearch();
   const router = useRouter();
+
   const handleSearch = (e: React.FormEvent) => {
-      e.preventDefault();
-      setSelectedPlatform(title);
-  
-      const queryParams = new URLSearchParams();
-  
-      if (title && title !== 'All')
-        queryParams.set('sourcesite', title);
-  
-      router.push(`/explore?${queryParams.toString()}`);
-    };
+    e.preventDefault();
+    setSelectedPlatform(title);
+
+    const queryParams = new URLSearchParams();
+    if (title && title !== "All") {
+      queryParams.set("sourcesite", title);
+    }
+    router.push(`/explore?${queryParams.toString()}`);
+  };
 
   return (
+  <div
+    onClick={handleSearch}
+    className="flex flex-col items-center gap-3 cursor-pointer select-none"
+    role="button"
+    tabIndex={0}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        handleSearch(e);
+      }
+    }}
+    aria-label={`Select platform ${title}`}
+  >
     <div
-        rel="noopener noreferrer"
-        onClick={handleSearch} 
-        className="flex flex-col items-center gap-3 cursor-pointer"
+      className="
+        relative w-full aspect-square
+        overflow-hidden rounded-xl
+        transition-transform duration-300 ease-in-out
+        hover:scale-105
+      "
     >
-        <div className="relative w-full aspect-square">{children}</div>
-        <div className="font-semibold text-xl text-center">{title}</div>
+      {children}
     </div>
-  );
+    <div
+      className="
+        font-semibold text-xl text-center text-black truncate
+        transition-transform duration-200 ease-in-out
+        hover:text-blue-600 hover:scale-105
+      "
+    >
+      {title}
+    </div>
+  </div>
+);
+
 };
 
 export default PlatformItem;
