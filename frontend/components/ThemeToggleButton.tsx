@@ -18,8 +18,8 @@ const ThemeToggleButton = () => {
       ></div>
 
       <div
-        className="absolute  left-1 w-7 h-7 rounded-full bg-white text-yellow-400
-        peer-checked:translate-x-7 peer-checked:text-blue-400
+        className="absolute  left-0 w-7 h-7 rounded-full bg-white text-yellow-400
+        peer-checked:translate-x-9 peer-checked:text-blue-400
         flex items-center justify-center text-xl transition-all duration-500"
       >
         {theme === 'dark' ? (

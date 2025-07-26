@@ -68,6 +68,10 @@ const HeaderTop = () => {
       {/* Right Column */}
       <div className="flex flex-row gap-3 justify-end  max-md:justify-center max-md:py-2">
         <div className="flex flex-row items-center gap-1">
+          <ThemeToggleButton />
+        </div>
+        <div>|</div>
+        <div className="flex flex-row items-center gap-1">
           <img
             className="shrink-0 w-5 h-5 relative overflow-visible justify-center"
             style={{ aspectRatio: "1" }}
@@ -88,10 +92,7 @@ const HeaderTop = () => {
             Eng
           </div>
         </div>
-        {/* <div>|</div>
-        <div className="flex flex-row items-center gap-1">
-          <ThemeToggleButton />
-        </div> */}
+        
       </div>
     </div>
 
