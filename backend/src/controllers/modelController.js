@@ -80,6 +80,35 @@ const getAllModels = async (req, res) => {
     }
 }
 
+const getModel = async (req, res) => {
+    const id = req.query.modelId;
+
+    try {
+        const model = await prisma.model.findUnique({
+            where: {
+                id: id
+            },
+            include: {
+                likes: true,
+                sourceSite: true,
+                category: true,
+                subCategory: true
+            }
+        })
+
+        console.log(model)
+
+        if (!model) {
+            return res.status(404).json({ error: 'Model not found!'});
+        }
+
+        res.status(200).json(model);
+    } catch (err) {
+        console.error('Error fetching model by ID: ', err)
+        res.status(500).json({ error: "internal server error!" });
+    }
+}
+
 const getTrendingModels = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
@@ -206,4 +235,4 @@ const modelFavourite = async(req, res) => {
     }
 }
 
-module.exports = { getAllModels, getTrendingModels, modelLike, modelFavourite };
+module.exports = { getAllModels, getTrendingModels, modelLike, modelFavourite, getModel };

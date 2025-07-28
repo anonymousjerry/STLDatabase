@@ -22,7 +22,15 @@ number_lists = [
 
 async def scrape_printables():
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)  # Set headless=True if you don't want the browser to show
+        browser = await p.chromium.launch(
+            headless=False,
+            proxy={
+                "server": "http://pool.infatica.io:10000",
+                "username": "C0aeX1JZjKzfxgTQDpbG",
+                "password": "yl9xbHM8"
+            }
+        
+        )  # Set headless=True if you don't want the browser to show
         page = await browser.new_page(
             user_agent=user_agent, 
             viewport={"width": 1280, "height": 800},
@@ -30,6 +38,7 @@ async def scrape_printables():
         )
         for group in group_lists:
             for number in number_lists:
+                # await page.goto(f"https://ipinfo.io/what-is-my-ip", timeout=60000, wait_until="domcontentloaded")
                 model_data = []
                 data = []
                 results = []
@@ -67,10 +76,13 @@ async def scrape_printables():
                 for i in range(len(model_data)):
                     merged_info = {}
                     info = await get_info(model_data[i][0])
+                    if not info:
+                        continue
                     print(info)
 
                     for item in info:
-                        merged_info.update(item)
+                        if isinstance(item, dict):
+                            merged_info.update(item)
                     merged_info["source_url"] = model_data[i][0]
                     merged_info["thumbnail_url"] = model_data[i][1]
                     merged_info["platform"] = "Printables"

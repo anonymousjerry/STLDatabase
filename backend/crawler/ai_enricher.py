@@ -44,6 +44,8 @@ categories = [
 ]
 subcategory_to_category = {sub: cat for sub, cat in categories}
 
+MAX_DESCRIPTION_LEN = 1000
+
 def enrich_data(data):
     subcategories = list(subcategory_to_category.keys())
 
@@ -51,7 +53,7 @@ def enrich_data(data):
         You are an assistant that enriches 3D model metadata.propert.property
         Given the following input:
         - Title: {data['title']}
-        - Desciption: {data['description']}
+        - Desciption: {data['description'][:MAX_DESCRIPTION_LEN]}
         - Source URL: {data['source_url']}
 
         1. Rewrite description simply and make it enticing product description.

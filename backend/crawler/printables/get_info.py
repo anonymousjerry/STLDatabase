@@ -8,7 +8,14 @@ async def get_info(url):
     info = []
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)  # Set to True to hide the browser
+        browser = await p.chromium.launch(
+            headless=False,
+            proxy={
+                "server": "http://pool.infatica.io:10000",
+                "username": "C0aeX1JZjKzfxgTQDpbG",
+                "password": "yl9xbHM8"
+            }
+        )  # Set to True to hide the browser
         page = await browser.new_page(user_agent=user_agent, 
             viewport={"width": 1280, "height": 800},
             locale="en-US"
