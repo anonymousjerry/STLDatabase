@@ -47,9 +47,9 @@ const PlatformItem = ({ title, children }: PlatformItemProps) => {
     </div>
     <div
       className="
-        font-semibold text-xl text-center text-black truncate
+        font-semibold text-xl text-center text-black truncate dark:text-custom-dark-textcolor
         transition-transform duration-200 ease-in-out
-        hover:text-blue-600 hover:scale-105
+        hover:text-blue-600 dark:hover:text-blue-400 hover:scale-105
       "
     >
       {title}

@@ -23,7 +23,7 @@ const Breadcrumb = (
 
   
   return (
-    <div className="text-lg breadcrumbs max-sm:text-base">
+    <div className="text-lg breadcrumbs max-sm:text-base text-custom-light-textcolor dark:text-custom-dark-textcolor">
       <ul>
         <li>
           <Link href="/">

@@ -21,9 +21,9 @@ const FeaturedSite = () => {
 
   return (
     <div className="pt-6 px-52 max-xl:px-20 max-lg:px-10 max-md:px-6 mx-auto bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
-      <div className="flex flex-col bg-custom-light-containercolor rounded-[32px] px-11 max-md:px-6">
+      <div className="flex flex-col bg-custom-light-containercolor dark:bg-custom-dark-containercolor rounded-[32px] px-11 max-md:px-6">
         <div className="grid grid-cols-2">
-          <div className="flex text-custom-light-titlecolor py-5 font-['Inter-Bold',_sans-serif] text-2xl font-bold">
+          <div className="flex text-custom-light-titlecolor dark:text-custom-dark-titlecolor py-5 text-2xl font-bold">
             FEATURED SITE
           </div>
           {PlatformMenuList.length > 9 && (
