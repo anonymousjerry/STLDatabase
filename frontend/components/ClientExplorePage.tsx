@@ -95,6 +95,7 @@ export default function ClientExplorePage({
         setLikesCount((prev) => (liked ? prev + 1 : Math.max(prev - 1, 0)));
         }
     };
+    console.log(result)
 
   return (
     <div className="flex flex-col bg-gray-100 pb-10">
@@ -191,7 +192,7 @@ export default function ClientExplorePage({
                 </div>
                 <div className="flex items-center gap-1 font-normal text-lg text-custom-light-textcolor">
                     <IoEyeOutline className="text-base" size={24} />
-                    <span>{result.downloads} </span>
+                    <span>{result.views} </span>
                 </div>
                 <div className="flex items-center gap-1 font-normal text-lg text-custom-light-textcolor">
                     <CiStar className="text-base" size={24} />
