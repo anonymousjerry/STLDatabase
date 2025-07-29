@@ -68,6 +68,7 @@ interface Model {
   subCategory: SubCategory;
   tags: string[];
   likes: Like[];
+  views: number;
   deleted: Boolean;
   price: string;
   downloads: number;

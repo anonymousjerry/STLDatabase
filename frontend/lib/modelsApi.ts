@@ -15,7 +15,6 @@ type SearchParams = {
 export const getModels = async (page: number = 1, limit: number = 12) => {
     console.log(page)
   const response = await axiosInstance.get(`/models?page=${page}&limit=${limit}`);
-  console.log(response.data.models)
   return response.data.models;
 };
 
@@ -28,8 +27,6 @@ export const getDailyModels = async () => {
     const response = await axiosInstance.get('/models/trending');
     return response.data.models;
 }
-
-
 
 export const searchModels = async ({key, sourcesite, category}: SearchParams) => {
     const params = new URLSearchParams();
@@ -62,5 +59,11 @@ export const likeModel = async(modelId: string, userId: string, token: string) =
             }
         }
     )
+    return response.data;
+}
+
+export const getModel = async(modelId: string) => {
+    console.log(modelId)
+    const response = await axiosInstance.get(`/models/getModelbyId?modelId=${modelId}`);
     return response.data;
 }

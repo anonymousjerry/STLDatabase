@@ -11,12 +11,29 @@ import { subCategoryList } from "@/utils/categoryFormat";
 const Categories = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [subcategories, setSubCategories] = useState([]);
+  const [columns, setColumns] = useState(2);
+
+  useEffect(() => {
+    function handleResize() {
+      const width = window.innerWidth;
+      if (width >= 1280) setColumns(9); // xl
+      else if (width >= 1024) setColumns(6); // lg
+      else if (width >= 768) setColumns(6); // md
+      else if (width >= 640) setColumns(3); // sm
+      else setColumns(2);
+    }
+
+    handleResize(); // Initial run
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   
   useEffect(() => {
     getSubCategories()
       .then(setSubCategories)
       .catch(console.error);
   }, []);
+
 
   const categoryMenuList = subCategoryList(subcategories);
 
@@ -42,28 +59,43 @@ const Categories = () => {
       aria-label="Top categories"
     >
       <div className="relative bg-custom-light-containercolor rounded-[32px] max-md:px-6">
-        <h2 className="px-11 py-5 text-center font-bold text-xl sm:text-2xl text-custom-light-titlecolor font-['Inter-Bold',_sans-serif]">
+        <h2 className="px-11 py-5 font-bold text-xl sm:text-2xl text-custom-light-titlecolor font-['Inter-Bold',_sans-serif]">
           TOP CATEGORIES
         </h2>
 
         <div
           key={fadeKey}
-          className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-9 grid-rounded-bottom
-                     transition-all duration-500 ease-in-out
+          className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-9 
+                     transition-all duration-500 ease-in-out 
             ${
               direction === "next"
                 ? "animate-slide-in-left"
                 : "animate-slide-in-right"
             }`}
         >
-          {paginatedItems.map((item, index) => (
-            <CategoryItem
-              key={item.id}
-              title={item.title}
-            >
-              <Image src={item.src} width={120} height={95} alt={item.title} />
-            </CategoryItem>
-          ))}
+          {paginatedItems.map((item, index) => {
+            // const columns = useTailwindColumns();
+            const total = paginatedItems.length;
+            const itemsInLastRow = total % columns || columns;
+            const startOfLastRow = total - itemsInLastRow;
+
+            const isBottomLeft = index === startOfLastRow;
+            const isBottomRight = index === total - 1;
+
+            let extraClass = "";
+            if (isBottomLeft) extraClass += " rounded-bl-[32px]";
+            if (isBottomRight) extraClass += " rounded-br-[32px]";
+
+            return (
+              <CategoryItem
+                key={item.id}
+                title={item.title}
+                className={extraClass}
+              >
+                <Image src={item.src} width={120} height={95} alt={item.title} />
+              </CategoryItem>
+            );
+          })}
         </div>
 
         {/* Pagination Arrows */}

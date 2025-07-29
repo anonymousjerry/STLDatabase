@@ -23,6 +23,7 @@ const TrendingModels = () => {
         getTrendingModels().then(setTrendingModels).catch(console.error);
     }, [])
 
+
     const visibleProducts = showAll ? trendingModels : trendingModels.slice(0, 4);
     return (
         <div className="pt-10 px-52 max-xl:px-20 max-lg:px-10 max-md:px-6 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
