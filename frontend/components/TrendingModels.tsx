@@ -9,10 +9,9 @@ import React from "react";
 import { useState } from "react";
 import { FaChevronLeft } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa6";
-import ProductItem from "./ProductItem";
 import { modelLists } from "@/lib/utils";
 import { useEffect } from "react";
-import { getModels, getTrendingModels } from "@/lib/modelsApi";
+import { getTrendingModels } from "@/lib/modelsApi";
 import ModelItem from "./ModelItem";
 
 const TrendingModels = () => {
@@ -27,9 +26,9 @@ const TrendingModels = () => {
     const visibleProducts = showAll ? trendingModels : trendingModels.slice(0, 4);
     return (
         <div className="pt-10 px-52 max-xl:px-20 max-lg:px-10 max-md:px-6 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
-        <div className="flex flex-col bg-custom-light-containercolor rounded-[32px] px-11 max-md:px-6">
+        <div className="flex flex-col bg-custom-light-containercolor dark:bg-custom-dark-containercolor rounded-[32px] px-11 max-md:px-6">
             <div className="grid grid-cols-2">
-                <div className="flex text-custom-light-titlecolor  py-5  font-['Inter-Bold',_sans-serif] text-2xl font-bold">
+                <div className="flex text-custom-light-titlecolor dark:text-custom-dark-titlecolor py-5 text-2xl font-bold">
                     TRENDING MODELS
                 </div>
                 {modelLists.length > 4 && (

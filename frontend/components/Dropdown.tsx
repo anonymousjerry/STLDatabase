@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useRef, useEffect } from 'react';
 
 interface DropdownButtonProps {
@@ -44,19 +42,32 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
   return (
     <div className="relative w-full text-left" ref={dropdownRef}>
       {/* Label */}
-      <div className=" text-custom-light-textcolor font-semibold text-lg text-left self-stretch">{label}</div>
+      <div className="text-custom-light-textcolor font-semibold text-lg text-left self-stretch dark:text-custom-dark-textcolor">
+        {label}
+      </div>
 
       {/* Button */}
       <button
         type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className="w-full flex justify-between items-center border-[#4e4d80] bg-white border rounded-xl px-4 py-3 text-gray-800 text-base font-medium shadow-sm hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-150"
+        className="
+          w-full flex justify-between items-center
+          border-[#4e4d80] bg-white border rounded-xl px-4 py-3
+          text-gray-800 text-base font-medium shadow-sm
+          hover:border-blue-500
+          focus:outline-none focus:ring-2 focus:ring-blue-300
+          transition-all duration-150
+          dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:border-blue-400 dark:focus:ring-blue-600
+        "
       >
         <span>{selected}</span>
         <span
           className={`transition-transform duration-300 ${
             open ? 'rotate-180' : 'rotate-0'
           }`}
+          aria-hidden="true"
         >
           ▼
         </span>
@@ -64,7 +75,14 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
 
       {/* Dropdown list */}
       {open && (
-        <div className="absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg animate-fade-in transition-transform origin-top">
+        <div
+          className="
+            absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg animate-fade-in transition-transform origin-top
+            dark:bg-gray-800 dark:border-gray-700
+          "
+          role="listbox"
+          tabIndex={-1}
+        >
           {/* Search box */}
           <div className="px-4 pt-3">
             <input
@@ -72,15 +90,23 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="
+                w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
+                focus:outline-none focus:ring-2 focus:ring-blue-300
+                dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:ring-blue-600
+              "
+              aria-label={`Search ${label}`}
+              autoFocus
             />
           </div>
 
           {/* Filtered List */}
-          <ul className="max-h-60 overflow-auto py-2 text-gray-700">
+          <ul className="max-h-60 overflow-auto py-2 text-gray-700 dark:text-gray-300">
             <li
               onClick={() => handleSelect('All')}
-              className="cursor-pointer px-4 py-2 hover:bg-gray-100 transition-colors"
+              role="option"
+              tabIndex={0}
+              className="cursor-pointer px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               All
             </li>
@@ -89,13 +115,15 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
                 <li
                   key={item}
                   onClick={() => handleSelect(item)}
-                  className="cursor-pointer px-4 py-2 hover:bg-gray-100 transition-colors"
+                  role="option"
+                  tabIndex={0}
+                  className="cursor-pointer px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   {item}
                 </li>
               ))
             ) : (
-              <li className="px-4 py-2 text-gray-400 italic">No matches found</li>
+              <li className="px-4 py-2 text-gray-400 italic dark:text-gray-500">No matches found</li>
             )}
           </ul>
         </div>

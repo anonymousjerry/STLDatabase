@@ -58,8 +58,8 @@ const Categories = () => {
       className="pt-10 px-6 sm:px-10 xl:px-52 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor"
       aria-label="Top categories"
     >
-      <div className="relative bg-custom-light-containercolor rounded-[32px] max-md:px-6">
-        <h2 className="px-11 py-5 font-bold text-xl sm:text-2xl text-custom-light-titlecolor font-['Inter-Bold',_sans-serif]">
+      <div className="relative bg-custom-light-containercolor dark:bg-custom-dark-containercolor rounded-[32px] max-md:px-6">
+        <h2 className="px-11 py-5 font-bold text-xl sm:text-2xl text-custom-light-titlecolor dark:text-custom-dark-titlecolor">
           TOP CATEGORIES
         </h2>
 
@@ -101,26 +101,36 @@ const Categories = () => {
         {/* Pagination Arrows */}
         <button
           aria-label="Previous page"
-          className={`absolute left-[-1rem] top-[59%] -translate-y-1/2 z-10
+          className={`
+            absolute left-[-1rem] top-[59%] -translate-y-1/2 z-10
             bg-white shadow p-2 rounded-full border border-custom-light-maincolor
             disabled:opacity-50 disabled:cursor-not-allowed
-            transition`}
+            transition
+            dark:bg-gray-800
+            dark:border-gray-600
+            dark:shadow-md
+          `}
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          <FaChevronLeft size={20} className="text-custom-light-maincolor" />
+          <FaChevronLeft size={20} className="text-custom-light-maincolor dark:text-gray-300" />
         </button>
 
         <button
           aria-label="Next page"
-          className={`absolute right-[-1rem] top-[59%] -translate-y-1/2 z-10
+          className={`
+            absolute right-[-1rem] top-[59%] -translate-y-1/2 z-10
             bg-white shadow p-2 rounded-full border border-custom-light-maincolor
             disabled:opacity-50 disabled:cursor-not-allowed
-            transition`}
+            transition
+            dark:bg-gray-800
+            dark:border-gray-600
+            dark:shadow-md
+          `}
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
-          <FaChevronRight size={20} className="text-custom-light-maincolor" />
+          <FaChevronRight size={20} className="text-custom-light-maincolor dark:text-gray-300" />
         </button>
       </div>
 

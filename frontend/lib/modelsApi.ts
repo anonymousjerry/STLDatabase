@@ -47,6 +47,7 @@ export const searchModels = async ({key, sourcesite, category}: SearchParams) =>
 }
 
 export const likeModel = async(modelId: string, userId: string, token: string) => {
+    console.log(modelId, userId)
     const response = await axiosInstance.post(
         `/models/like`,
         {
@@ -62,8 +63,29 @@ export const likeModel = async(modelId: string, userId: string, token: string) =
     return response.data;
 }
 
+export const saveModel = async(modelId: string, userId: string, token: string) => {
+    console.log(modelId, userId)
+    const response = await axiosInstance.post(
+        `/models/save`,
+        {
+            userId: userId,
+            modelId: modelId,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        }
+    )
+    return response.data;
+}
+
 export const getModel = async(modelId: string) => {
-    console.log(modelId)
     const response = await axiosInstance.get(`/models/getModelbyId?modelId=${modelId}`);
     return response.data;
+}
+
+export const getSuggestionModels = async(modelId: string) => {
+    const response = await axiosInstance.get(`/models/similar?modelId=${modelId}`);
+    return response.data.similarModels;
 }
