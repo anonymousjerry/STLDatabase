@@ -11,7 +11,17 @@
 import Link from "next/link";
 import React from "react";
 
-const Breadcrumb = () => {
+type BreadcrumbProps = {
+  category: string;
+  subCategory: string;
+  title: string
+}
+
+const Breadcrumb = (
+  {category, subCategory, title}: BreadcrumbProps
+) => {
+
+  
   return (
     <div className="text-lg breadcrumbs max-sm:text-base">
       <ul>
@@ -20,12 +30,17 @@ const Breadcrumb = () => {
             STLDatase.com
           </Link>
         </li>
-        <li>
-          <Link href="/Explore">Explore</Link>
-        </li>
-        <li>
-          <Link href="/Explore">All products</Link>
-        </li>
+        {category && (
+          <li>
+            <Link href={`/explore`}>{category.replace(/-/g, " ")}</Link>
+          </li>
+        )}
+        {subCategory && (
+          <li>
+            <Link href={`/explore`}>{subCategory.replace(/-/g, " ")}</Link>
+          </li>
+        )}
+        {title && <li>{title.replace(/-/g, " ")}</li>}
       </ul>
     </div>
   );

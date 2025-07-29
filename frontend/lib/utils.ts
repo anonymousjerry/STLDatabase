@@ -1,3 +1,4 @@
+
 export const categoryMenuList = [
   {
     id: 1,
@@ -470,53 +471,59 @@ export const modelLists = [
   {
     id: "1",
     title: "Dragon action figure",
-    tags: ["Toys", "Action figure"],
+    description: "asddsffffffffffffffffff sasdddddddddddfasdfasdfasdf",
+    tags: ["Toys", "Action figure", "TableTop", "Animal", "Action figure"],
+    sourceSiteId: "234234a",
+    categoryId: "asa",
+    subCategoryId: "asdfasdf",
     platforms: "Printables",
     downloads: 48,
+    thumbnailUrl: "https://media.printables.com/media/prints/148a776a-6c63-4a41-aaf9-6714199a1b9e/images/10056262_ca7e4ba5-9389-43c5-9e70-7ee1e75f27fb_3d1aeccc-bf77-466f-b154-59c1c7eff103/thumbs/inside/640x480/jpg/3.webp",
     likes: 135,
-    price: "7.00",
-    imageUrl: "https://media.printables.com/media/prints/148a776a-6c63-4a41-aaf9-6714199a1b9e/images/10056262_ca7e4ba5-9389-43c5-9e70-7ee1e75f27fb_3d1aeccc-bf77-466f-b154-59c1c7eff103/thumbs/inside/640x480/jpg/3.webp"
+    price: "$7.00",
+    imageUrl: [
+      ['https://thangs.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fproduction-thangs-public%2Fuploads%2Fattachments%2F845542d6-1e5f-4543-bf9d-2e96b320fee9%2FF2.png&w=3840&q=85', 'https://thangs.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fproduction-thangs-public%2Fuploads%2Fattachments%2F845542d6-1e5f-4543-bf9d-2e96b320fee9%2FF2.png&w=256&q=75'], 
+      ['https://thangs.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fthangs-thumbnails%2Fproduction%2Fbb3dffcb-7937-4ed4-979d-7217f6bb5de7%2FRamadan_String_Art.png&w=3840&q=85', 'https://thangs.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fthangs-thumbnails%2Fproduction%2Fbb3dffcb-7937-4ed4-979d-7217f6bb5de7%2FRamadan_String_Art.png&w=256&q=75']
+    ],
+    sourceUrl: "https://media.printables.com/media/prints/148a776a-6c63-4a41-aaf9-6714199a1b9e/images/10056262_ca7e4ba5-9389-43c5-9e70-7ee1e75f27fb_3d1aeccc-bf77-466f-b154-59c1c7eff103/thumbs/inside/640x480/jpg/3.webp"
   },
   {
     id: "2",
-    title: "German soldier ww2",
-    tags: ["Toys", "Tabletop"],
+    title: "Dragon action figure",
+    description: "asddsffffffffffffffffff sasdddddddddddfasdfasdfasdf",
+    tags: ["Toys", "Action figure", "TableTop", "Animal", "Action figure"],
+    sourceSiteId: "234234a",
+    categoryId: "asa",
+    subCategoryId: "asdfasdf",
     platforms: "Printables",
-    downloads: 72,
-    likes: 6,
-    price: "20.00",
-    imageUrl: "https://media.printables.com/media/prints/fa96f7b9-2bfa-4334-84ff-e72b5800f043/images/10176264_57fa53d4-500b-44d2-8f8d-b67211683f37_f650cd6f-68b6-4a12-be30-0c3599c35f2e/thumbs/inside/640x480/jpg/04.webp"
+    downloads: 48,
+    thumbnailUrl: "https://media.printables.com/media/prints/148a776a-6c63-4a41-aaf9-6714199a1b9e/images/10056262_ca7e4ba5-9389-43c5-9e70-7ee1e75f27fb_3d1aeccc-bf77-466f-b154-59c1c7eff103/thumbs/inside/640x480/jpg/3.webp",
+    likes: 135,
+    price: "$7.00",
+    imageUrl: [
+      ['https://thangs.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fproduction-thangs-public%2Fuploads%2Fattachments%2F845542d6-1e5f-4543-bf9d-2e96b320fee9%2FF2.png&w=3840&q=85', 'https://thangs.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fproduction-thangs-public%2Fuploads%2Fattachments%2F845542d6-1e5f-4543-bf9d-2e96b320fee9%2FF2.png&w=256&q=75'], ['https://thangs.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fthangs-thumbnails%2Fproduction%2Fbb3dffcb-7937-4ed4-979d-7217f6bb5de7%2FRamadan_String_Art.png&w=3840&q=85', 'https://thangs.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fthangs-thumbnails%2Fproduction%2Fbb3dffcb-7937-4ed4-979d-7217f6bb5de7%2FRamadan_String_Art.png&w=256&q=75']
+    ],
+    sourceUrl: "https://media.printables.com/media/prints/148a776a-6c63-4a41-aaf9-6714199a1b9e/images/10056262_ca7e4ba5-9389-43c5-9e70-7ee1e75f27fb_3d1aeccc-bf77-466f-b154-59c1c7eff103/thumbs/inside/640x480/jpg/3.webp"
   },
   {
     id: "3",
-    title: "Double_Duck_You",
-    tags: ["Toys", "Animal"],
+    title: "Dragon action figure",
+    description: "asddsffffffffffffffffff sasdddddddddddfasdfasdfasdf",
+    tags: ["Toys", "Action figure", "TableTop", "Animal", "Action figure"],
+    sourceSiteId: "234234a",
+    categoryId: "asa",
+    subCategoryId: "asdfasdf",
     platforms: "Printables",
-    downloads: 1,
-    likes: 132,
-    price: "FREE",
-    imageUrl: "https://media.printables.com/media/prints/70ee9cdf-77a4-46e9-86f8-6dca20a61e2b/images/9662824_7a498208-87b1-4a70-b01a-f9b84eb92e8f_c81730a5-0263-408c-ad7f-35a22e1ba87d/thumbs/inside/640x480/gif/earplugcase.webp"
+    downloads: 48,
+    thumbnailUrl: "https://media.printables.com/media/prints/148a776a-6c63-4a41-aaf9-6714199a1b9e/images/10056262_ca7e4ba5-9389-43c5-9e70-7ee1e75f27fb_3d1aeccc-bf77-466f-b154-59c1c7eff103/thumbs/inside/640x480/jpg/3.webp",
+    likes: 135,
+    price: "$7.00",
+    imageUrl: [
+      ['https://thangs.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fproduction-thangs-public%2Fuploads%2Fattachments%2F845542d6-1e5f-4543-bf9d-2e96b320fee9%2FF2.png&w=3840&q=85', 'https://thangs.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fproduction-thangs-public%2Fuploads%2Fattachments%2F845542d6-1e5f-4543-bf9d-2e96b320fee9%2FF2.png&w=256&q=75'], ['https://thangs.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fthangs-thumbnails%2Fproduction%2Fbb3dffcb-7937-4ed4-979d-7217f6bb5de7%2FRamadan_String_Art.png&w=3840&q=85', 'https://thangs.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fthangs-thumbnails%2Fproduction%2Fbb3dffcb-7937-4ed4-979d-7217f6bb5de7%2FRamadan_String_Art.png&w=256&q=75']
+    ],
+    sourceUrl: "https://media.printables.com/media/prints/148a776a-6c63-4a41-aaf9-6714199a1b9e/images/10056262_ca7e4ba5-9389-43c5-9e70-7ee1e75f27fb_3d1aeccc-bf77-466f-b154-59c1c7eff103/thumbs/inside/640x480/jpg/3.webp"
   },
-  {
-    id: "4",
-    title: "Cat Pencil Holder",
-    tags: ["Toys", "Animal"],
-    platforms: "Printables",
-    downloads: 1,
-    likes: 132,
-    price: "5.99",
-    imageUrl: "https://media.printables.com/media/prints/fcc663c4-f55d-4f3a-aab2-66228afa9694/images/9866256_5b9a39c8-a5d7-48f7-af1b-6ad5388ef063_783227f4-3dbc-4cb1-a9fb-1175a1908390/thumbs/inside/640x480/jpg/130_color.webp"
-  },
-  {
-    id: "5",
-    title: "Red Brigade Sniper",
-    tags: ["Creatures", "Action figure"],
-    platforms: "Printables",
-    downloads: 128,
-    likes: 32,
-    price: "35.75",
-    imageUrl: "https://media.printables.com/media/prints/794dd285-d21c-4302-b349-3d07aeb15cde/images/9862371_d7ff835d-00ee-447d-b4b1-61025b5eca14_5bac197c-3263-4583-8d6f-2e0ad5a6390d/thumbs/inside/640x480/jpg/v139.webp"
-  },
+  
 ];
 
 export const incentives = [

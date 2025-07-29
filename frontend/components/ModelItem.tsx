@@ -33,8 +33,8 @@ const ModelItem = ({
       .replace(/--+/g, "-")
       .replace(/^-+|-+$/g, "");
 
-  const generateSlug = (category: string, subCategory: string, title: string) =>
-    `${slugify(category)}/${slugify(subCategory)}/${slugify(title)}`;
+  const generateSlug = (category: string, subCategory: string, title: string, modelId: string) =>
+    `${slugify(category)}/${slugify(subCategory)}/${slugify(title)}/${modelId}/${liked}`;
 
   const handleModelOnClick = async (modelId: string) => {
     if (!userId) return;
@@ -73,7 +73,8 @@ const ModelItem = ({
         href={`/explore/${generateSlug(
           model.category.name,
           model.subCategory.name,
-          model.title
+          model.title,
+          model.id
         )}`}
         className="overflow-hidden rounded-t-3xl"
       >
@@ -91,7 +92,8 @@ const ModelItem = ({
           href={`/explore/${generateSlug(
             model.category.name,
             model.subCategory.name,
-            model.title
+            model.title,
+            model.id
           )}`}
           className="font-semibold text-2xl truncate max-w-full hover:underline transition-colors duration-200"
         >
@@ -150,7 +152,8 @@ const ModelItem = ({
             href={`/explore/${generateSlug(
               model.category.name,
               model.subCategory.name,
-              model.title
+              model.title,
+              model.id
             )}`}
             className="flex-1 flex items-center justify-center gap-2 bg-custom-light-maincolor text-white rounded-xl py-2 font-medium text-2xl transition-transform duration-200 hover:bg-[#3a3663] hover:scale-[1.03]"
           >
