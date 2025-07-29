@@ -34,9 +34,10 @@ model Model {
   favourites     Favourite[]
   deleted        Boolean @default(false)
   downloads      Int      @default(0)
+  views          Int      @default(0)
   thumbnailUrl   String
   sourceUrl      String @unique
-  imagesUrl      String[]
+  imagesUrl      Json
   price          String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

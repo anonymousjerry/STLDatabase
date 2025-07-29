@@ -74,8 +74,9 @@ def main():
         ["Classroom Aids", "Educational & Scientific"], ["Geography Models", "Educational & Scientific"], 
         ["Math Models", "Educational & Scientific"], ["Medical Accessories", "Educational & Scientific"], ["Science Tools", "Educational & Scientific"],
         # 5 
-        ["FDM Printers", "3D Printers & Mods"], ["Resin Printers", "3D Printers & Mods"], ["Printer Mods", "3D Printers & Mods"]
+        ["FDM Printers", "3D Printers & Mods"], ["Resin Printers", "3D Printers & Mods"], ["Printer Mods", "3D Printers & Mods"],
         #2
+        ["Other", "Other"]
     ]
 
     for subcategory in subcategories:
