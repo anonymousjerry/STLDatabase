@@ -11,7 +11,7 @@ const getAllModels = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
-    console.log(req.query)
+    // console.log(req.query)
 
     
     try {
@@ -72,7 +72,7 @@ const getAllModels = async (req, res) => {
             totalCount: total
         })
 
-        console.log(models)
+        // console.log(models)
         // res.status(200).json(models);
     } catch(err) {
         console.error("Error fetching models: ", err);
@@ -96,7 +96,7 @@ const getModel = async (req, res) => {
             }
         })
 
-        console.log(model)
+        // console.log(model)
 
         if (!model) {
             return res.status(404).json({ error: 'Model not found!'});
@@ -233,6 +233,48 @@ const modelFavourite = async(req, res) => {
         console.error("Error fetching models: ", err);
         res.status(500).json({error: 'Internal server error!'})
     }
+};
+
+const getSimilars = async (req, res) => {
+
+    const modelId = req.query.modelId;
+
+    
+    try {
+        const model = await prisma.model.findUnique({
+            where: { id: modelId },
+            include: { subCategory: true, }
+        });
+
+        if (!model) return res.status(404).json({ error: "Model not found!" });
+
+        const similarModels = await prisma.model.findMany({
+            where: {
+                id: { not: modelId},
+                subCategoryId: model.subCategoryId,
+                OR: [
+                    { tags : { hasSome: model.tags}},
+                    { title: { contains: model.title.split(" ")[0], mode: 'insensitive'}}
+                ]
+            },
+            take: 12,
+            orderBy: { createdAt: 'desc'},
+            include: {
+                likes: true,
+                sourceSite: true,
+                category: true,
+                subCategory: true
+            }
+        });
+
+        res.status(200).json({ similarModels,})
+
+        // console.log(models)
+        // res.status(200).json(models);
+    } catch(err) {
+        console.error("Error fetching models: ", err);
+        res.status(500).json({ error: 'Internal server error'})
+    }
 }
 
-module.exports = { getAllModels, getTrendingModels, modelLike, modelFavourite, getModel };
+module.exports = { getAllModels, getTrendingModels, modelLike, modelFavourite, getModel, getSimilars };
