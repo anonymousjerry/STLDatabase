@@ -1,0 +1,46 @@
+import React from "react";
+import { useSearch } from "@/context/SearchContext";
+import { useRouter } from "next/navigation";
+
+const FavoriteFilter = () => {
+  const router = useRouter();
+  const {
+    searchInput,
+    selectedPlatform,
+    selectedCategory,
+    searchPrice,
+    favorited,
+    setFavorited,
+  } = useSearch();
+
+  const handleCheckboxChange = (checked: boolean) => {
+    setFavorited(checked);
+
+    const queryParams = new URLSearchParams();
+
+    if (searchInput) queryParams.set("key", searchInput);
+    if (selectedPlatform && selectedPlatform !== "All")
+      queryParams.set("sourcesite", selectedPlatform);
+    if (selectedCategory && selectedCategory !== "All")
+      queryParams.set("category", selectedCategory);
+    if (searchPrice && searchPrice !== "All")
+      queryParams.set("price", searchPrice);
+    if (checked) queryParams.set("favorited", "true");
+
+    router.push(`/explore?${queryParams.toString()}`);
+  };
+
+  return (
+    <label className="flex items-center mt-2 text-sm">
+      <input
+        type="checkbox"
+        checked={favorited}
+        onChange={(e) => handleCheckboxChange(e.target.checked)}
+        className="mr-2 accent-red-600"
+      />
+      Favorited
+    </label>
+  );
+};
+
+export default FavoriteFilter;

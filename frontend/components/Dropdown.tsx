@@ -1,20 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
 
 interface DropdownButtonProps {
-  initialContent: string;
+  value: string;
   label: string;
   list: string[];
   onSelect?: (item: string) => void;
 }
 
 const DropdownButton: React.FC<DropdownButtonProps> = ({
-  initialContent,
+  value,
   label,
   list,
   onSelect,
 }) => {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState(initialContent);
   const [search, setSearch] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -33,7 +32,6 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
   }, []);
 
   const handleSelect = (item: string) => {
-    setSelected(item);
     setOpen(false);
     setSearch('');
     onSelect?.(item);
@@ -62,7 +60,7 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
           dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:border-blue-400 dark:focus:ring-blue-600
         "
       >
-        <span>{selected}</span>
+        <span>{value}</span>
         <span
           className={`transition-transform duration-300 ${
             open ? 'rotate-180' : 'rotate-0'
@@ -123,7 +121,9 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
                 </li>
               ))
             ) : (
-              <li className="px-4 py-2 text-gray-400 italic dark:text-gray-500">No matches found</li>
+              <li className="px-4 py-2 text-gray-400 italic dark:text-gray-500">
+                No matches found
+              </li>
             )}
           </ul>
         </div>
