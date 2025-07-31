@@ -52,10 +52,14 @@ async def get_info(url):
                 if main_src and main_src.startswith("https://img-new.cgtrader.com/items/"):
                     image_urls.append([main_src, thumb_src])
 
+            thumnail_url = image_urls[0][0]
+            
+
             info.append({"title" : title})
             info.append({"description" : description})
             info.append({"tags" : tags})
             info.append({"image_urls" : image_urls})
+            info.append({"thumbnail_url": thumnail_url})
             info.append({"price" : price})
             return(info)
 
@@ -66,7 +70,7 @@ async def get_info(url):
             await browser.close()
 
 if __name__ == "__main__":
-    url = 'https://www.cgtrader.com/3d-models/aircraft/commercial-aircraft/boeing-737-800-turkish-airlines-high-detailed'
+    url = 'https://www.cgtrader.com/3d-models/aircraft/military-aircraft/f-16c-viper'
     result = asyncio.run(get_info(url))
 
     print(result)

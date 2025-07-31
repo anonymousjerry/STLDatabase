@@ -7,12 +7,12 @@ const getAllModels = async (req, res) => {
     // const { category, platform, key} = req.query;
     const category = req.query.category;
     const key = req.query.key;
+    const priceFilter = req.query.price;
     const sourceSite = req.query.sourcesite;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
-    // console.log(req.query)
-
+    console.log(priceFilter)
     
     try {
         let sourceSiteId, categoryId;
@@ -31,6 +31,35 @@ const getAllModels = async (req, res) => {
             categoryId = categoryRecord.id
         }
 
+        let priceCondition = {};
+        if (priceFilter) {
+            switch (priceFilter) {
+                case "free":
+                    priceCondition = { priceValue: { equals: 0 }};
+                    break;
+                case "premium":
+                    priceCondition = { priceValue: { equals: -1 }};
+                    break;
+                case "under-10":
+                    priceCondition = { priceValue: { lt: 10, gt: 0 } };
+                    break;
+                case "10-25":
+                    priceCondition = { priceValue: { gte: 10, lte: 25 } };
+                    break;
+                case "25-50":
+                    priceCondition = { priceValue: { gt: 25, lte: 50 } };
+                    break;
+                case "50-100":
+                    priceCondition = { priceValue: { gt: 50, lte: 100 } };
+                    break;
+                case "over-100":
+                    priceCondition = { priceValue: { gt: 100 } };
+                    break;
+                default:
+                    priceCondition = {};
+            }
+        }
+
         const whereClause = {
             ...(sourceSite && { sourceSiteId: sourceSiteId }),
             ...(category && { subCategoryId : categoryId }),
@@ -40,7 +69,8 @@ const getAllModels = async (req, res) => {
                     { description : { contains: key, mode: 'insensitive' } },
                     { tags: { has : key } }
                 ]
-            })
+            }),
+            ...priceCondition
         }
 
         const [models, total] = await Promise.all([
@@ -59,7 +89,7 @@ const getAllModels = async (req, res) => {
             prisma.model.count({
                 where: whereClause
             })
-        ])
+        ]);
 
         const totalPages = Math.ceil(total/limit);
         const hasMore = page < totalPages;
@@ -71,6 +101,8 @@ const getAllModels = async (req, res) => {
             hasMore,
             totalCount: total
         })
+
+        console.log(models)
 
         // console.log(models)
         // res.status(200).json(models);
