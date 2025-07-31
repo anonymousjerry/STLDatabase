@@ -39,6 +39,7 @@ model Model {
   sourceUrl      String @unique
   imagesUrl      Json
   price          String
+  priceValue     Float?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }

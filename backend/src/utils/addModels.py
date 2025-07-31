@@ -61,6 +61,6 @@ def import_csv(filepath):
             add_model(row)
 
 def main():
-    import_csv("../../crawler/pinshape/pinshape.csv")
+    import_csv("../../crawler/thingiverse/thingiverse.csv")
 
 main()

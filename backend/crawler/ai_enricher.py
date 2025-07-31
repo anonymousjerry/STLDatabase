@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 import json
 load_dotenv()
+import re
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -44,6 +45,19 @@ categories = [
 ]
 subcategory_to_category = {sub: cat for sub, cat in categories}
 
+def extract_json_from_response(content):
+    # Try to extract JSON block inside triple backticks
+    match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", content, re.DOTALL)
+    if match:
+        return match.group(1)
+
+    # Fallback: try to find first valid-looking JSON object
+    match = re.search(r"(\{.*\})", content, re.DOTALL)
+    if match:
+        return match.group(1)
+
+    return None
+
 MAX_DESCRIPTION_LEN = 1000
 
 def enrich_data(data):
@@ -76,19 +90,26 @@ def enrich_data(data):
         temperature=0.7
     )
 
-    result = json.loads(response.choices[0].message.content)
+    raw_content = response.choices[0].message.content
+    json_str = extract_json_from_response(raw_content)
+    if json_str:
+        result = json.loads(json_str)
+    else:
+        result = None
     subcategory = result['subcategory']
     category = subcategory_to_category.get(subcategory, "Other")
 
-
-    enriched = {
-        **data,
-        "description" : result["new_description"],
-        "category" : category,
-        "subcategory" : subcategory,
-        "tags" : ",".join(result["tags"])
-    }
-    return enriched
+    if result == None:
+        return None
+    else:
+        enriched = {
+            **data,
+            "description" : result["new_description"],
+            "category" : category,
+            "subcategory" : subcategory,
+            "tags" : ",".join(result["tags"])
+        }
+        return enriched
 
 # enrich_data({
 #     "title" : "abc",
