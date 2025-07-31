@@ -5,6 +5,9 @@ type SearchParams = {
   key?: string;
   sourcesite?: string;
   category?: string;
+  price?: string;
+  favorited?: string;
+  filters?: string[];
 };
 
 // export const getModels = async () => {
@@ -13,7 +16,6 @@ type SearchParams = {
 // }
 
 export const getModels = async (page: number = 1, limit: number = 12) => {
-    console.log(page)
   const response = await axiosInstance.get(`/models?page=${page}&limit=${limit}`);
   return response.data.models;
 };
@@ -28,7 +30,7 @@ export const getDailyModels = async () => {
     return response.data.models;
 }
 
-export const searchModels = async ({key, sourcesite, category}: SearchParams) => {
+export const searchModels = async ({key, sourcesite, category, price, favorited, filters = []}: SearchParams) => {
     const params = new URLSearchParams();
 
     if (key) params.append('key', key);
@@ -40,14 +42,23 @@ export const searchModels = async ({key, sourcesite, category}: SearchParams) =>
         params.append('category', category);
     else if (category && category === 'All')
         params.append('category', '');
+    if (price) 
+        params.append('price', price);
+    if (favorited) 
+        params.append('favorited', favorited);
 
+    filters.forEach((filter) => {
+        if (filter && filter !== 'All') {
+        params.append('filter', filter); // e.g. /models?filter=Popular&filter=Trending
+        }
+    });
+    console.log(params.toString())
 
     const response = await axiosInstance.get(`/models?${params.toString()}`);
     return response.data.models;
 }
 
 export const likeModel = async(modelId: string, userId: string, token: string) => {
-    console.log(modelId, userId)
     const response = await axiosInstance.post(
         `/models/like`,
         {
@@ -64,7 +75,6 @@ export const likeModel = async(modelId: string, userId: string, token: string) =
 }
 
 export const saveModel = async(modelId: string, userId: string, token: string) => {
-    console.log(modelId, userId)
     const response = await axiosInstance.post(
         `/models/save`,
         {

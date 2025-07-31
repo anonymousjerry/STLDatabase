@@ -19,9 +19,13 @@ const SearchBar = () => {
     selectedPlatform,
     selectedCategory,
     searchInput,
+    searchPrice,
+    favorited,
     setSelectedPlatform,
     setSelectedCategory,
     setSearchInput,
+    setSearchPrice,
+    setFavorited,
   } = useSearch();
 
   useEffect(() => {
@@ -42,6 +46,8 @@ const SearchBar = () => {
     if (selectedCategory && selectedCategory !== "All")
       queryParams.set("category", selectedCategory);
     if (searchInput) queryParams.set("key", searchInput);
+    if (searchPrice) queryParams.set("price", searchPrice);
+    if (favorited) queryParams.set("favorited", 'true');
 
     router.push(`/explore?${queryParams.toString()}`);
   };
@@ -53,7 +59,7 @@ const SearchBar = () => {
     >
       <div className="basis-1/5">
         <DropdownButton
-          initialContent={selectedPlatform}
+          value={selectedPlatform}
           label="Platform"
           list={platformArray}
           onSelect={(value) => setSelectedPlatform(value)}
@@ -62,7 +68,7 @@ const SearchBar = () => {
 
       <div className="basis-1/5">
         <DropdownButton
-          initialContent={selectedCategory}
+          value={selectedCategory}
           label="Categories"
           list={categoriesArray}
           onSelect={setSelectedCategory}
