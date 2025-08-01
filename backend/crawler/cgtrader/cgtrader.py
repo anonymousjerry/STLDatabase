@@ -3,35 +3,13 @@ import asyncio
 from get_cgt import get_info
 import os
 import sys
-import psycopg2
-from cuid import cuid
-import ast
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.append(project_root)
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from ai_enricher import enrich_data
-from src.utils.convertPrice import parse_price_to_value
-from datetime import datetime
-from psycopg2.extras import Json
+from src.utils.injection import url_exists_in_db, inject_database
 
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
-
-conn = psycopg2.connect(
-    dbname="projectdb",
-    user="postgres",
-    password="mypassword",
-    host="localhost",
-    port="5432"
-)
-
-cursor = conn.cursor()
-
-def url_exists_in_db(href):
-    query = 'SELECT 1 FROM "Model" WHERE "sourceUrl" = %s'
-    cursor.execute(query, (href,))
-    result = cursor.fetchone()
-    return result is not None
-
 
 async def scrape_cgtrader(category, number):
     found_urls = 0
@@ -98,44 +76,6 @@ async def pass_AI(results):
         else:
             inject_database(res)
 
-def generate_unique_id():
-    while True:
-        id = cuid()
-        cursor.execute(
-            """SELECT COUNT(*) FROM "Model" WHERE id = %s""", (id,)
-        )
-        if cursor.fetchone()[0] == 0:
-            return id
-
-def inject_database(data):
-    now = datetime.utcnow()
-    try:
-        cursor.execute('SELECT id FROM "SourceSite" WHERE name = %s', (data['platform'],))
-        source_site_id = cursor.fetchone()[0]
-        cursor.execute('SELECT id FROM "Category" WHERE name=%s', (data['category'],))
-        category_id = cursor.fetchone()[0]
-        if data['category'] == 'Other':
-            cursor.execute('SELECT id FROM "SubCategory" WHERE name=%s', ("Other",))
-            subcategory_id = cursor.fetchone()[0]
-        else:
-            cursor.execute('SELECT id FROM "SubCategory" WHERE name=%s', (data['subcategory'],))
-            subcategory_id = cursor.fetchone()[0]
-        data['tags'] = [tag.strip() for tag in data['tags'].split(',')]
-        if isinstance(data['image_urls'], str):
-            data['image_urls'] = ast.literal_eval(data['image_urls'])
-        cursor.execute(
-            """INSERT INTO "Model" (id, "sourceSiteId", title, description, "categoryId", "subCategoryId", tags, "sourceUrl", "thumbnailUrl", "imagesUrl", price, "priceValue", "createdAt", "updatedAt")
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT ("sourceUrl") Do NOTHING
-            """,
-            (generate_unique_id(), source_site_id, data['title'], data['description'], category_id, subcategory_id, 
-            data['tags'],data['source_url'],data['thumbnail_url'], Json(data['image_urls']), data['price'],  parse_price_to_value(data['price']),now, now)
-        )
-        conn.commit()
-    except psycopg2.Error as e:
-        print(f"Error adding source site: {e}")
-        conn.rollback()
-
 if __name__ == "__main__":
-    results = asyncio.run(scrape_cgtrader("aircraft", 5))
+    results = asyncio.run(scrape_cgtrader("aircraft", 1))
     asyncio.run(pass_AI(results))

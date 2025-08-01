@@ -6,12 +6,16 @@ import random
 import csv
 import os
 import sys
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.append(project_root)
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from src.utils.injection import inject_database, url_exists_in_db, find_thingiverse_stpoint
 from ai_enricher import enrich_data
 
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
 
-async def scrape_thingiverse():
+async def scrape_thingiverse(num):
+    collected_url = []
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=False)  # Set headless=True if you don't want the browser to show
         page = await browser.new_page(
@@ -27,43 +31,39 @@ async def scrape_thingiverse():
         
         maxId = 0
 
-        await page.wait_for_selector('a[href*="/thing:"]', timeout=5000, state="attached")
+        await page.wait_for_selector('a[href*="/thing:"]', timeout=10000, state="attached")
         link = await page.query_selector('a[href*="/thing:"]')
 
         href = await link.get_attribute('href')
         match = re.search(r'thing:(\d+)', href)
         maxId = int(match.group(1))
         print(maxId)
-        #for i in range(maxId):
-        for i in range(10):
-            url = f"https://www.thingiverse.com/thing:{(i+1)}"
-            try:
+
+        current = find_thingiverse_stpoint() + 1
+
+        while len(collected_url) < num:
+            url = f"https://www.thingiverse.com/thing:{(current)}"
+            info = await get_info(url)
+            if info is not None:
                 merged_info = {}
-                info = await get_info(url)
-                if info != None:
-                    for item in info:
+                for item in info:
+                    if isinstance(item, dict):
                         merged_info.update(item)
+                merged_info["source_url"] = url
+                merged_info["platform"] = "Thingiverse"
+                res = enrich_data(merged_info)
+                if res == None:
+                    continue
+                else:
+                    inject_database(res)
+                collected_url.append(url)
+            current += 1
 
-                    merged_info["source_url"] = url
-                    merged_info["platform"] = "Thingiverse"
-                    result = enrich_data(merged_info)
-                    write_csv(result)
-            except Exception as e:
-                print(e)
-               
-
+            if current > maxId:
+                print("Reached last modelID")
+                break
+        
         await browser.close()
 
-def write_csv(row):
-    filename = "thingiverse.csv"
-    headers = ["platform", "title", "description", "category", "subcategory", "source_url", "thumbnail_url", "tags", "image_urls", "price"]
-    file_exists = os.path.isfile(filename) and os.path.getsize(filename) > 0
-    with open(filename, "a", newline="", encoding="utf-8") as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=headers)
-        if not file_exists:
-            writer.writeheader()
-        complete_row = { key: row.get(key, "") for key in headers}
-        writer.writerow(complete_row)
-
 if __name__ == "__main__":
-    asyncio.run(scrape_thingiverse())
+    results = asyncio.run(scrape_thingiverse(2))
