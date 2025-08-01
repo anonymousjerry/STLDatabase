@@ -31,15 +31,16 @@ const FavoriteFilter = () => {
   };
 
   return (
-    <label className="flex items-center mt-2 text-sm">
+    <label className="flex items-center gap-2 mt-2 text-sm text-gray-800 dark:text-gray-200">
       <input
         type="checkbox"
         checked={favorited}
         onChange={(e) => handleCheckboxChange(e.target.checked)}
-        className="mr-2 accent-red-600"
+        className="w-4 h-4 accent-red-600 dark:accent-red-400"
       />
-      Favorited
+      <span>Favorited</span>
     </label>
+
   );
 };
 

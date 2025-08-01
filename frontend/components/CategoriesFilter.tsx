@@ -43,21 +43,25 @@ const CategoriesFilter = () => {
 };
     
     return(
-        <div className="ml-2 mt-1 space-y-1">
+        <div className="ml-2 mt-1 space-y-2">
             {categories.map((option) => (
-                <label key={option} className="flex items-center text-sm">
-                    <input
+                <label
+                key={option}
+                className="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-200"
+                >
+                <input
                     type="radio"
                     name="Categories"
                     value={option}
-                    checked={ selectedCategory === option}
+                    checked={selectedCategory === option}
                     onChange={() => handleRadioChange(option)}
-                    className="mr-2 accent-blue-600"
-                    />
-                    {option}
+                    className="w-4 h-4 accent-blue-600 dark:accent-blue-400"
+                />
+                <span>{option}</span>
                 </label>
             ))}
         </div>
+
     )
 }
 

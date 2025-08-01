@@ -203,8 +203,8 @@ export default function ClientExplorePage({
 
         {/* Right Side Details */}
         <div className="flex flex-col basis-2/5 w-full gap-4">
-          <div className="font-bold text-custom-light-textcolor dark:text-custom-dark-titlecolor text-[40px] truncate overflow-hidden whitespace-nowrap max-w-full">
-            {title}
+          <div className="font-bold text-custom-light-textcolor dark:text-custom-dark-titlecolor text-[40px]">
+            {title.replace(/-/g, " ")}
           </div>
           <div className="flex gap-2 flex-wrap">
             {result.tags.map((tag: string, index: number) => (

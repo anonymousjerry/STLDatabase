@@ -8,23 +8,28 @@ interface ExplorePageProps {
     category?: string;
     price?: string;
     favorited?: string;
+    currentPage?: number;
   };
 }
 
 const ExploreMainPage = async ({ searchParams }: ExplorePageProps) => {
-  const { key, sourcesite, category, price, favorited } = await searchParams;
+  const { key, sourcesite, category, price, favorited, currentPage} = searchParams;
 
-    const models = await searchModels({
-        key: key || "",
-        sourcesite: sourcesite || "",
-        category: category || "",
-        price: price || "",
-        favorited: favorited || "false",
-    });
+  const { models, totalPage, page, hasMore } = await searchModels({
+    key: key || '',
+    sourcesite: sourcesite || '',
+    category: category || '',
+    price: price || '',
+    favorited: favorited || 'false',
+    page: currentPage || 1,
+    limit: 12,
+  });
 
   return (
     <ExploreMainPageClient
       initialModels={models}
+      totalPage={totalPage}
+      currentPage={page}
       initialSearchParams={{ key, sourcesite, category, price }}
     />
   );

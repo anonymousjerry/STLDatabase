@@ -48,6 +48,7 @@ const SearchBar = () => {
     if (searchInput) queryParams.set("key", searchInput);
     if (searchPrice) queryParams.set("price", searchPrice);
     if (favorited) queryParams.set("favorited", 'true');
+    queryParams.set("currentPage", '1');
 
     router.push(`/explore?${queryParams.toString()}`);
   };
