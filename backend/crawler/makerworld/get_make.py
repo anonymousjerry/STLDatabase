@@ -77,7 +77,7 @@ async def get_info(url):
             await browser.close()
 
 if __name__ == "__main__":
-    url = 'https://makerworld.com/en/models/1636612-bambu-lab-silica-desiccant-core-dryboxwiry-v2'
+    url = 'https://makerworld.com/en/models/1651943-a1-a1-mini-screw-map-organizer-holder-for-extruder'
     result = asyncio.run(get_info(url))
 
     print(result)
