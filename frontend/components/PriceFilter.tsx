@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { searchModels } from "@/lib/modelsApi";
+import React from "react";
 import { useSearch } from "@/context/SearchContext";
 import { useRouter } from "next/navigation";
 
 
 const PriceArray = [
-  { title: "Free", value: "Free" },
-  { title: "Under $10", value: "10" },
-  { title: "$10 - $25", value: "25" },
-  { title: "$25 - $50", value: "50" },
-  { title: "$50 - $100", value: "100" },
-  { title: "Over $100", value: "Over100" },
+  { title: "Free", value: "free" },
+  { title: "Premium", value: "premium"},
+  { title: "Under $10", value: "under-10" },
+  { title: "$10 - $25", value: "10-25" },
+  { title: "$25 - $50", value: "25-50" },
+  { title: "$50 - $100", value: "50-100" },
+  { title: "Over $100", value: "over-100" },
 ];
 
 const PriceFilter = () => {
@@ -31,7 +31,6 @@ const PriceFilter = () => {
 
   const handleRadioChange = (value: string) => {
         setSearchPrice(value);
-        console.log(value)
 
         const queryParams = new URLSearchParams();
 
@@ -48,21 +47,25 @@ const PriceFilter = () => {
 };
 
   return (
-    <div className="ml-2 mt-1 space-y-1">
-      {PriceArray.map(({title, value}) => (
-        <label key={value} className="flex items-center text-sm">
+    <div className="ml-2 mt-1 space-y-2">
+      {PriceArray.map(({ title, value }) => (
+        <label
+          key={value}
+          className="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-200"
+        >
           <input
             type="radio"
             name="priceFilter"
             value={value}
             checked={searchPrice === value}
             onChange={() => handleRadioChange(value)}
-            className="mr-2 accent-blue-600"
+            className="w-4 h-4 accent-blue-600 dark:accent-blue-400"
           />
-          {title}
+          <span>{title}</span>
         </label>
       ))}
     </div>
+
   );
 };
 

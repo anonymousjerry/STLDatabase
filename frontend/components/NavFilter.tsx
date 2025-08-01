@@ -40,7 +40,7 @@ const NavFilter: React.FC<NavFilterProps> = ({
               ${
                 isSelected
                   ? 'bg-custom-light-maincolor text-white text-lg'
-                  : 'bg-white text-custom-light-textcolor border-gray-300 hover:bg-gray-100'
+                  : 'bg-white dark:bg-custom-dark-secondcolor text-custom-light-textcolor dark:text-custom-dark-textcolor border-gray-300 hover:bg-gray-100'
               }
             `}
           >

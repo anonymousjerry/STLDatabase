@@ -10,25 +10,6 @@ import FavoriteFilter from "./FavoriteFilter";
 
 const filters: string[] = ["Platforms", "Categories", "Price", "Favorited"];
 
-// type SideFilterProps = {
-//   searchParams: {
-//     key?: string;
-//     sourcesite?: string;
-//     category?: string;
-//     price?: string;
-//     favorited?: boolean;
-//   };
-//   setSearchParams: React.Dispatch<
-//     React.SetStateAction<{
-//       key?: string;
-//       sourcesite?: string;
-//       category?: string;
-//       price?: string;
-//       favorited?: boolean;
-//     }>
-//   >;
-// };
-
 const SideFilter = () => {
   const [openSections, setOpenSections] = useState<{ [key: string]: boolean }>({});
 
@@ -40,8 +21,8 @@ const SideFilter = () => {
   };
 
   return (
-    <aside className="flex flex-col w-full bg-white border rounded-lg shadow p-4">
-      <div className="flex items-center justify-center text-custom-light-textcolor text-lg font-medium relative pt-2 gap-2">
+    <aside className="flex flex-col w-full bg-white dark:bg-custom-dark-containercolor border rounded-lg shadow p-4">
+      <div className="flex items-center justify-center text-custom-light-textcolor dark:text-custom-dark-textcolor text-lg font-medium relative pt-2 gap-2">
         <BiFilterAlt />
         Search Filter
         <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-[#C8C8C8] rounded" />
@@ -51,7 +32,7 @@ const SideFilter = () => {
         {filters.map((title) => (
           <div key={title}>
             <button
-              className="flex justify-between items-center w-full text-left font-medium text-lg text-custom-light-textcolor"
+              className="flex justify-between items-center w-full text-left font-medium text-lg text-custom-light-textcolor dark:text-custom-dark-textcolor"
               onClick={() => toggleSection(title)}
             >
               <span>{title}</span>
