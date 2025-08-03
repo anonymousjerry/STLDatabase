@@ -8,7 +8,6 @@ export const axiosInstance = axios.create({
     'Content-Type': 'application/json'
   }
 })
-// Add token to request headers
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -20,7 +19,6 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle global responses
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {

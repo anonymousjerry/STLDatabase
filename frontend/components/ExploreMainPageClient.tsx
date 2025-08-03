@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import SearchBar from '@/components/SearchBar';
-import SearchResultPart from '@/components/SearchResultPart';
-import NavFilter from '@/components/NavFilter';
+import SearchBar from './SearchBar';
+import SearchResultPart from './SearchResultPart';
+import NavFilter from './NavFilter';
 import { searchModels } from '@/lib/modelsApi';
 import { FiBox } from 'react-icons/fi';
 import SideFilter from './SideFilter';
@@ -22,12 +22,12 @@ type ExploreMainPageClientProps = {
   };
 };
 
-const ExploreMainPageClient: React.FC<ExploreMainPageClientProps> = ({
+const ExploreMainPageClient = ({
   initialModels,
   totalPage,
   currentPage,
   initialSearchParams,
-}) => {
+}: ExploreMainPageClientProps) => {
   const router = useRouter();
   const [models, setModels] = useState<Model[]>(initialModels);
   const [selectedFilters, setSelectedFilters] = useState<string[]>(['All']);

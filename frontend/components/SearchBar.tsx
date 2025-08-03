@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import DropdownButton from "./Dropdown";
+import DropdownButton from "./DropdownButton";
 import SearchInput from "./SearchInput";
 import { getSubCategories } from "@/lib/categoryApi";
 import { getPlatforms } from "@/lib/platformApi";

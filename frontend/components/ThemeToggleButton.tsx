@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { useTheme } from '../context/ThemeContext'; // <- from the ThemeProvider we discussed
+import { useTheme } from '../context/ThemeContext';
 
 const ThemeToggleButton = () => {
   const { theme, toggleTheme } = useTheme();
