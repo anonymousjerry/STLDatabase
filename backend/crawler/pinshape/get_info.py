@@ -7,7 +7,14 @@ async def get_info(url):
     info = []
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)  # Set to True to hide the browser
+        browser = await p.chromium.launch(
+            headless=False,
+            proxy={
+                "server": "http://pool.infatica.io:10000",
+                "username": "C0aeX1JZjKzfxgTQDpbG",
+                "password": "yl9xbHM8"
+            } 
+        )  # Set to True to hide the browser
         page = await browser.new_page(user_agent=user_agent, 
             viewport={"width": 1280, "height": 800},
             locale="en-US"
@@ -16,16 +23,31 @@ async def get_info(url):
         try:
             await page.goto(url, timeout=60000, wait_until="domcontentloaded")
             
-            await page.wait_for_selector('h1#design-name')
-            title = await page.locator('h1#design-name').inner_text()
+            await page.wait_for_selector('h1.fw-bold')
+            title = await page.locator('h1.fw-bold').inner_text()
 
-            price_locator = page.locator('span.price [itemprop="price"]')
-            price_text = await price_locator.inner_text()
-            price = price_text.strip()
-            if price == "":
+            button = page.locator("button.btn.btn-primary.btn-lg")
+
+            if await button.count() > 0:
+                text = await button.text_content()
+                # print("Button Text:", text)
+
+                # Extract the price using string parsing
+                # Example: "Buy for $5.00" → extract "$5.00"
+                if text and "$" in text:
+                    price = text.strip().split("Buy for")[-1].strip()
+                    # print("Extracted Price:", price)
+                else:
+                    print("Price not found in button text.")
+            else:
                 price = "Free"
+            # price_locator = page.locator('span.price [itemprop="price"]')
+            # price_text = await price_locator.inner_text()
+            # price = price_text.strip()
+            # if price == "":
+            #     price = "Free"
 
-            paragraphs = await page.locator('div.mh-description p').all_inner_texts()
+            paragraphs = await page.locator('div.description-content p').all_inner_texts()
             # Filter out empty strings and join the rest
             description = " ".join(p.strip() for p in paragraphs if p.strip())
 
@@ -40,7 +62,7 @@ async def get_info(url):
             # # Optional: prepend "https:" if URLs start with "//"
             # carousel_urls = [f"https:{url}" if url.startswith("//") else url for url in carousel_urls]
 
-            thumbnail_locator = page.locator('div.owl-dot img')
+            thumbnail_locator = page.locator('div.thumbnail-carousel img')
             thumbnail_urls = await thumbnail_locator.evaluate_all(
                 '(elements) => elements.map(img => img.getAttribute("src"))'
             )
@@ -48,17 +70,27 @@ async def get_info(url):
             # Normalize URLs (prepend "https:" if needed)
             thumbnail_urls = [f"https:{url}" if url.startswith("//") else url for url in thumbnail_urls]
 
-            filtered_thumbnail_urls = [thumbnail_url for thumbnail_url in thumbnail_urls if '/shape_file/' not in thumbnail_url]
+            filtered_thumbnail_urls = [thumbnail_url for thumbnail_url in thumbnail_urls if '/shape_file/' not in thumbnail_url and '.mp4' not in thumbnail_url]
 
             carousel_urls = [
-                url.replace('horizontal_thumbnail_', 'container_')
+                url.replace('small_', 'large_')
                 for url in filtered_thumbnail_urls
             ]
 
             image_urls = []
             for i in range(len(carousel_urls)):
                 image_urls.append([carousel_urls[i], filtered_thumbnail_urls[i]])
-            # print(image_urls)
+            if len(image_urls) == 0:
+                carousel_locator = page.locator('div.position-relative img')
+                carousel_urls = await carousel_locator.evaluate_all(
+                    '(elements) => elements.map(img => img.getAttribute("src"))'
+                )
+                thumbnail_urls = [
+                    url.replace('large_', 'small_')
+                    for url in carousel_urls
+                ]
+                for i in range(len(carousel_urls)):
+                    image_urls.append([carousel_urls[i], thumbnail_urls[i]])
 
             info.append({"title" : title})
             info.append({"description" : description})
@@ -74,11 +106,5 @@ async def get_info(url):
             await browser.close()
 
 if __name__ == "__main__":
-    url = 'https://pinshape.com/items/34605-3d-printed-fully-3d-printed-fidget-spinner'
+    url = 'https://pinshape.com/items/9407-the-t-rex-skull'
     result = asyncio.run(get_info(url))
-
-    print(result)
-    merged_info = {}
-    for item in result:
-        merged_info.update(item)
-    print(merged_info)

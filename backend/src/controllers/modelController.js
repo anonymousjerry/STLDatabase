@@ -203,7 +203,6 @@ const modelLike = async(req, res) => {
                     modelId
                 }
             }) 
-            // await getAllModels()
             res.status(200).json({ success: "successfully liked"})
         } 
         else{
@@ -215,7 +214,6 @@ const modelLike = async(req, res) => {
                     },
                 },
             })
-            // await getAllModels()
             res.status(200).json({ success: "successfully disliked!"})
         } 
 
@@ -247,7 +245,7 @@ const modelFavourite = async(req, res) => {
                     modelId
                 }
             }) 
-            res.status(200).json({ success: "successfully liked"})
+            res.status(200).json({ success: "successfully favourited!"})
         } 
         else{
             await prisma.favourite.delete({
@@ -258,7 +256,7 @@ const modelFavourite = async(req, res) => {
                     },
                 },
             })
-            res.status(200).json({ success: "successfully disliked!"})
+            res.status(200).json({ success: "successfully remove favourite!"})
         } 
 
     } catch(err){

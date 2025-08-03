@@ -1,5 +1,6 @@
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+import asyncio
 
 def get_quality_from_url(url):
     parsed_url = urlparse(url)
@@ -51,7 +52,14 @@ async def get_info(url):
     info = []
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)  # Set to True to hide the browser
+        browser = await p.chromium.launch(
+            headless=False,
+            proxy={
+                "server": "http://pool.infatica.io:10000",
+                "username": "C0aeX1JZjKzfxgTQDpbG",
+                "password": "yl9xbHM8"
+            } 
+        )  # Set to True to hide the browser
         page = await browser.new_page(user_agent=user_agent, 
             viewport={"width": 1280, "height": 800},
             locale="en-US"
@@ -124,7 +132,7 @@ async def get_info(url):
         finally:
             await browser.close()
 
-# if __name__ == "__main__":
-#     url = 'https://thangs.com/designer/3dprintbunny/3d-model/Ramadan%20String%20Art-1030820'
-#     result = asyncio.run(get_info(url))
-#     print(result)
+if __name__ == "__main__":
+    url = 'https://thangs.com/designer/3dprintbunny/3d-model/Ramadan%20String%20Art-1030820'
+    result = asyncio.run(get_info(url))
+    print(result)
