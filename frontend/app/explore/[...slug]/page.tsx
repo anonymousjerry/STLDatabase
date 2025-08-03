@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getModel } from "@/lib/modelsApi";
-import ClientExplorePage from "@/components/ClientExplorePage";
+import { ClientExplorePage } from "@/components"
 
 export default async function ExplorePage({
   params,

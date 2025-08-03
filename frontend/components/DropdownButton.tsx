@@ -6,13 +6,7 @@ interface DropdownButtonProps {
   list: string[];
   onSelect?: (item: string) => void;
 }
-
-const DropdownButton: React.FC<DropdownButtonProps> = ({
-  value,
-  label,
-  list,
-  onSelect,
-}) => {
+const DropdownButton = ({ value, label, list, onSelect}: DropdownButtonProps) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);

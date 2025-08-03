@@ -16,10 +16,10 @@ type NavFilterProps = {
   onFilterChange: (filters: string[]) => void;
 };
 
-const NavFilter: React.FC<NavFilterProps> = ({
+const NavFilter = ({
   selectedFilters,
   onFilterChange,
-}) => {
+}: NavFilterProps) => {
   const handleFilterChange = (clicked: string) => {
     // Always allow only one selection
     onFilterChange([clicked]);

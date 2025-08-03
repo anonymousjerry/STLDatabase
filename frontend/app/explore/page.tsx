@@ -1,4 +1,4 @@
-import ExploreMainPageClient from '@/components/ExploreMaiPageClient';
+import { ExploreMainPageClient } from '@/components';
 import { searchModels } from '@/lib/modelsApi';
 
 interface ExplorePageProps {

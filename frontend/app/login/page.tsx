@@ -9,7 +9,6 @@ import { FaGoogle, FaApple, FaGithub } from "react-icons/fa6";
 const LoginPage = () => {
   const router = useRouter();
   const [error, setError] = useState("");
-  // const session = useSession();
   const { data: session, status: sessionStatus } = useSession();
 
   const providers = [

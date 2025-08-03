@@ -1,18 +1,8 @@
-// *********************
-// Role of the component: Search input element located in the header but it can be used anywhere in your application
-// Name of the component: SearchInput.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <SearchInput />
-// Input parameters: no input parameters
-// Output: form with search input and button
-// *********************
-
 "use client";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import React, { useState, useRef, useEffect } from "react";
-import { FaUser, FaHeart, FaCar } from 'react-icons/fa';
+import { FaUser, FaHeart } from 'react-icons/fa';
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { signOut } from "next-auth/react";

@@ -6,14 +6,7 @@ import Breadcrumb from "./Breadcrumb";
 import SearchBar from "./SearchBar";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { HiDownload } from "react-icons/hi";
-import {
-  CiBookmark,
-  CiBookmarkCheck,
-  CiFlag1,
-  CiHeart,
-  CiShare2,
-  CiStar,
-} from "react-icons/ci";
+import { CiBookmark, CiBookmarkCheck, CiFlag1, CiHeart, CiShare2, CiStar, } from "react-icons/ci";
 import { IoEyeOutline } from "react-icons/io5";
 import { useSession } from "next-auth/react";
 import { likeModel, saveModel } from "@/lib/modelsApi";

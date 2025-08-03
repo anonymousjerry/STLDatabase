@@ -1,8 +1,3 @@
-// *********************
-// Role: Featured site grid wrapper
-// Name: FeaturedSite.tsx
-// *********************
-
 "use client";
 
 import React from "react";

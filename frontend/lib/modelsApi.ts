@@ -12,10 +12,6 @@ type SearchParams = {
   limit?: number;
 };
 
-// export const getModels = async () => {
-//     const response = await axiosInstance.get('/models');
-//     return response.data;
-// }
 
 export const getModels = async (page: number = 1, limit: number = 12) => {
   const response = await axiosInstance.get(`/models?page=${page}&limit=${limit}`);

@@ -2,7 +2,6 @@ type SubCategoryItem = {
   id: number;
   title: string;
   src: string;
-//   href: string;
 };
 
 const subCategoryList = (subcategories: string[]): SubCategoryItem[] => {
@@ -16,7 +15,6 @@ const subCategoryList = (subcategories: string[]): SubCategoryItem[] => {
         id: index + 1,
         title: category,
         src: `/Categories/${slugify(category)}.png`,
-        // href: `/explore/${slugify(category)}`
     }));
 }
 
