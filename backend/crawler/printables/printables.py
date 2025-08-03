@@ -1,11 +1,14 @@
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 import asyncio
 from get_info import get_info
-import csv
 import os
 import sys
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.append(project_root)
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from ai_enricher import enrich_data
+from src.utils.injection import url_exists_in_db, inject_database
+
 
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
 
@@ -14,13 +17,7 @@ group_lists = [
     'store'
 ]
 
-number_lists = [
-    134, 40, 138, 136, 135, 2, 137, 12, 16, 14, 15, 41, 77, 78, 81, 80, 18, 20, 42, 25, 27, 26, 28, 100, 140, 43, 88, 99, 89, 52, 51, 95, 50,
-    64, 49, 82, 5, 6, 139, 44, 4, 7, 29, 53, 45, 57, 92, 93, 98, 94, 96, 91, 69, 68, 71, 70, 84, 85, 83, 74, 97, 104, 103, 105, 36, 31, 37, 34,
-    33, 38, 47, 61, 62, 75, 60
-]
-
-async def scrape_printables():
+async def scrape_printables(category_id, num):
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=False,
@@ -36,14 +33,12 @@ async def scrape_printables():
             viewport={"width": 1280, "height": 800},
             locale="en-US"
         )
-        for group in group_lists:
-            for number in number_lists:
-                # await page.goto(f"https://ipinfo.io/what-is-my-ip", timeout=60000, wait_until="domcontentloaded")
-                model_data = []
-                data = []
-                results = []
+        
+        collected_urls = []
+        while len(collected_urls) < num:
+            for group in group_lists:
                 try:
-                    await page.goto(f"https://www.printables.com/{group}?category={number}", timeout=60000, wait_until="domcontentloaded")
+                    await page.goto(f"https://www.printables.com/{group}?category={category_id}", timeout=60000, wait_until="domcontentloaded")
                 except PlaywrightTimeoutError:
                     print(f"Attempt failed to load: ")
                 # Scroll down repeatedly to load more models
@@ -63,54 +58,38 @@ async def scrape_printables():
                 anchors = await page.locator("a.card-image").all()
                 for a in anchors:
                     href = await a.get_attribute("href")
-                    if href and href.startswith("/model/") and "/comments" not in href:
+                    if href and href.startswith("/model/") and "/comments" not in href and not url_exists_in_db(href) and href not in collected_urls:
                         model_link = "https://www.printables.com" + href
+                        collected_urls.append(model_link)
                     
-                    img = a.locator('img').nth(1)
-                    img_src = await img.get_attribute("src")
+                        img = a.locator('img').nth(1)
+                        img_src = await img.get_attribute("src")
+                        
+                        merged_info = {}
+                        info = await get_info(model_link)
+                        if not info:
+                            continue
 
-                    model_data.append([model_link, img_src])
+                        for item in info:
+                            if isinstance(item, dict):
+                                merged_info.update(item)
+                        merged_info["source_url"] = model_link
+                        merged_info["platform"] = "Printables"
+                        merged_info["thumbnail_url"] = img_src
+                        res = enrich_data(merged_info)
+                        if res == None:
+                            continue
+                        else:
+                            inject_database(res)
+                        if len(collected_urls) == num:
+                            break
 
-                print(f"Found {len(model_data)} model links.")
-
-                for i in range(len(model_data)):
-                    merged_info = {}
-                    info = await get_info(model_data[i][0])
-                    if not info:
-                        continue
-                    print(info)
-
-                    for item in info:
-                        if isinstance(item, dict):
-                            merged_info.update(item)
-                    merged_info["source_url"] = model_data[i][0]
-                    merged_info["thumbnail_url"] = model_data[i][1]
-                    merged_info["platform"] = "Printables"
-                    data.append(merged_info)
-                
-                for d in data:
-                    res = enrich_data(d)
-                    results.append(res)
-
-                write_csv(results)
-            
-        await browser.close()
-                
+                if len(collected_urls) == num:
+                    break
+            break
         
-def write_csv(results):
-    filename = 'printables.csv'
-    headers = ["platform", "title", "description", "category", "subcategory", "source_url", "thumbnail_url", "tags", "image_urls", "price"]
-
-    file_exists = os.path.isfile(filename) and os.path.getsize(filename) > 0
-
-    with open(filename, "a", newline="", encoding="utf-8") as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=headers)
-        if not file_exists:
-            writer.writeheader()
-        for row in results:
-            complete_row = { key: row.get(key, "") for key in headers}
-            writer.writerow(complete_row)
-
+    await browser.close()
+            
 
 if __name__ == "__main__":
-    asyncio.run(scrape_printables())
+    asyncio.run(scrape_printables(134, 5))
