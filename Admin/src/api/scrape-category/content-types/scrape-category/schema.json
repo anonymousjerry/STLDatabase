@@ -1,0 +1,22 @@
+{
+  "kind": "collectionType",
+  "collectionName": "scrape_categories",
+  "info": {
+    "singularName": "scrape-category",
+    "pluralName": "scrape-categories",
+    "displayName": "ScrapeCategory"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name"
+    }
+  }
+}
