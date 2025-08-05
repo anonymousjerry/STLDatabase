@@ -1,3 +1,5 @@
+"use client"
+
 import React, { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useSearch } from "@/context/SearchContext";

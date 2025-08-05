@@ -23,8 +23,8 @@ export const getTrendingModels = async () => {
     return response.data.models;
 }
 
-export const getDailyModels = async () => {
-    const response = await axiosInstance.get('/models/trending');
+export const getDailyModels = async (page: number = 1, limit: number = 12) => {
+    const response = await axiosInstance.get(`/models/dailyDiscover?page=${page}&limit=${limit}`);
     return response.data.models;
 }
 
@@ -77,9 +77,39 @@ export const likeModel = async(modelId: string, userId: string, token: string) =
 
 export const saveModel = async(modelId: string, userId: string, token: string) => {
     const response = await axiosInstance.post(
-        `/models/save`,
+        `/models/favourite`,
         {
             userId: userId,
+            modelId: modelId,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        }
+    )
+    return response.data;
+}
+
+export const downloadModel = async(modelId: string, token: string) => {
+    const response = await axiosInstance.post(
+        `/models/download`,
+        {
+            modelId: modelId,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        }
+    )
+    return response.data;
+}
+
+export const viewModel = async(modelId: string, token: string) => {
+    const response = await axiosInstance.post(
+        `/models/view`,
+        {
             modelId: modelId,
         },
         {

@@ -4,10 +4,12 @@ import React, {useEffect} from "react";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { HiDownload, HiOutlineFolderDownload } from "react-icons/hi";
 import { useSession } from "next-auth/react";
-import { likeModel } from "@/lib/modelsApi";
+import { likeModel, viewModel } from "@/lib/modelsApi";
 import Image from "next/image";
 import Link from "next/link";
 import { useLikesStore } from "@/app/_zustand/useLikesStore";
+import { useViewsStore } from "@/app/_zustand/useViewStore";
+import toast from "react-hot-toast";
 
 const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   const { data: session, status } = useSession();
@@ -16,6 +18,8 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   const { likedModels, likesCount, toggleLike } = useLikesStore();
   const liked = likedModels[model.id] ?? model.likes?.some((like: Like) => like.userId === userId) ?? false;
   const count = likesCount[model.id] ?? model.likes.length;
+
+  const { addView, isView, ViewCounts } = useViewsStore();
 
   const isDisabled = status !== "authenticated";
   const sourceSiteName = model.sourceSite?.name ?? "";
@@ -73,6 +77,15 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
     liked: liked.toString()
   };
 
+  const handleToggleView = async (modelId: string) => {
+    try {
+      const data = await viewModel(modelId, session?.accessToken || "");
+      addView(modelId, data.count);
+    } catch (error) {
+      toast.error("Failed to view model.");
+    }
+  };
+
   return (
     <div className="flex flex-col w-full bg-custom-light-containercolor dark:bg-custom-dark-containercolor shadow-lg rounded-3xl border border-gray-200 overflow-hidden relative">
       {/* Source icon */}
@@ -88,6 +101,7 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
       {/* Image */}
       <Link
         href={{ pathname: `/explore/${modelSlug}`, query }}
+        onClick={() => {handleToggleView(model.id)}}
         className="overflow-hidden rounded-t-3xl"
       >
         <img
@@ -102,6 +116,7 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
         {/* Title */}
         <Link
           href={{ pathname: `/explore/${modelSlug}`, query }}
+          onClick={() => {handleToggleView(model.id)}}
           className="font-semibold text-2xl truncate max-w-full hover:underline transition-colors duration-200"
         >
           {model.title}
@@ -161,6 +176,7 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
 
           <Link
             href={{ pathname: `/explore/${modelSlug}`, query }}
+            onClick={() => {handleToggleView(model.id)}}
             className="flex-1 flex items-center justify-center gap-2 bg-custom-light-maincolor text-white rounded-xl py-2 font-medium text-2xl transition-transform duration-200 hover:bg-[#3a3663] hover:scale-[1.03]"
           >
             <HiDownload />

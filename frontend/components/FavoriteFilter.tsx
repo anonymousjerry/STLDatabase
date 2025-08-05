@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import { useSearch } from "@/context/SearchContext";
 import { useRouter } from "next/navigation";
@@ -31,7 +33,7 @@ const FavoriteFilter = () => {
   };
 
   return (
-    <label className="flex items-center gap-2 mt-2 text-sm text-gray-800 dark:text-gray-200">
+    <label className="flex items-center gap-2 mt-2 font-normal text-lg text-custom-light-textcolor dark:text-custom-dark-textcolor">
       <input
         type="checkbox"
         checked={favorited}

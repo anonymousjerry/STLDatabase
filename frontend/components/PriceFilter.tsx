@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import { useSearch } from "@/context/SearchContext";
 import { useRouter } from "next/navigation";
@@ -51,7 +53,7 @@ const PriceFilter = () => {
       {PriceArray.map(({ title, value }) => (
         <label
           key={value}
-          className="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-200"
+          className="flex items-center gap-2 font-normal text-lg text-custom-light-textcolor dark:text-custom-dark-textcolor"
         >
           <input
             type="radio"

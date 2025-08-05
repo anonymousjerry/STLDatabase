@@ -9,11 +9,12 @@ import { HiDownload } from "react-icons/hi";
 import { CiBookmark, CiBookmarkCheck, CiFlag1, CiHeart, CiShare2, CiStar, } from "react-icons/ci";
 import { IoEyeOutline } from "react-icons/io5";
 import { useSession } from "next-auth/react";
-import { likeModel, saveModel } from "@/lib/modelsApi";
+import { downloadModel, likeModel, saveModel } from "@/lib/modelsApi";
 import SuggestionSection from "./SuggestionSection";
 import { useLikesStore } from "@/app/_zustand/useLikesStore";
 import toast from "react-hot-toast";
 import { useFavoritesStore } from "@/app/_zustand/useFavoritesStore";
+import { useDownloadsStore } from "@/app/_zustand/useDonwloadStore";
 
 interface ClientExplorePageProps {
   category: string;
@@ -21,7 +22,6 @@ interface ClientExplorePageProps {
   title: string;
   id: string;
   result: Model;
-  like: Boolean;
 }
 
 export default function ClientExplorePage({
@@ -30,7 +30,6 @@ export default function ClientExplorePage({
   title,
   id,
   result,
-  like,
 }: ClientExplorePageProps) {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,6 +45,8 @@ export default function ClientExplorePage({
 
   const { addFavorite, removeFavorite, isFavorite } = useFavoritesStore();
   const [saved, setSaved] = useState(isFavorite(id));
+
+  const { addDownload, isDownload, DownloadCounts } = useDownloadsStore();
 
   const isDisabled = status !== "authenticated";
 
@@ -79,40 +80,51 @@ export default function ClientExplorePage({
       .replace(/--+/g, "-")
       .replace(/^-+|-+$/g, "");
 
-    const sourceSiteName = result.sourceSite?.name ?? "";
+  const sourceSiteName = result.sourceSite?.name ?? "";
 
-    const handleModelOnClick = async (modelId: string) => {
-        if (!userId) return;
+  const handleModelOnClick = async (modelId: string) => {
+      if (!userId) return;
 
-        try {
+      try {
         toggleLike(modelId);
         await likeModel(modelId, userId, session?.accessToken || "");
-        } catch (err) {
-        console.error("Like failed:", err);
-        }
-    };
+      } catch (err) {
+      console.error("Like failed:", err);
+      }
+  };
 
-    const handleToggleFavorite = async (modelId: string) => {
-        if (saved) {
-            removeFavorite(id);
-        toast.success("Remove this model successfully!")
-        } else {
-            addFavorite(id);
-            await saveModel(modelId, userId || "", session?.accessToken || "");
-            toast.success("Add this model successfully!")
-        }
-            setSaved(!saved);
-    };
+  const handleToggleFavorite = async (modelId: string) => {
+      if (saved) {
+          removeFavorite(id);
+          await saveModel(modelId, userId || "", session?.accessToken || "");
+          toast.success("Remove this model successfully!")
+      } else {
+          addFavorite(id);
+          await saveModel(modelId, userId || "", session?.accessToken || "");
+          toast.success("Add this model successfully!")
+      }
+          setSaved(!saved);
+  };
 
-    const handleShare = async () => {
-        try {
-            await navigator.clipboard.writeText(window.location.href);
-            toast.success("Page URL copied to clipboard!");
-        } catch (err) {
-            console.error("Failed to copy:", err);
-            toast.error("Failed to copy URL.");
-        }
-    };
+  const handleToggleDownload = async (modelId: string) => {
+    try {
+      const data = await downloadModel(modelId, session?.accessToken || "");
+      addDownload(modelId, data.count);
+      toast.success("Model downloaded successfully!")
+    } catch (error) {
+      toast.error("Failed to download model.");
+    }
+  };
+
+  const handleShare = async () => {
+      try {
+          await navigator.clipboard.writeText(window.location.href);
+          toast.success("Page URL copied to clipboard!");
+      } catch (err) {
+          console.error("Failed to copy:", err);
+          toast.error("Failed to copy URL.");
+      }
+  };
 
   return (
     <div className="flex flex-col pb-10">
@@ -224,7 +236,7 @@ export default function ClientExplorePage({
           <div className="flex gap-4 font-normal text-lg text-custom-light-textcolor dark:text-custom-dark-textcolor">
             <div className="flex items-center gap-1 ">
               <HiDownload size={24} />
-              <span>{result.downloads}</span>
+              <span>{DownloadCounts[result.id] ?? 0}</span>
             </div>
             <div className="flex items-center gap-1 ">
               <IoEyeOutline size={24} />
@@ -239,6 +251,7 @@ export default function ClientExplorePage({
             <a
               href={result.sourceUrl}
               target="_blank"
+              onClick={() => {handleToggleDownload(id)}}
               className="flex-1 flex basis-3/4 items-center justify-center gap-2 bg-custom-light-maincolor text-white rounded-xl py-2 font-medium text-2xl transition-transform duration-200 hover:bg-[#3a3663] hover:scale-[1.03]"
             >
               <HiDownload />

@@ -21,7 +21,7 @@ const SideFilter = () => {
   };
 
   return (
-    <aside className="flex flex-col w-full bg-white dark:bg-custom-dark-containercolor border rounded-lg shadow p-4">
+    <aside className="flex flex-col w-full bg-white dark:bg-custom-dark-containercolor border rounded-lg shadow p-4 h-screen overflow-y-auto">
       <div className="flex items-center justify-center text-custom-light-textcolor dark:text-custom-dark-textcolor text-lg font-medium relative pt-2 gap-2">
         <BiFilterAlt />
         Search Filter

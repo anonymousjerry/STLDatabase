@@ -47,24 +47,23 @@ const PlatformsFilter = () => {
 
   return (
     <div className="ml-2 mt-1 space-y-2">
-  {platformArray.map((option) => (
-    <label
-      key={option}
-      className="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-200"
-    >
-      <input
-        type="radio"
-        name="Platforms"
-        value={option}
-        checked={selectedPlatform === option}
-        onChange={() => handleRadioChange(option)}
-        className="accent-blue-600 dark:accent-blue-400 w-4 h-4"
-      />
-      <span>{option}</span>
-    </label>
-  ))}
-</div>
-
+      {platformArray.map((option) => (
+        <label
+          key={option}
+          className="flex items-center gap-2 font-normal text-lg text-custom-light-textcolor dark:text-custom-dark-textcolor"
+        >
+          <input
+            type="radio"
+            name="Platforms"
+            value={option}
+            checked={selectedPlatform === option}
+            onChange={() => handleRadioChange(option)}
+            className="accent-blue-600 dark:accent-blue-400 w-4 h-4"
+          />
+          <span>{option}</span>
+        </label>
+      ))}
+    </div>
   );
 };
 

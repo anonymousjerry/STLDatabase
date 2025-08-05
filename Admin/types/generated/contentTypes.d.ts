@@ -373,41 +373,11 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiScrapeCategoryScrapeCategory
-  extends Struct.CollectionTypeSchema {
-  collectionName: 'scrape_categories';
-  info: {
-    displayName: 'ScrapeCategory';
-    pluralName: 'scrape-categories';
-    singularName: 'scrape-category';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::scrape-category.scrape-category'
-    > &
-      Schema.Attribute.Private;
-    name: Schema.Attribute.String;
-    publishedAt: Schema.Attribute.DateTime;
-    slug: Schema.Attribute.UID<'name'>;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiScraperSourceSiteScraperSourceSite
   extends Struct.CollectionTypeSchema {
   collectionName: 'scraper_source_sites';
   info: {
-    displayName: 'ScraperSource';
+    displayName: 'ScraperSourceSite';
     pluralName: 'scraper-source-sites';
     singularName: 'scraper-source-site';
   };
@@ -415,24 +385,22 @@ export interface ApiScraperSourceSiteScraperSourceSite
     draftAndPublish: true;
   };
   attributes: {
-    categories: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::scrape-category.scrape-category'
-    >;
+    category: Schema.Attribute.Component<'category.category', true>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    enabled: Schema.Attribute.Boolean;
+    limitCount: Schema.Attribute.Integer & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::scraper-source-site.scraper-source-site'
     > &
       Schema.Attribute.Private;
-    modelLimit: Schema.Attribute.Integer;
     platform: Schema.Attribute.Enumeration<
-      ['thingiver', 'printables', 'CGtrader']
-    >;
+      ['Thingiverse', 'Thangs', 'Printables']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Thingiverse'>;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -949,7 +917,6 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
-      'api::scrape-category.scrape-category': ApiScrapeCategoryScrapeCategory;
       'api::scraper-source-site.scraper-source-site': ApiScraperSourceSiteScraperSourceSite;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_category_categories",
+  "info": {
+    "displayName": "category"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "Books",
+        "Games",
+        "Movies"
+      ]
+    },
+    "categoryId": {
+      "type": "integer"
+    }
+  },
+  "config": {}
+}
