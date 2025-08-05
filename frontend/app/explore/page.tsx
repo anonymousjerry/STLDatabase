@@ -7,20 +7,22 @@ interface ExplorePageProps {
     sourcesite?: string;
     category?: string;
     price?: string;
-    favorited?: string;
+    favourited?: string;
+    userId?: string;
     currentPage?: number;
   };
 }
 
 const ExploreMainPage = async ({ searchParams }: ExplorePageProps) => {
-  const { key, sourcesite, category, price, favorited, currentPage} =  await searchParams;
+  const { key, sourcesite, category, price, favourited, userId, currentPage} =  await searchParams;
 
   const { models, totalPage, page, hasMore } = await searchModels({
     key: key || '',
     sourcesite: sourcesite || '',
     category: category || '',
     price: price || '',
-    favorited: favorited || 'false',
+    favourited: favourited || 'false',
+    userId: userId || '',
     page: currentPage || 1,
     limit: 12,
   });

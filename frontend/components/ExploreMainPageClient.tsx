@@ -41,7 +41,8 @@ const ExploreMainPageClient = ({
     selectedCategory,
     searchInput,
     searchPrice,
-    favorited,
+    favourited,
+    userId
   } = useSearch();
 
 
@@ -57,7 +58,8 @@ const ExploreMainPageClient = ({
         sourcesite: selectedPlatform,
         category: selectedCategory,
         price: searchPrice,
-        favorited: favorited ? 'true' : undefined,
+        favourited: favourited ? 'true' : undefined,
+        userId: userId,
         page: 1,
         limit: 12,
       });
@@ -68,7 +70,7 @@ const ExploreMainPageClient = ({
     };
 
     fetchFilteredModels();
-  }, [selectedFilters, selectedPlatform, selectedCategory, searchPrice, favorited, searchInput]);
+  }, [selectedFilters, selectedPlatform, selectedCategory, searchPrice, favourited, searchInput]);
 
   
 
@@ -83,10 +85,12 @@ const ExploreMainPageClient = ({
         sourcesite: selectedPlatform,
         category: selectedCategory,
         price: searchPrice,
-        favorited: favorited ? 'true' : undefined,
+        favourited: favourited ? 'true' : undefined,
+        userId: userId,
         page,
         limit: 12,
       });
+
 
       setModels((prev) => {
         const existingIds = new Set(prev.map((m) => m.id));
@@ -121,19 +125,16 @@ const ExploreMainPageClient = ({
   }, [hasMore, isLoading]);
 
   return (
-    <div className="flex flex-col pt-5 pb-60">
+    <div className="flex flex-col pt-5 ">
       <SearchBar />
       <div className="flex gap-5 pt-10">
         <div className="flex basis-1/5">
-          <SideFilter
-            // searchParams={searchParams}
-            // setSearchParams={setSearchParams}
-          />
+          <SideFilter />
         </div>
         <div className="flex flex-col basis-4/5">
           <div className="flex items-center w-full text-lg font-medium text-custom-light-textcolor dark:text-custom-dark-textcolor relative pt-1">
             <FiBox className="mr-2" />
-            <span>Result(All) - {models.length} models</span>
+            <span>Result - {models.length} models</span>
             <span className="absolute left-0 -bottom-2 w-full h-0.5 bg-custom-light-maincolor dark:bg-custom-light-containercolor rounded" />
           </div>
           <NavFilter selectedFilters={selectedFilters} onFilterChange={setSelectedFilters} />

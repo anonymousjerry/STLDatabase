@@ -4,27 +4,31 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getPlatforms } from "@/lib/platformApi";
 import { useSearch } from "@/context/SearchContext";
+import { useSession } from "next-auth/react";
 
 
 const PlatformsFilter = () => {
-  const router = useRouter();
-  const [platforms, setPlatforms] = useState<string[][]>([]);
+    const router = useRouter();
+    const [platforms, setPlatforms] = useState<string[][]>([]);
+    // const { data: session, status } = useSession();
+    // const userId = (session?.user as { id?: string })?.id;
 
-  useEffect(() => {
-    getPlatforms().then(setPlatforms).catch(console.error);
-  }, []);
+    useEffect(() => {
+      getPlatforms().then(setPlatforms).catch(console.error);
+    }, []);
 
-  const {
-        selectedPlatform,
-        selectedCategory,
-        searchInput,
-        searchPrice,
-        favorited,
-        setSelectedPlatform,
-    } = useSearch();
+    const {
+          selectedPlatform,
+          selectedCategory,
+          searchInput,
+          searchPrice,
+          favourited,
+          userId,
+          setSelectedPlatform,
+      } = useSearch();
 
 
-  const platformArray = platforms?.map(([platform]) => platform) || [];
+    const platformArray = platforms?.map(([platform]) => platform) || [];
 
     const handleRadioChange = (option: string) => {
 
@@ -39,8 +43,12 @@ const PlatformsFilter = () => {
         queryParams.set("category", selectedCategory);
         if (searchInput) queryParams.set("key", searchInput);
         if (searchPrice) queryParams.set("price", searchPrice);
-        if (favorited) queryParams.set("favorited", 'true');
+        if (favourited) queryParams.set("favourited", 'true');
+        if (userId) {
+          queryParams.set("userId", userId)
+        }
         queryParams.set("currentPage", "1")
+
 
         router.push(`/explore?${queryParams.toString()}`);
     };

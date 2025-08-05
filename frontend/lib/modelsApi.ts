@@ -6,7 +6,8 @@ type SearchParams = {
   sourcesite?: string;
   category?: string;
   price?: string;
-  favorited?: string;
+  favourited?: string;
+  userId?: string;
   filters?: string[];
   page?: number;
   limit?: number;
@@ -28,7 +29,7 @@ export const getDailyModels = async (page: number = 1, limit: number = 12) => {
     return response.data.models;
 }
 
-export const searchModels = async ({key, sourcesite, category, price, favorited, filters = [], page = 1, limit = 12}: SearchParams) => {
+export const searchModels = async ({key, sourcesite, category, price, favourited, userId, filters = [], page = 1, limit = 12}: SearchParams) => {
     const params = new URLSearchParams();
 
     if (key) params.append('key', key);
@@ -42,18 +43,20 @@ export const searchModels = async ({key, sourcesite, category, price, favorited,
         params.append('category', '');
     if (price) 
         params.append('price', price);
-    if (favorited) 
-        params.append('favorited', favorited);
+    if (favourited) 
+        params.append('favourited', favourited);
+    if (userId)
+        params.append('userId', userId);
 
     params.append('page', String(page));
     params.append('limit', String(limit));
 
     filters.forEach((filter) => {
         if (filter && filter !== 'All') {
-        params.append('filter', filter); // e.g. /models?filter=Popular&filter=Trending
+        params.append('filter', filter);
         }
     });
-
+    console.log(params.toString())
 
     const response = await axiosInstance.get(`/models?${params.toString()}`);
     return response.data;

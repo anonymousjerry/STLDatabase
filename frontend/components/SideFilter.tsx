@@ -7,8 +7,12 @@ import PlatformsFilter from "./PlatformsFilter";
 import CategoriesFilter from "./CategoriesFilter";
 import PriceFilter from "./PriceFilter";
 import FavoriteFilter from "./FavoriteFilter";
+import { CgWebsite } from "react-icons/cg";
+import { BiCategory } from "react-icons/bi";
+import { AiOutlineDollarCircle } from "react-icons/ai";
+import { MdFavoriteBorder } from "react-icons/md";
 
-const filters: string[] = ["Platforms", "Categories", "Price", "Favorited"];
+const filters: string[] = ["Platforms", "Categories", "Price", "favourited"];
 
 const SideFilter = () => {
   const [openSections, setOpenSections] = useState<{ [key: string]: boolean }>({});
@@ -35,7 +39,13 @@ const SideFilter = () => {
               className="flex justify-between items-center w-full text-left font-medium text-lg text-custom-light-textcolor dark:text-custom-dark-textcolor"
               onClick={() => toggleSection(title)}
             >
-              <span>{title}</span>
+              <span className="flex justify-center items-center gap-2">
+                {title === "Platforms" && <CgWebsite />}
+                {title === "Categories" && <BiCategory />}
+                {title === "Price" && <AiOutlineDollarCircle />}
+                {title === "favourited" && <MdFavoriteBorder />}
+                {title}
+              </span>
               <span>
                 {openSections[title] ? <GoTriangleDown /> : <GoTriangleRight />}
               </span>
@@ -52,7 +62,7 @@ const SideFilter = () => {
                 {title === "Price" && (
                   <PriceFilter />
                 )}
-                {title === "Favorited" && (
+                {title === "favourited" && (
                   <FavoriteFilter />
                 )}
               </div>
