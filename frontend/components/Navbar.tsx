@@ -9,6 +9,7 @@ import { signOut } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useModal } from "@/context/ModalContext";
 import { useSearch } from "@/context/SearchContext";
+import { FaAngleDown } from "react-icons/fa6";
 
 const Navbar = () => {
 
@@ -93,29 +94,17 @@ const Navbar = () => {
         ))}
         <div ref={categoryRef} className="relative">
           <button
-          onClick={() => setCategoryOpen(!categoryOpen)}
-          className={`relative flex flex-row items-center gap-1 transition ${
-            isCategoryActive ? 'font-medium' : 'hover:text-green-600'
-          }`}
-        >
-          <span>Categories</span>
-          <svg
-            className="size-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
+            onClick={() => setCategoryOpen(!categoryOpen)}
+            className={`relative flex flex-row items-center gap-1 transition ${
+              isCategoryActive ? 'font-medium' : 'hover:text-green-600'
+            }`}
           >
-            <path
-              fillRule="evenodd"
-              d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-              clipRule="evenodd"
-            />
-          </svg>
-
-          {categoryOpen && (
-            <span className="absolute left-0 -bottom-1 w-full h-1 bg-green-500 rounded" />
-          )}
-        </button>
+            <span>Categories</span>
+            <FaAngleDown />
+            {categoryOpen && (
+              <span className="absolute left-0 -bottom-1 w-full h-1 bg-green-500 rounded" />
+            )}
+          </button>
 
           {/* Dropdown box */}
           {/* {categoryOpen && (

@@ -13,7 +13,7 @@ interface ExplorePageProps {
 }
 
 const ExploreMainPage = async ({ searchParams }: ExplorePageProps) => {
-  const { key, sourcesite, category, price, favorited, currentPage} = searchParams;
+  const { key, sourcesite, category, price, favorited, currentPage} =  await searchParams;
 
   const { models, totalPage, page, hasMore } = await searchModels({
     key: key || '',

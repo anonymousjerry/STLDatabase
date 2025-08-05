@@ -4,7 +4,7 @@
     "info": {
         "singularName": "scraper-source-site",
         "pluralName": "scraper-source-sites",
-        "displayName": "ScraperSource"
+        "displayName": "ScraperSourceSite"
     },
     "options": {
         "draftAndPublish": true
@@ -13,22 +13,22 @@
     "attributes": {
         "platform": {
             "type": "enumeration",
+            "required": true,
+            "default": "Thingiverse",
             "enum": [
-                "thingiver",
-                "printables",
-                "CGtrader"
+                "Thingiverse",
+                "Thangs",
+                "Printables"
             ]
         },
-        "categories": {
-            "type": "relation",
-            "relation": "oneToMany",
-            "target": "api::scrape-category.scrape-category"
+        "limitCount": {
+            "type": "integer",
+            "required": true
         },
-        "modelLimit": {
-            "type": "integer"
-        },
-        "enabled": {
-            "type": "boolean"
+        "category": {
+            "type": "component",
+            "component": "category.category",
+            "repeatable": true
         }
     }
 }
