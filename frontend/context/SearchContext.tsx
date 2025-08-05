@@ -8,12 +8,14 @@ type SearchContextType = {
   selectedCategory: string;
   searchInput: string;
   searchPrice: string;
-  favorited: boolean;
+  favourited: boolean;
+  userId: string;
   setSelectedPlatform: (value: string) => void;
   setSelectedCategory: (value: string) => void;
   setSearchInput: (value: string) => void;
   setSearchPrice: (value: string) => void;
-  setFavorited: (value: boolean) => void;
+  setfavourited: (value: boolean) => void;
+  setUserId: (value: string) => void;
 };
 
 const SearchContext = createContext<SearchContextType | null>(null);
@@ -23,7 +25,8 @@ export const SearchProvider = ({children}: {children: React.ReactNode}) => {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [searchInput, setSearchInput] = useState("");
     const [searchPrice, setSearchPrice] = useState("");
-    const [favorited, setFavorited] = useState(false);
+    const [favourited, setfavourited] = useState(false);
+    const [userId, setUserId] = useState("");
 
     return (
         <SearchContext.Provider
@@ -32,12 +35,14 @@ export const SearchProvider = ({children}: {children: React.ReactNode}) => {
                 selectedCategory,
                 searchInput,
                 searchPrice,
-                favorited,
+                favourited,
+                userId,
                 setSelectedPlatform,
                 setSelectedCategory,
                 setSearchInput,
                 setSearchPrice,
-                setFavorited
+                setfavourited,
+                setUserId
             }}
         >
             {children}

@@ -10,7 +10,7 @@ import { subCategoryList } from "@/utils/categoryFormat";
 
 const Categories = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [subcategories, setSubCategories] = useState([]);
+  const [subcategories, setSubCategories] = useState<string[]>([]);
   const [columns, setColumns] = useState(2);
 
   useEffect(() => {
@@ -30,8 +30,11 @@ const Categories = () => {
   
   useEffect(() => {
     getSubCategories()
-      .then(setSubCategories)
-      .catch(console.error);
+    .then((data: Category[]) => {
+      const subcategoryNames = data.map((item) => item.name);
+      setSubCategories(subcategoryNames);
+    })
+    .catch(console.error);
   }, []);
 
 

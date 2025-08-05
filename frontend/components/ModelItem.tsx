@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   const { data: session, status } = useSession();
   const userId = (session?.user as { id?: string })?.id;
+  const isDisabled = status !== "authenticated";
 
   const { likedModels, likesCount, toggleLike } = useLikesStore();
   const liked = likedModels[model.id] ?? model.likes?.some((like: Like) => like.userId === userId) ?? false;
@@ -21,7 +22,6 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
 
   const { addView, isView, ViewCounts } = useViewsStore();
 
-  const isDisabled = status !== "authenticated";
   const sourceSiteName = model.sourceSite?.name ?? "";
 
   useEffect(() => {

@@ -3,6 +3,7 @@
 import React from "react";
 import { useSearch } from "@/context/SearchContext";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 
 const PriceArray = [
@@ -17,18 +18,21 @@ const PriceArray = [
 
 const PriceFilter = () => {
     const router = useRouter();
+    // const { data: session, status } = useSession();
+    // const userId = (session?.user as { id?: string })?.id;
 
   const {
       selectedPlatform,
       selectedCategory,
       searchInput,
       searchPrice,
-      favorited,
+      favourited,
+      userId,
       setSelectedPlatform,
       setSelectedCategory,
       setSearchInput,
       setSearchPrice,
-      setFavorited,
+      setfavourited,
     } = useSearch();
 
   const handleRadioChange = (value: string) => {
@@ -42,7 +46,10 @@ const PriceFilter = () => {
         queryParams.set("category", selectedCategory);
         if (searchInput) queryParams.set("key", searchInput);
         if (value) queryParams.set("price", value);
-        if (favorited) queryParams.set("favorited", 'true');
+        if (favourited) queryParams.set("favourited", 'true');
+        if (userId) {
+          queryParams.set("userId", userId)
+        }
         
 
         router.push(`/explore?${queryParams.toString()}`);
