@@ -92,4 +92,6 @@ async def scrape_printables(category_id, num):
             
 
 if __name__ == "__main__":
-    asyncio.run(scrape_printables(134, 5))
+    category_id = int(sys.argv[1])
+    number = int(sys.argv[2])
+    asyncio.run(scrape_printables(category_id, number))

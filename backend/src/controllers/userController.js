@@ -45,4 +45,38 @@ const login = async (req, res) => {
     });
 }
 
-module.exports = { register, login };
+const getUserFavourites = async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId){
+        return res.status(404).json({ error: "User ID is required"});
+    };
+
+    try {
+        const favourites = await prisma.favourite.findMany({
+            where: {
+                userId: userId
+            },
+            include: {
+                model: {
+                    include: {
+                        sourceSite: true,
+                        category: true,
+                        subCategory: true,
+                        likes: true,
+                        favourites: true
+                    }
+                }
+            }
+        });
+
+        const favouriteModels = favourites.map(fav => fav.model);
+
+        res.status(200).json(favouriteModels);
+    } catch(err){
+        console.error('Error fetching favourite models: ', err);
+        res.status(500).json({ error: 'Internal server error'});
+    }
+}
+
+module.exports = { register, login, getUserFavourites };

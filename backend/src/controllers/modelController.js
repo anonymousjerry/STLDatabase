@@ -9,10 +9,12 @@ const getAllModels = async (req, res) => {
     const key = req.query.key;
     const priceFilter = req.query.price;
     const sourceSite = req.query.sourcesite;
+    const userId = req.query.userId;
+    const showFavouritesOnly = req.query.favourited === 'true'
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
-    console.log(priceFilter)
+    console.log(req.query)
     
     try {
         let sourceSiteId, categoryId;
@@ -21,7 +23,7 @@ const getAllModels = async (req, res) => {
                 where: { name: sourceSite}
             })
             sourceSiteId = sourceSiteRecord.id
-            console.log(sourceSiteId)
+            // console.log(sourceSiteId)
         };
 
         if (category){
@@ -60,6 +62,29 @@ const getAllModels = async (req, res) => {
             }
         }
 
+        let favouriteModelIds = [];
+
+        if (showFavouritesOnly && userId){
+            const favouriteRecords = await prisma.favourite.findMany({
+                where: {userId},
+                select: {modelId: true}
+            });
+            favouriteModelIds = favouriteRecords.map(f => f.modelId);
+
+            if (favouriteModelIds.length === 0) {
+                return res.status(200).json({
+                    models: [],
+                    page,
+                    totalPages: 0,
+                    hasMore: false,
+                    totalCount: 0
+                })
+            }
+        }
+
+        console.log(favouriteModelIds)
+        console.log(showFavouritesOnly, userId)
+
         const whereClause = {
             ...(sourceSite && { sourceSiteId: sourceSiteId }),
             ...(category && { subCategoryId : categoryId }),
@@ -70,6 +95,9 @@ const getAllModels = async (req, res) => {
                     { tags: { has : key } }
                 ]
             }),
+            ...(showFavouritesOnly && userId && {
+                id: { in: favouriteModelIds }
+            }),
             ...priceCondition
         }
 
@@ -78,6 +106,7 @@ const getAllModels = async (req, res) => {
                 where: whereClause,
                 include: {
                     likes: true,
+                    favourites: true,
                     sourceSite: true,
                     category: true,
                     subCategory: true
@@ -91,18 +120,27 @@ const getAllModels = async (req, res) => {
             })
         ]);
 
+        console.log(total)
+
+        const modelsWithFlag = models.map(model => ({
+            ...model,
+            isFavourited: model.favourites?.some(f => f.userId === userId)
+        }));
+
+        // console.log(modelsWithFlag)
+
         const totalPages = Math.ceil(total/limit);
         const hasMore = page < totalPages;
 
         res.status(200).json({
-            models,
+            models: modelsWithFlag,
             page,
             totalPages,
             hasMore,
             totalCount: total
         })
 
-        console.log(models)
+        // console.log(models)
 
         // console.log(models)
         // res.status(200).json(models);
@@ -138,6 +176,63 @@ const getModel = async (req, res) => {
     } catch (err) {
         console.error('Error fetching model by ID: ', err)
         res.status(500).json({ error: "internal server error!" });
+    }
+}
+
+const getDailyModels = async (req, res) => {
+    const now = new Date();
+    const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const endOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    try {
+        const [models, total] = await Promise.all([
+            prisma.model.findMany({
+                where: {
+                    createdAt: {
+                        gte: startOfDay,
+                        lte: endOfDay
+                    }
+                },
+                include: {
+                    likes: true,
+                    sourceSite: true,
+                    category: true,
+                    subCategory: true
+                },
+                skip,
+                take: limit,
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            }),
+            prisma.model.count({
+                where: {
+                    createdAt: {
+                        gte: startOfDay,
+                        lte: endOfDay
+                    }
+                }
+            })
+        ]);
+
+        const totalPages = Math.ceil(total / limit);
+        const hasMore = page < totalPages;
+
+        res.status(200).json({
+            models,
+            page,
+            totalPages,
+            hasMore,
+            totalCount: total
+        });
+        // console.log(models)
+    }catch(err){
+        console.error('Error fetching daily discover: ', err);
+        res.status(500).json({error: "Internal server error!"})
     }
 }
 
@@ -307,4 +402,52 @@ const getSimilars = async (req, res) => {
     }
 }
 
-module.exports = { getAllModels, getTrendingModels, modelLike, modelFavourite, getModel, getSimilars };
+const handleModelDownload = async (req, res) => {
+    try {
+        await prisma.$transaction([
+            prisma.model.update({
+                where: { id: modelId },
+                data: { downloads: { increment: 1 } },
+            }),
+
+            prisma.downloadEvent.create({
+                data: {
+                    modelId
+                }
+            })
+        ])
+        res.status(200).json("Download successfully recorded!")
+    } catch(error) {
+        console.error("Failed to record download: ", error);
+        throw error;
+    };
+
+}
+
+const modelView = async(req, res) => {
+    const { modelId } = req.body;
+    console.log( modelId)
+
+    try {
+        const model = await prisma.model.update({
+            where: {
+                id: modelId
+            },
+            data: {
+                views:{
+                    increment: 1,
+                },
+            }
+        });
+
+        res.status(200).json({
+            count: model.views,
+            message: "View count incremented successfully."
+        })
+    } catch(err){
+        console.error("Error fetching models: ", err);
+        res.status(500).json({error: 'Internal server error!'})
+    }
+}
+
+module.exports = { getAllModels, getTrendingModels, modelLike, modelFavourite, getModel, getSimilars, handleModelDownload, modelView, getDailyModels };

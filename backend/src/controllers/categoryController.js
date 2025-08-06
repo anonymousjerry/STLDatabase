@@ -5,12 +5,19 @@ const prisma = new PrismaClient();
 const getAllSubcategories = async (req, res) => {
     try {
         const categories = await prisma.subCategory.findMany({
-            select: {
-                name: true
+            include: {
+                category: {
+                    select: {
+                        name: true
+                    }
+                }
             }
         })
 
-        const subcategoryList = categories.map((item) => item.name);
+        const subcategoryList = categories.map((item) => ({
+            name: item.name,
+            category: item.category.name
+        }));
         res.status(200).json(subcategoryList);
     } catch(err) {
         console.error("Error fetching categories: ", err);
