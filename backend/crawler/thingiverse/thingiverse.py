@@ -2,8 +2,6 @@ from playwright.async_api import async_playwright, TimeoutError as PlaywrightTim
 import asyncio
 from get_thing import get_info
 import re
-import random
-import csv
 import os
 import sys
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -66,4 +64,5 @@ async def scrape_thingiverse(num):
         await browser.close()
 
 if __name__ == "__main__":
-    results = asyncio.run(scrape_thingiverse(2))
+    num = int(sys.argv[1])
+    results = asyncio.run(scrape_thingiverse(num))

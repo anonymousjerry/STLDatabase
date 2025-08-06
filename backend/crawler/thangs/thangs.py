@@ -80,5 +80,8 @@ async def pass_AI(results):
             inject_database(res)
 
 if __name__ == "__main__":
-    results = asyncio.run(scrape_thangs("3D Printers", "Anker", 5))
+    category = sys.argv[1]
+    subCategory = sys.argv[2]
+    number = int(sys.argv[3])
+    results = asyncio.run(scrape_thangs(category, subCategory, number))
     asyncio.run(pass_AI(results))

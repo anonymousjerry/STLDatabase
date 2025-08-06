@@ -71,4 +71,6 @@ async def scrape_pinshape(category_id, num):
         await browser.close()
 
 if __name__ == "__main__":
-    asyncio.run(scrape_pinshape(1, 16))
+    category_id = int(sys.argv[1])
+    number = int(sys.argv[2])
+    asyncio.run(scrape_pinshape(category_id, number))

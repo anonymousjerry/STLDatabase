@@ -42,6 +42,8 @@ model Model {
   priceValue     Float?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  downloadEvents DownloadEvent[]
 }
 
 model SourceSite {
@@ -84,4 +86,11 @@ model Favourite {
   modelId String
 
   @@unique([userId, modelId])
+}
+
+model DownloadEvent{
+  id        String @id @default(cuid())
+  model     Model  @relation(fields: [modelId], references: [id])
+  modelId   String
+  createdAt DateTime @default(now())
 }
