@@ -3,18 +3,16 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const getAllModels = async (req, res) => {
-
-    // const { category, platform, key} = req.query;
     const category = req.query.category;
     const key = req.query.key;
     const priceFilter = req.query.price;
     const sourceSite = req.query.sourcesite;
     const userId = req.query.userId;
     const showFavouritesOnly = req.query.favourited === 'true'
+    const sortBy = req.query.sortby || "new"
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
-    console.log(req.query)
     
     try {
         let sourceSiteId, categoryId;
@@ -36,29 +34,14 @@ const getAllModels = async (req, res) => {
         let priceCondition = {};
         if (priceFilter) {
             switch (priceFilter) {
-                case "free":
-                    priceCondition = { priceValue: { equals: 0 }};
-                    break;
-                case "premium":
-                    priceCondition = { priceValue: { equals: -1 }};
-                    break;
-                case "under-10":
-                    priceCondition = { priceValue: { lt: 10, gt: 0 } };
-                    break;
-                case "10-25":
-                    priceCondition = { priceValue: { gte: 10, lte: 25 } };
-                    break;
-                case "25-50":
-                    priceCondition = { priceValue: { gt: 25, lte: 50 } };
-                    break;
-                case "50-100":
-                    priceCondition = { priceValue: { gt: 50, lte: 100 } };
-                    break;
-                case "over-100":
-                    priceCondition = { priceValue: { gt: 100 } };
-                    break;
-                default:
-                    priceCondition = {};
+                case "free": priceCondition = { priceValue: { equals: 0 }}; break;
+                case "premium": priceCondition = { priceValue: { equals: -1 }}; break;
+                case "under-10": priceCondition = { priceValue: { lt: 10, gt: 0 } }; break;
+                case "10-25": priceCondition = { priceValue: { gte: 10, lte: 25 } }; break;
+                case "25-50": priceCondition = { priceValue: { gt: 25, lte: 50 } }; break;
+                case "50-100": priceCondition = { priceValue: { gt: 50, lte: 100 } }; break;
+                case "over-100": priceCondition = { priceValue: { gt: 100 } }; break;
+                default: priceCondition = {};
             }
         }
 
@@ -82,10 +65,8 @@ const getAllModels = async (req, res) => {
             }
         }
 
-        console.log(favouriteModelIds)
-        console.log(showFavouritesOnly, userId)
-
         const whereClause = {
+            deleted: false,
             ...(sourceSite && { sourceSiteId: sourceSiteId }),
             ...(category && { subCategoryId : categoryId }),
             ...(key && {
@@ -99,6 +80,84 @@ const getAllModels = async (req, res) => {
                 id: { in: favouriteModelIds }
             }),
             ...priceCondition
+        };
+
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        if (sortBy === 'Popular' || sortBy === 'Trending'){
+            const modelsBase = await prisma.model.findMany({
+                where: whereClause,
+                select: { id: true }
+            });
+
+            const modelIds = modelsBase.map(m => m.id);
+
+            const [viewCounts, likeCounts, downloadCounts] = await Promise.all([
+                prisma.viewEvent.groupBy({
+                    by: ['modelId'],
+                    where: {
+                        modelId: { in: modelIds },
+                        ...(sortBy === 'Trending' && { createdAt: { gte: sevenDaysAgo }})
+                    },
+                    _count: true
+                }),
+                prisma.like.groupBy({
+                    by: ['modelId'],
+                    where: {
+                        modelId: { in: modelIds },
+                        ...(sortBy === 'Trending' && { createdAt: { gte: sevenDaysAgo }})
+                    },
+                    _count: true
+                }),
+                prisma.downloadEvent.groupBy({
+                    by: ['modelId'],
+                    where: {
+                        modelId: { in: modelIds },
+                        ...(sortBy === 'Trending' && { createdAt: { gte: sevenDaysAgo }})
+                    },
+                    _count: true
+                }),
+            ]);
+
+            const scoreMap = new Map();
+
+            viewCounts.forEach(v => scoreMap.set(v.modelId, (scoreMap.get(v.modelId) || 0) + v._count*1));
+            likeCounts.forEach(l => scoreMap.set(l.modelId, (scoreMap.get(l.modelId) || 0) + l._count*1));
+            downloadCounts.forEach(d => scoreMap.set(d.modelId, (scoreMap.get(d.modelId) || 0) + d._count*1));
+
+            const scoredModels = [...scoreMap.entries()]
+                .sort((a ,b) => b[1] - a[1])
+                .map(([modelId]) => modelId);
+            
+            const paginatedIds = scoredModels.slice(skip, skip+limit);
+
+            const models = await prisma.model.findMany({
+                where: { id: { in: paginatedIds } },
+                include: {
+                    likes: true,
+                    favourites: true,
+                    sourceSite: true,
+                    category: true,
+                    subCategory: true
+                }
+            });
+
+            const modelMap = Object.fromEntries(models.map(m => [m.id, m]));
+            const sortedModels = paginatedIds.map(id => modelMap[id]);
+
+            const modelsWithFlag = sortedModels.map(model => ({
+                ...model,
+                isFavourited: model.favourites?.some(f => f.userId === userId)
+            }));
+
+            return res.status(200).json({
+                models: modelsWithFlag,
+                page,
+                totalPages: Math.ceil(scoredModels.length / limit),
+                hasMore: page < Math.ceil(scoredModels.length / limit),
+                totalCount: scoredModels.length
+            });
         }
 
         const [models, total] = await Promise.all([
@@ -120,8 +179,6 @@ const getAllModels = async (req, res) => {
             })
         ]);
 
-        console.log(total)
-
         const modelsWithFlag = models.map(model => ({
             ...model,
             isFavourited: model.favourites?.some(f => f.userId === userId)
@@ -140,10 +197,6 @@ const getAllModels = async (req, res) => {
             totalCount: total
         })
 
-        // console.log(models)
-
-        // console.log(models)
-        // res.status(200).json(models);
     } catch(err) {
         console.error("Error fetching models: ", err);
         res.status(500).json({ error: 'Internal server error'})
@@ -403,8 +456,9 @@ const getSimilars = async (req, res) => {
 }
 
 const handleModelDownload = async (req, res) => {
+    const { modelId } = req.body
     try {
-        await prisma.$transaction([
+        const [updatedModel] = await prisma.$transaction([
             prisma.model.update({
                 where: { id: modelId },
                 data: { downloads: { increment: 1 } },
@@ -416,12 +470,11 @@ const handleModelDownload = async (req, res) => {
                 }
             })
         ])
-        res.status(200).json("Download successfully recorded!")
+        res.status(200).json({ downloads : updatedModel.downloads })
     } catch(error) {
         console.error("Failed to record download: ", error);
         throw error;
     };
-
 }
 
 const modelView = async(req, res) => {
@@ -429,19 +482,20 @@ const modelView = async(req, res) => {
     console.log( modelId)
 
     try {
-        const model = await prisma.model.update({
-            where: {
-                id: modelId
-            },
-            data: {
-                views:{
-                    increment: 1,
-                },
-            }
-        });
+        const [updatedModel] = await prisma.$transaction([
+            prisma.model.update({
+                where: { id: modelId },
+                data: { views: { increment: 1 } },
+            }),
 
+            prisma.viewEvent.create({
+                data: {
+                    modelId
+                }
+            })
+        ])
         res.status(200).json({
-            count: model.views,
+            count: updatedModel.views,
             message: "View count incremented successfully."
         })
     } catch(err){
