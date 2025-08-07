@@ -77,8 +77,8 @@ async def pass_AI(results):
             inject_database(res)
 
 if __name__ == "__main__":
-    # category = sys.argv[1]
-    # number = int(sys.argv[2])
-    # results = asyncio.run(scrape_cgtrader(category, number))
-    results = asyncio.run(scrape_cgtrader("aircraft", 5))
+    category = sys.argv[1]
+    number = int(sys.argv[2])
+    results = asyncio.run(scrape_cgtrader(category, number))
     asyncio.run(pass_AI(results))
+    # results = asyncio.run(scrape_cgtrader("aircraft", 1))

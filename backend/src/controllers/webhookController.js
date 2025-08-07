@@ -13,9 +13,18 @@ const prisma = new PrismaClient();
 
 const startScraping = async (req, res) => {
     try {
-        console.log('Webhook triggered by Strapi');
-        const {platform, modelLimit, category, subCategory, category_id} = req.body.entry;
-        console.log(platform, modelLimit, category, subCategory, category_id)
+        console.log('Webhook triggered by Sanity');
+        console.log(req.body);
+        const {
+            platform, 
+            limit: modelLimit, 
+            categoryCGTrader,
+            categoryPinshape,
+            thangsCategory,
+            thangsSubcategory,
+            printablesSubcategory
+        } = req.body;
+        
 
         if (platform === 'Thingiverse'){
             const pythonProcess = spawn('python', [thingiPath, modelLimit.toString()]);
@@ -34,7 +43,7 @@ const startScraping = async (req, res) => {
         };
 
         if (platform === 'CGTrader'){
-            const pythonProcess = spawn('python', [cgtraderPath, category, modelLimit.toString()]);
+            const pythonProcess = spawn('python', [cgtraderPath, categoryCGTrader, modelLimit.toString()]);
 
             pythonProcess.stdout.on('data', (data) => {
                 console.log(`stdout: ${data}`);
@@ -66,7 +75,7 @@ const startScraping = async (req, res) => {
         };
 
         if (platform === 'Pinshape'){
-            const pythonProcess = spawn('python', [pinshapePath, category_id.toString(), modelLimit.toString()]);
+            const pythonProcess = spawn('python', [pinshapePath, categoryPinshape.toString(), modelLimit.toString()]);
 
             pythonProcess.stdout.on('data', (data) => {
                 console.log(`stdout: ${data}`);
@@ -82,7 +91,7 @@ const startScraping = async (req, res) => {
         };
 
         if (platform === 'Printables'){
-            const pythonProcess = spawn('python', [printablesPath, category_id.toString(), modelLimit.toString()]);
+            const pythonProcess = spawn('python', [printablesPath, printablesSubcategory.toString(), modelLimit.toString()]);
 
             pythonProcess.stdout.on('data', (data) => {
                 console.log(`stdout: ${data}`);
@@ -98,7 +107,7 @@ const startScraping = async (req, res) => {
         }
 
         if (platform === 'Thangs'){
-            const pythonProcess = spawn('python', [thangsPath, category, subCategory, modelLimit.toString()]);
+            const pythonProcess = spawn('python', [thangsPath, thangsCategory, thangsSubcategory, modelLimit.toString()]);
 
             pythonProcess.stdout.on('data', (data) => {
                 console.log(`stdout: ${data}`);

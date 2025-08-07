@@ -18,7 +18,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/models', modelRoutes);
 app.use('/api/subcategories', categoryRoutes);
 app.use('/api/sites', siteRoutes);
-app.use('/webhook', webhookRouter);
+app.use('/api/webhook', webhookRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
