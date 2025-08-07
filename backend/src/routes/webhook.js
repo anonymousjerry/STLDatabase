@@ -2,6 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { startScraping } = require('../controllers/webhookController');
 
-router.post('/strapi-webhook', startScraping);
+router.post('/scrape-job', startScraping);
 
 module.exports = router;

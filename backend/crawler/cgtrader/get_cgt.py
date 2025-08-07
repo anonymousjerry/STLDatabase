@@ -1,5 +1,15 @@
 from playwright.async_api import async_playwright
 import asyncio
+import httpx
+import boto3
+
+# s3 = boto3.client(
+#     's3',
+#     endpoint_url='https://s3.us-central-1.wasabisys.com',
+#     aws_access_key_id='5HOWDRMVV9WMR6IN6G15',
+#     aws_secret_access_key='tubtAvpWpOgd0tJsKSZ1NtDH40ZHgdu96BRWogD6',
+#     region_name='us-central-1'
+# )
 
 async def get_info(url):
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
@@ -52,14 +62,14 @@ async def get_info(url):
                 if main_src and main_src.startswith("https://img-new.cgtrader.com/items/"):
                     image_urls.append([main_src, thumb_src])
 
-            thumnail_url = image_urls[0][0]
-            
+            thumbnail_url = image_urls[0][0]
+            # await transfer_image_to_wasabi(thumbnail_url, '3ddb', 'we.jpg')
 
             info.append({"title" : title})
             info.append({"description" : description})
             info.append({"tags" : tags})
             info.append({"image_urls" : image_urls})
-            info.append({"thumbnail_url": thumnail_url})
+            info.append({"thumbnail_url": thumbnail_url})
             info.append({"price" : price})
             return(info)
 
@@ -68,6 +78,18 @@ async def get_info(url):
             return None
         finally:
             await browser.close()
+
+# async def transfer_image_to_wasabi(image_url, bucket_name, key_path):
+#     async with httpx.AsyncClient() as client:
+#         response = await client.get(image_url)
+#         print(response)
+#         s3.put_object(
+#             Bucket = bucket_name,
+#             Key=key_path,
+#             Body=response.content,
+#             ACL='public-read',
+#             ContentType=response.headers.get("Content-Type", "image/jpeg")
+#         )
 
 if __name__ == "__main__":
     url = 'https://www.cgtrader.com/3d-models/aircraft/military-aircraft/f-16c-viper'
