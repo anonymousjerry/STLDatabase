@@ -25,7 +25,6 @@ export default async function ExplorePage({
       subCategory={subCategory}
       title={title}
       id = {id}
-      like={liked}
     />
   );
 }

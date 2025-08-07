@@ -109,7 +109,9 @@ export default function ClientExplorePage({
   const handleToggleDownload = async (modelId: string) => {
     try {
       const data = await downloadModel(modelId, session?.accessToken || "");
-      addDownload(modelId, data.count);
+      console.log(data.downloads)
+      addDownload(modelId, data.downloads);
+      console.log(DownloadCounts)
       toast.success("Model downloaded successfully!")
     } catch (error) {
       toast.error("Failed to download model.");
@@ -236,7 +238,7 @@ export default function ClientExplorePage({
           <div className="flex gap-4 font-normal text-lg text-custom-light-textcolor dark:text-custom-dark-textcolor">
             <div className="flex items-center gap-1 ">
               <HiDownload size={24} />
-              <span>{DownloadCounts[result.id] ?? 0}</span>
+              <span>{DownloadCounts[id] ?? 0}</span>
             </div>
             <div className="flex items-center gap-1 ">
               <IoEyeOutline size={24} />

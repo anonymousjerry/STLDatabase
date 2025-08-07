@@ -48,6 +48,7 @@ const ExploreMainPageClient = ({
 
   // 1️⃣ When filters change, reset page & fetch new models
   useEffect(() => {
+    console.log(selectedFilters)
     const fetchFilteredModels = async () => {
       setIsLoading(true);
       setPage(1);
@@ -60,6 +61,7 @@ const ExploreMainPageClient = ({
         price: searchPrice,
         favourited: favourited ? 'true' : undefined,
         userId: userId,
+        filters: selectedFilters,
         page: 1,
         limit: 12,
       });
