@@ -1,6 +1,8 @@
 // /sanity/schemas/scrapeJob.ts
 import ThangsCategorySubcategory from "../components/ThangsCategorySubcategory"
+import PrintablesCategorySubcategory from "../components/PrintablesCategorySubcategory"
 import { thangsList } from "../../static/data/thangsList"
+import { printablesList } from "../../static/data/printablesList"
 
 export default {
   name: 'scrapeJob',
@@ -66,6 +68,29 @@ export default {
         hidden: (ctx: { parent: { platform?: string } }) =>
             ctx.parent?.platform !== 'Thangs',
         components: { input: ThangsCategorySubcategory }
+    },
+    {
+      name: 'printablesCategory',
+      type: 'string',
+      title: 'Printables Category',
+      hidden: (ctx: { parent: { platform?: string } }) =>
+            ctx.parent?.platform !== 'Printables',
+      options: {
+        list: Array.from(new Set(printablesList.map(([cat]) => cat))).map(cat => ({
+          title: cat,
+          value: cat,
+        })),
+      },
+    },
+    {
+      name: 'printablesSubcategory',
+      type: 'number',
+      title: 'Printables Subcategory',
+      hidden: (ctx: { parent: { platform?: string } }) =>
+            ctx.parent?.platform !== 'Printables',
+      components: {
+        input: PrintablesCategorySubcategory,
+      },
     },
     {
       name: 'limit',
