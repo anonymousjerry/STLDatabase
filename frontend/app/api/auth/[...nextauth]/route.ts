@@ -61,7 +61,8 @@ export const authOptions: any = {
     async jwt({ token, user }: {token:any, user:any}) {
       if (user?.email) {
       const sanityUser = await syncUserToSanity({
-        name: user.name,
+        username: user.username,
+        id: user.id,
         email: user.email
       })
 

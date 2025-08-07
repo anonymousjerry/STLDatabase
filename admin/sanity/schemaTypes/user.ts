@@ -4,9 +4,14 @@ export default {
   title: 'User',
   fields: [
     {
-      name: 'name',
+      name: 'username',
       type: 'string',
       title: 'Name',
+    },
+    {
+      name: 'id',
+      type: 'string',
+      title: 'UserId',
     },
     {
       name: 'email',

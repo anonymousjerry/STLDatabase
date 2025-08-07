@@ -21,8 +21,6 @@ const CategoriesFilter = () => {
 
   const [groupedCategories, setGroupedCategories] = useState<GroupedCategory[]>([]);
   const [openGroup, setOpenGroup] = useState<string | null>(null); // <-- only one open
-  // const { data: session, status } = useSession();
-  // const userId = (session?.user as { id?: string })?.id;
 
   const {
     selectedPlatform,
