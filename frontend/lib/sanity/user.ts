@@ -2,15 +2,16 @@
 import { createClient } from '@sanity/client'
 
 const client = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
   apiVersion: '2025-08-07',
-  token: process.env.SANITY_API_TOKEN!, // must have write access
+  token: process.env.SANITY_API_TOKEN, // must have write access
   useCdn: false,
 })
 
 export async function syncUserToSanity(user: {
-  name?: string
+  username?: string
+  id?: string
   email: string
 }) {
   const query = `*[_type == "user" && email == $email][0]`
@@ -20,7 +21,8 @@ export async function syncUserToSanity(user: {
 
   const newUser = await client.create({
     _type: 'user',
-    name: user.name || '',
+    username: user.username || '',
+    id: user.id || '',
     email: user.email,
     role: 'user'
   })
