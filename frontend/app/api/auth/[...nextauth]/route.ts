@@ -6,6 +6,7 @@ import GoogleProvider from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple";
 import bcrypt from "bcryptjs";
 import { nanoid } from "nanoid";
+import { syncUserToSanity } from "@/lib/sanity/user";
 
 export const authOptions: any = {
   // Configure one or more authentication providers
@@ -58,10 +59,19 @@ export const authOptions: any = {
 
   callbacks: {
     async jwt({ token, user }: {token:any, user:any}) {
-      if (user) {
-        token.accessToken = user.accessToken; // from backend
-        token.user = user;
+      if (user?.email) {
+      const sanityUser = await syncUserToSanity({
+        name: user.name,
+        email: user.email
+      })
+
+      token.sanityId = sanityUser._id
+      token.user = {
+        ...user,
+        role: sanityUser.role,
+        sanityId: sanityUser._id
       }
+    }
       return token;
     },
     async session({ session, token }: {session:any, token:any}) {

@@ -21,4 +21,5 @@ export const useDownloadsStore = create<DownloadsState>((set, get) => ({
   isDownload: (modelId) => {
     return get().DownloadModels.has(modelId);
   },
+
 }));

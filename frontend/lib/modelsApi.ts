@@ -14,10 +14,10 @@ type SearchParams = {
 };
 
 
-export const getModels = async (page: number = 1, limit: number = 12) => {
-  const response = await axiosInstance.get(`/models?page=${page}&limit=${limit}`);
-  return response.data.models;
-};
+// export const getModels = async (page: number = 1, limit: number = 12) => {
+//   const response = await axiosInstance.get(`/models?page=${page}&limit=${limit}`);
+//   return response.data.models;
+// };
 
 export const getTrendingModels = async () => {
     const response = await axiosInstance.get('/models/trending');
@@ -53,7 +53,7 @@ export const searchModels = async ({key, sourcesite, category, price, favourited
 
     filters.forEach((filter) => {
         if (filter && filter !== 'All') {
-        params.append('filter', filter);
+        params.append('sortby', filter);
         }
     });
     console.log(params.toString())
@@ -95,6 +95,7 @@ export const saveModel = async(modelId: string, userId: string, token: string) =
 }
 
 export const downloadModel = async(modelId: string, token: string) => {
+    console.log("!23")
     const response = await axiosInstance.post(
         `/models/download`,
         {
@@ -106,6 +107,7 @@ export const downloadModel = async(modelId: string, token: string) => {
             }
         }
     )
+    console.log(response.data)
     return response.data;
 }
 

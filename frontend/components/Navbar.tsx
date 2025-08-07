@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { useModal } from "@/context/ModalContext";
 import { useSearch } from "@/context/SearchContext";
 import { FaAngleDown } from "react-icons/fa6";
+import CategoryMenu from "./CategoryMenu";
 
 const Navbar = () => {
 
@@ -107,17 +108,9 @@ const Navbar = () => {
           </button>
 
           {/* Dropdown box */}
-          {/* {categoryOpen && (
-            <div className="absolute top-10 left-0 w-48 bg-white border rounded shadow-md p-4 z-50">
-              <ul className="space-y-2 text-black">
-                <li className="cursor-pointer hover:text-green-600">🎮 Gaming</li>
-                <li className="cursor-pointer hover:text-green-600">🎨 Art</li>
-                <li className="cursor-pointer hover:text-green-600">🏠 Home & Living</li>
-                <li className="cursor-pointer hover:text-green-600">🛠️ Tools</li>
-                <li className="cursor-pointer hover:text-green-600">🐾 Pets</li>
-              </ul>
-            </div>
-          )} */}
+          { categoryOpen && (
+            <CategoryMenu setCategoryOpen = {setCategoryOpen}/>
+          )}
         </div>
         {[...links.slice(2)].map(link => (
           <Link
