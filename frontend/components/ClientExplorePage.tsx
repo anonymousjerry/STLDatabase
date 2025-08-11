@@ -245,7 +245,7 @@ export default function ClientExplorePage({
               <span>{result.views}</span>
             </div>
             <div className="flex items-center gap-1 ">
-              <CiStar size={24} />
+              <CiHeart size={24} />
               <span>{count}</span>
             </div>
           </div>

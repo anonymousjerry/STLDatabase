@@ -7,8 +7,12 @@ const nextConfig = {
             hostname: 'placehold.co',
             port: ""
           },
+          {
+            protocol: 'https',
+            hostname: 'media.printables.com',
+            port: "/**"
+          },
         ],
-        domains: ["media.printables.com"]
       },
 };
 

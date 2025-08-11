@@ -58,7 +58,7 @@ const Categories = () => {
 
   return (
     <section
-      className="pt-10 px-6 sm:px-10 xl:px-52 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor"
+      className="pt-10 px-52 max-xl:px-30 max-lg:px-20 max-md:px-10 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor"
       aria-label="Top categories"
     >
       <div className="relative bg-custom-light-containercolor dark:bg-custom-dark-containercolor rounded-[32px] max-md:px-6">

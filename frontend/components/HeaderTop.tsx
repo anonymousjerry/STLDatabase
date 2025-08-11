@@ -12,13 +12,11 @@ const HeaderTop = () => {
     >
       {/* Left Column */}
       <div className="flex flex-row gap-3 text-white text-left font-['Inter-Light',_sans-serif] text-base font-light max-md:justify-center max-md:py-2">
-        <div>Platform Center</div>
-        <div>|</div>
-        <div className="flex gap-1">
+        <div className="flex gap-2">
           <div className="text-white text-left font-['Inter-Light',_sans-serif] text-base font-light">
             Follow us on
           </div>
-          <div className="flex flex-row gap-1 items-center justify-start shrink-0 relative">
+          <div className="flex flex-row gap-2 items-center justify-start shrink-0 relative">
             <img
               className="shrink-0 w-4 h-4 relative overflow-visible"
               style={{ aspectRatio: "1" }}
@@ -33,16 +31,6 @@ const HeaderTop = () => {
               className="shrink-0 w-4 h-4 relative overflow-visible"
               style={{ aspectRatio: "1" }}
               src="/mark3.png"
-            />
-            <img
-              className="shrink-0 w-4 h-4 relative overflow-visible"
-              style={{ aspectRatio: "1" }}
-              src="/mark4.png"
-            />
-            <img
-              className="shrink-0 w-4 h-4 relative overflow-visible"
-              style={{ aspectRatio: "1" }}
-              src="/mark5.png"
             />
           </div>
         </div>
