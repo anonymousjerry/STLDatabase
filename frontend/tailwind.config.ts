@@ -37,6 +37,12 @@ const config: Config = {
         'slide-in-right': 'slideInRight 0.6s ease-in-out forwards',
       },
     },
+    screens: {
+      'sm': '480px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1550px',
+    }
   },  
   plugins: [require("@tailwindcss/typography"), require("@tailwindcss/forms"), require("daisyui")],
 };

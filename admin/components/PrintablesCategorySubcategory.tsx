@@ -2,7 +2,8 @@ import React from 'react'
 import { useFormValue, set, unset } from 'sanity'
 import { Select } from '@sanity/ui'
 import { StringInputProps } from 'sanity'
-import { printablesList } from '../../static/data/printablesList'
+// import { printablesList } from '../../static/data/printablesList'
+import { printablesList } from '../static/data/printablesList'
 
 export default function PrintablesCategorySubcategory(props: StringInputProps) {
   const { value, onChange, readOnly, id } = props

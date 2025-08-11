@@ -3,7 +3,7 @@ import React from 'react'
 import { useFormValue, set, unset } from 'sanity'
 import { Select } from '@sanity/ui'
 import { StringInputProps } from 'sanity'
-import { thangsList } from '../../static/data/thangsList'
+import { thangsList } from '../static/data/thangsList'
 
 export default function ThangsCategorySubcategory(props: StringInputProps) {
   const { value, onChange, readOnly, id } = props

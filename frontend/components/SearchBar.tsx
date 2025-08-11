@@ -105,7 +105,7 @@ const SearchBar = () => {
           aria-label="Search models"
           className="bg-[#4e4d80] dark:bg-[#3a3a60] rounded-xl basis-1/5 pr-2.5 pl-2.5 mt-7 flex flex-row gap-2 items-center justify-center shrink-0 h-12 relative hover:bg-[#3d3c66] dark:hover:bg-[#2e2e4a] transition"
         >
-          <div className="text-white font-[Inter-Medium] text-lg font-medium text-left relative select-none">
+          <div className="text-white text-lg font-medium text-left relative select-none">
             Search
           </div>
           <Image

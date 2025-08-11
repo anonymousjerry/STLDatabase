@@ -66,7 +66,6 @@ export const authOptions: any = {
         email: user.email
       })
 
-      token.sanityId = sanityUser._id
       token.user = {
         ...user,
         role: sanityUser.role,
@@ -76,6 +75,7 @@ export const authOptions: any = {
       return token;
     },
     async session({ session, token }: {session:any, token:any}) {
+      
       session.user = token.user;
       session.accessToken = token.accessToken;
       return session;

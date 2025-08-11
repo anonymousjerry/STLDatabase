@@ -1,6 +1,6 @@
 // /sanity/schemas/scrapeJob.ts
-import ThangsCategorySubcategory from "../components/ThangsCategorySubcategory"
-import PrintablesCategorySubcategory from "../components/PrintablesCategorySubcategory"
+import ThangsCategorySubcategory from "../../components/ThangsCategorySubcategory"
+import PrintablesCategorySubcategory from "../../components/PrintablesCategorySubcategory"
 import { thangsList } from "../../static/data/thangsList"
 import { printablesList } from "../../static/data/printablesList"
 

@@ -88,36 +88,39 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
 
   return (
     <div className="flex flex-col w-full bg-custom-light-containercolor dark:bg-custom-dark-containercolor shadow-lg rounded-3xl border border-gray-200 overflow-hidden relative">
+
       {/* Source icon */}
       <div className="absolute top-2 left-2 rounded-lg hover:bg-opacity-100 transition">
         <Image
           src={`/Platforms/${slugify(sourceSiteName)}.png`}
           alt={sourceSiteName}
-          width={40}
-          height={40}
+          width={32}
+          height={32}
+          className="sm:w-10 sm:h-10 w-8 h-8"
         />
       </div>
 
       {/* Image */}
       <Link
         href={{ pathname: `/explore/${modelSlug}`, query }}
-        onClick={() => {handleToggleView(model.id)}}
+        onClick={() => handleToggleView(model.id)}
         className="overflow-hidden rounded-t-3xl"
       >
         <img
           src={model.thumbnailUrl}
           alt={model.title}
-          className="w-full h-48 object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+          className="w-full h-36 sm:h-44 md:h-48 object-cover transition-transform duration-300 ease-in-out hover:scale-105"
         />
       </Link>
 
       {/* Details */}
-      <div className="flex flex-col px-3 py-2 text-custom-light-maincolor dark:text-custom-dark-titlecolor gap-1">
+      <div className="flex flex-col px-3 py-2 text-custom-light-maincolor dark:text-custom-dark-titlecolor gap-2">
+
         {/* Title */}
         <Link
           href={{ pathname: `/explore/${modelSlug}`, query }}
-          onClick={() => {handleToggleView(model.id)}}
-          className="font-semibold text-2xl truncate max-w-full hover:underline transition-colors duration-200"
+          onClick={() => handleToggleView(model.id)}
+          className="font-semibold text-lg sm:text-xl md:text-2xl truncate max-w-full hover:underline transition-colors duration-200"
         >
           {model.title}
         </Link>
@@ -127,7 +130,7 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
           {model.tags.slice(0, 2).map((tag: string, index: number) => (
             <span
               key={`${tag}-${index}`}
-              className="bg-custom-light-maincolor font-medium text-sm text-white py-[1px] px-2 rounded-md"
+              className="bg-custom-light-maincolor font-medium text-xs sm:text-sm text-white py-[1px] px-2 rounded-md"
             >
               {tag}
             </span>
@@ -135,28 +138,28 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
         </div>
 
         {/* Meta Info */}
-        <div className="flex text-sm font-medium justify-between text-gray-700 dark:text-custom-dark-titlecolor">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor">
           <div className="flex items-center gap-1">
-            <HiOutlineFolderDownload className="text-base" size={24} />
+            <HiOutlineFolderDownload className="text-base" size={20} />
             <span>{model.downloads} files</span>
           </div>
           <div className="flex items-center gap-1">
-            <FaRegHeart className="text-base" size={20} />
+            <FaRegHeart className="text-base" size={18} />
             <span>{count} likes</span>
           </div>
-          <div className="font-semibold text-2xl text-custom-light-maincolor dark:text-custom-dark-maincolor">
+          <div className="font-semibold text-lg sm:text-xl text-custom-light-maincolor dark:text-custom-dark-maincolor">
             {model.price === "FREE" ? "Free" : model.price}
           </div>
         </div>
 
         {/* Buttons */}
-        <div className="flex items-center gap-2 pb-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pb-2">
           <button
             aria-label="Like"
             disabled={isDisabled}
             onClick={() => handleModelOnClick(model.id)}
             className={`
-              flex items-center justify-center w-12 h-12 border rounded-xl transition-transform duration-200
+              flex items-center justify-center w-full sm:w-12 h-12 border rounded-xl transition-transform duration-200
               ${
                 isDisabled
                   ? "border-gray-300 text-gray-300 cursor-not-allowed dark:border-gray-600 dark:text-gray-500"
@@ -167,17 +170,16 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
             `}
           >
             {liked ? (
-              <FaHeart className="text-white" size={30} />
+              <FaHeart className="text-white" size={24} />
             ) : (
-              <FaRegHeart size={30} />
+              <FaRegHeart size={24} />
             )}
           </button>
 
-
           <Link
             href={{ pathname: `/explore/${modelSlug}`, query }}
-            onClick={() => {handleToggleView(model.id)}}
-            className="flex-1 flex items-center justify-center gap-2 bg-custom-light-maincolor text-white rounded-xl py-2 font-medium text-2xl transition-transform duration-200 hover:bg-[#3a3663] hover:scale-[1.03]"
+            onClick={() => handleToggleView(model.id)}
+            className="flex-1 flex items-center justify-center gap-2 bg-custom-light-maincolor text-white rounded-xl py-2 font-medium text-base sm:text-lg md:text-xl lg:text-2xl transition-transform duration-200 hover:bg-[#3a3663] hover:scale-[1.03]"
           >
             <HiDownload />
             Download
@@ -185,6 +187,7 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
         </div>
       </div>
     </div>
+
   );
 };
 
