@@ -77,11 +77,12 @@ async def pass_AI(results):
         if res == None:
             continue
         else:
-            inject_database(res)
+            await inject_database(res)
 
 if __name__ == "__main__":
-    category = sys.argv[1]
-    subCategory = sys.argv[2]
-    number = int(sys.argv[3])
-    results = asyncio.run(scrape_thangs(category, subCategory, number))
+    # category = sys.argv[1]
+    # subCategory = sys.argv[2]
+    # number = int(sys.argv[3])
+    # results = asyncio.run(scrape_thangs(category, subCategory, number))
+    results = asyncio.run(scrape_thangs("Fashion", "Clothing", 1))
     asyncio.run(pass_AI(results))

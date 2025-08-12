@@ -64,7 +64,7 @@ def enrich_data(data):
     subcategories = list(subcategory_to_category.keys())
 
     prompt = f"""
-        You are an assistant that enriches 3D model metadata.propert.property
+        You are an assistant that enriches 3D model metadata
         Given the following input:
         - Title: {data['title']}
         - Desciption: {data['description'][:MAX_DESCRIPTION_LEN]}
@@ -74,7 +74,7 @@ def enrich_data(data):
         2. Choose exactly one subcategory from this list (copy-paste, do NOT modify or invent). 
            You must choose exactly one string from this Python list (case-sensitive, no alterations): {subcategories}
            If the subcategory is not in the list, your output will be discarded. So double-check it matches exactly, character for character.
-        3. Generate a list of 10~15 relevant tags. Include the original tags: [{data['tags']}]
+        3. Generate a list of 10~15 relevant tags by analyzing images on this urls [{data['image_urls']}]. Include the original tags: [{data['tags']}]
 
         Respond in this JSON format:
         {{

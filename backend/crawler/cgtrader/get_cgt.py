@@ -1,15 +1,5 @@
 from playwright.async_api import async_playwright
 import asyncio
-import httpx
-import boto3
-
-# s3 = boto3.client(
-#     's3',
-#     endpoint_url='https://s3.us-central-1.wasabisys.com',
-#     aws_access_key_id='5HOWDRMVV9WMR6IN6G15',
-#     aws_secret_access_key='tubtAvpWpOgd0tJsKSZ1NtDH40ZHgdu96BRWogD6',
-#     region_name='us-central-1'
-# )
 
 async def get_info(url):
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
@@ -28,27 +18,27 @@ async def get_info(url):
 
             await page.wait_for_selector('span[itemprop="item"] span[itemprop="name"]')
             title = await page.locator('span[itemprop="item"] span[itemprop="name"]').inner_text()
+            if await page.locator(".product-description").count() > 0:
+                await page.wait_for_selector('.product-description', state="attached")
 
-            await page.wait_for_selector('.product-description')
-
-            tags = []
-            tag_els = await page.query_selector_all('.tags-list .labels-list .label')
-            for el in tag_els:
-                text = await el.evaluate('(el) => el.childNodes[0]?.textContent.trim()')
-                if not text:
-                    a = await el.query_selector('a:not(.js-remove-tag)')
-                    if a:
-                        text = await a.text_content()
-                        text = text.strip()
-                        if text:
-                            tags.append(text)
-                else:
-                    tags.append(text)
-            
-            await page.eval_on_selector('.product-description .tags-list', 'el => el.remove()')
-            description_text = await page.text_content('.product-description')
-            full_description = description_text.strip()
-            description = full_description.replace("Description", "", 1).strip()
+                tags = []
+                tag_els = await page.query_selector_all('.tags-list .labels-list .label')
+                for el in tag_els:
+                    text = await el.evaluate('(el) => el.childNodes[0]?.textContent.trim()')
+                    if not text:
+                        a = await el.query_selector('a:not(.js-remove-tag)')
+                        if a:
+                            text = await a.text_content()
+                            text = text.strip()
+                            if text:
+                                tags.append(text)
+                    else:
+                        tags.append(text)
+                
+                await page.eval_on_selector('.product-description .tags-list', 'el => el.remove()')
+                description_text = await page.text_content('.product-description')
+                full_description = description_text.strip()
+                description = full_description.replace("Description", "", 1).strip()
 
             elements = await page.query_selector_all('#product-price-final')
             first_el = elements[0]
@@ -63,7 +53,6 @@ async def get_info(url):
                     image_urls.append([main_src, thumb_src])
 
             thumbnail_url = image_urls[0][0]
-            # await transfer_image_to_wasabi(thumbnail_url, '3ddb', 'we.jpg')
 
             info.append({"title" : title})
             info.append({"description" : description})
@@ -79,20 +68,8 @@ async def get_info(url):
         finally:
             await browser.close()
 
-# async def transfer_image_to_wasabi(image_url, bucket_name, key_path):
-#     async with httpx.AsyncClient() as client:
-#         response = await client.get(image_url)
-#         print(response)
-#         s3.put_object(
-#             Bucket = bucket_name,
-#             Key=key_path,
-#             Body=response.content,
-#             ACL='public-read',
-#             ContentType=response.headers.get("Content-Type", "image/jpeg")
-#         )
-
 if __name__ == "__main__":
-    url = 'https://www.cgtrader.com/3d-models/aircraft/military-aircraft/f-16c-viper'
+    url = 'https://www.cgtrader.com/3d-models/aircraft/aircraft-part/engine-jet-pack'
     result = asyncio.run(get_info(url))
 
     print(result)

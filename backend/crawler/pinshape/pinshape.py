@@ -63,7 +63,7 @@ async def scrape_pinshape(category_id, num):
                     if res == None:
                         continue
                     else:
-                        inject_database(res)
+                        await inject_database(res)
                     if len(collected_urls) == num:
                         break
             pagenum += 1
@@ -71,6 +71,7 @@ async def scrape_pinshape(category_id, num):
         await browser.close()
 
 if __name__ == "__main__":
-    category_id = int(sys.argv[1])
-    number = int(sys.argv[2])
-    asyncio.run(scrape_pinshape(category_id, number))
+    # category_id = int(sys.argv[1])
+    # number = int(sys.argv[2])
+    # asyncio.run(scrape_pinshape(category_id, number))
+    asyncio.run(scrape_pinshape(3, 1))

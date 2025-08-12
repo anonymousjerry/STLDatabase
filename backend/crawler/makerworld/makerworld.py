@@ -75,9 +75,10 @@ async def pass_AI(results):
         if res == None:
             continue
         else:
-            inject_database(res)
+            await inject_database(res)
 
 if __name__ == "__main__":
-    number = int(sys.argv[1])
-    results = scrape_makerworld(number)
+    # number = int(sys.argv[1])
+    # results = scrape_makerworld(number)
+    results = scrape_makerworld(1)
     asyncio.run(pass_AI(results))
