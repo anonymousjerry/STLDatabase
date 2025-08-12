@@ -53,7 +53,7 @@ async def scrape_thingiverse(num):
                 if res == None:
                     continue
                 else:
-                    inject_database(res)
+                    await inject_database(res)
                 collected_url.append(url)
             current += 1
 
@@ -64,5 +64,6 @@ async def scrape_thingiverse(num):
         await browser.close()
 
 if __name__ == "__main__":
-    num = int(sys.argv[1])
-    results = asyncio.run(scrape_thingiverse(num))
+    # num = int(sys.argv[1])
+    # results = asyncio.run(scrape_thingiverse(num))
+    results = asyncio.run(scrape_thingiverse(1))

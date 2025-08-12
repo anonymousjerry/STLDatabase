@@ -58,8 +58,8 @@ async def scrape_printables(category_id, num):
                 anchors = await page.locator("a.card-image").all()
                 for a in anchors:
                     href = await a.get_attribute("href")
-                    if href and href.startswith("/model/") and "/comments" not in href and not url_exists_in_db(href) and href not in collected_urls:
-                        model_link = "https://www.printables.com" + href
+                    model_link = "https://www.printables.com" + href
+                    if href and href.startswith("/model/") and "/comments" not in href and not url_exists_in_db(model_link) and model_link not in collected_urls:                     
                         collected_urls.append(model_link)
                     
                         img = a.locator('img').nth(1)
@@ -80,7 +80,7 @@ async def scrape_printables(category_id, num):
                         if res == None:
                             continue
                         else:
-                            inject_database(res)
+                            await inject_database(res)
                         if len(collected_urls) == num:
                             break
 
@@ -92,6 +92,7 @@ async def scrape_printables(category_id, num):
             
 
 if __name__ == "__main__":
-    category_id = int(sys.argv[1])
-    number = int(sys.argv[2])
-    asyncio.run(scrape_printables(category_id, number))
+    # category_id = int(sys.argv[1])
+    # number = int(sys.argv[2])
+    # asyncio.run(scrape_printables(category_id, number))
+    asyncio.run(scrape_printables(5, 1))
