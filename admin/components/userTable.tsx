@@ -1,150 +1,308 @@
 import React, { useEffect, useState } from 'react'
-import { useClient } from 'sanity'
+import axios from 'axios'
+import { createUserApi, deleteUserApi, getAllUser, updateUserApi } from '../lib/userApi'
+import { User } from '../sanity/types';
+
+export interface UserPayload {
+  username: string;
+  email: string;
+  role: 'user' | 'admin';
+}
+
+const api = axios.create({ baseURL: process.env.BACKEND_URL })
+api.interceptors.request.use((config) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('sanity_admin_token') : null
+  if (token) {
+    config.headers = config.headers || {}
+    config.headers['authorization'] = `Bearer ${token}`
+  }
+  return config
+})
 
 export function UserTable() {
-  const client = useClient()
-  const [users, setUsers] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [formData, setFormData] = useState({ username: '', email: '', role: '' })
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [form, setForm] = useState<Partial<User>>({})
+  const [filter, setFilter] = useState('')
+  const [isFormVisible, setIsFormVisible] = useState(false);
 
-  // Fetch users
-  const fetchUsers = () => {
+  const refresh = async () => {
     setLoading(true)
-    client
-      .fetch(`*[_type == "user"]{_id, username, email, role}`)
-      .then((data) => {
-        setUsers(data)
-        setLoading(false)
-      })
-      .catch((err) => {
-        console.error('Failed to fetch users:', err)
-        setLoading(false)
-      })
+    setError(null)
+    try {
+      const res = await getAllUser()
+      setUsers(res)
+    } catch (err: any) {
+      console.error(err)
+      setError('Failed to fetch users')
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
-    fetchUsers()
+    refresh()
   }, [])
 
-  // Create user
-  const createUser = () => {
-    if (!formData.username || !formData.email || !formData.role) {
-      alert('All fields required')
+  const showAlert = (type: 'success' | 'error', message: string) => {
+    setAlert({ type, message })
+    setTimeout(() => setAlert(null), 3000)
+  }
+
+  const startEdit = (u: User) => {
+    setEditingId(u.id)
+    setForm({ username: u.username, email: u.email, role: u.role })
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setForm({})
+  }
+
+  const createUser = async () => {
+    if (!form.username || !form.email) {
+      showAlert('error', 'Username and Email are required!')
       return
     }
-    client
-      .create({
-        _type: 'user',
-        username: formData.username,
-        email: formData.email,
-        role: formData.role,
-      })
-      .then(() => {
-        setFormData({ username: '', email: '', role: '' })
-        fetchUsers()
-      })
+    try {
+      setLoading(true)
+      const payload = {
+        username: form.username,
+        email: form.email,
+        role: form.role ?? 'user'
+      }
+      await createUserApi(payload);
+      await refresh()
+      setForm({})
+      showAlert('success', 'User created successfully!')
+    } catch (err: any) {
+      console.error(err)
+      showAlert('error', err?.response?.data?.error || 'Failed to create user')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  // Update user
-  const updateUser = () => {
-    if (!editingId) return
-    client
-      .patch(editingId)
-      .set({
-        username: formData.username,
-        email: formData.email,
-        role: formData.role,
-      })
-      .commit()
-      .then(() => {
-        setEditingId(null)
-        setFormData({ username: '', email: '', role: '' })
-        fetchUsers()
-      })
+  const updateUser = async (id: string) => {
+    try {
+      setLoading(true)
+      const payload = {
+        id,
+        username: form.username ?? "",
+        email: form.email ?? "",
+        role: form.role ?? "user",
+      }
+      await updateUserApi(payload)
+      await refresh()
+      setEditingId(null)
+      setForm({})
+      showAlert('success', 'User updated successfully!')
+    } catch (err: any) {
+      console.error(err)
+      showAlert('error', err?.response?.data?.error || 'Failed to update user')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  // Delete user
-  const deleteUser = (id: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return
-    client
-      .delete(id)
-      .then(() => {
-        fetchUsers()
-      })
+  const deleteUser = async (id: string) => {
+    console.log("123")
+    if (!confirm('Delete this user?')) return
+    try {
+      setLoading(true)
+      await deleteUserApi(id);
+      await refresh()
+      showAlert('success', 'User deleted successfully!')
+    } catch (err: any) {
+      console.error(err)
+      showAlert('error', err?.response?.data?.error || 'Failed to delete user')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  if (loading) return <div>Loading users...</div>
+
+  const filtered = users.filter((u) => {
+    if (!filter) return true
+    const s = filter.toLowerCase()
+    return u.username.toLowerCase().includes(s) ||
+      u.email.toLowerCase().includes(s) ||
+      u.role.toLowerCase().includes(s)
+  })
+
+  const toggleFormVisibility = () => {
+  setIsFormVisible((prevState) => !prevState);
+};
 
   return (
-    <div>
-      <h2>Users</h2>
+    <div className="p-6 bg-white rounded-lg shadow overflow-hidden">
+      {/* Header Controls */}
+      <div className="flex flex-col justify-center gap-4 mb-4">
+         <div className='flex flex-col'>
+          <button
+            onClick={toggleFormVisibility}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md w-[150px]"
+          >
+            {isFormVisible ? 'Cancel' : 'Add User'}
+          </button>
 
-      {/* User Form */}
-      <div style={{ marginBottom: '20px' }}>
+          {isFormVisible && (
+  <form
+    className="mt-4 flex flex-col gap-3 p-4 border rounded-lg bg-gray-50"
+    onSubmit={(e) => {
+      e.preventDefault();
+      createUser();
+    }}
+  >
+    <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex-1 flex flex-col">
+        <label className="text-sm font-medium mb-1">Username <span className="text-red-500">*</span></label>
         <input
-          placeholder="Username"
-          value={formData.username}
-          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+          type="text"
+          placeholder="Enter username"
+          className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={form.username || ''}
+          onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
+          required
         />
+      </div>
+      <div className="flex-1 flex flex-col">
+        <label className="text-sm font-medium mb-1">Email <span className="text-red-500">*</span></label>
         <input
-          placeholder="Email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          type="email"
+          placeholder="Enter email"
+          className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={form.email || ''}
+          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+          required
         />
-        <input
-          placeholder="Role"
-          value={formData.role}
-          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-        />
-        {editingId ? (
-          <button onClick={updateUser}>Update User</button>
-        ) : (
-          <button onClick={createUser}>Add User</button>
-        )}
+      </div>
+      <div className="flex-1 flex flex-col">
+        <label className="text-sm font-medium mb-1">Role</label>
+        <select
+          className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={form.role || 'user'}
+          onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as 'user' | 'admin' }))}
+        >
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+    </div>
+
+    <div className="flex justify-end gap-2 mt-3">
+      <button
+        type="button"
+        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+        onClick={toggleFormVisibility}
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+        disabled={loading}
+      >
+        {loading ? 'Saving...' : 'Save User'}
+      </button>
+    </div>
+  </form>
+)}
+
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            className="border border-gray-200 rounded-md px-3 py-2 text-sm focus:ring focus:ring-blue-300"
+            placeholder="Search users..."
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          />
+        </div>
       </div>
 
-      {/* User Table */}
-      <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-        <thead>
-          <tr>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Username</th>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Email</th>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Role</th>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user._id}>
-              <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                {user.username}
-              </td>
-              <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                {user.email}
-              </td>
-              <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                {user.role}
-              </td>
-              <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                <button
-                  onClick={() => {
-                    setEditingId(user._id)
-                    setFormData({
-                      username: user.username,
-                      email: user.email,
-                      role: user.role,
-                    })
-                  }}
+      {/* Alerts */}
+      {alert && (
+        <div className={`mb-4 px-4 py-2 rounded ${alert.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          {alert.message}
+        </div>
+      )}
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              {['ID', 'Username', 'Email', 'Role', 'Actions'].map((h) => (
+                <th
+                  key={h}
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Edit
-                </button>
-                <button onClick={() => deleteUser(user._id)}>Delete</button>
-              </td>
+                  {h}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-100">
+            {filtered.map((user) => (
+              <tr key={user.id} className="hover:bg-gray-50 transition">
+                <td className="px-4 py-3">{user.id}</td>
+                <td className="px-4 py-3">
+                  {editingId === user.id ? (
+                    <input
+                      className="border border-gray-300 rounded-md px-2 py-1 w-full text-sm"
+                      value={form.username || ''}
+                      onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
+                    />
+                  ) : (
+                    user.username
+                  )}
+                </td>
+                <td className="px-4 py-3">{editingId === user.id ? (
+                  <input
+                    className="border border-gray-300 rounded-md px-2 py-1 w-full text-sm"
+                    value={form.email || ''}
+                    onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                  />
+                ) : user.email}</td>
+                <td className="px-4 py-3">
+                  {editingId === user.id ? (
+                    <select
+                      className="border border-gray-300 rounded-md px-2 py-1 text-sm"
+                      value={form.role || 'user'}
+                      onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as 'user' | 'admin' }))}
+                    >
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  ) : (
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                      user.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700'
+                    }`}>
+                      {user.role}
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-right space-x-2">
+                  {editingId === user.id ? (
+                    <>
+                      <button className="text-blue-600 hover:text-blue-800 text-sm" onClick={() => updateUser(user.id)}>Save</button>
+                      <button className="text-gray-600 hover:text-gray-800 text-sm" onClick={cancelEdit}>Cancel</button>
+                    </>
+                  ) : (
+                    <>
+                      <button className="text-indigo-600 hover:text-indigo-900 text-sm" onClick={() => startEdit(user)}>Edit</button>
+                      <button className="text-red-600 hover:text-red-900 text-sm" onClick={() => deleteUser(user.id)}>Delete</button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
