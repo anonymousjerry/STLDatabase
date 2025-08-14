@@ -1,9 +1,10 @@
 import {defineCliConfig} from 'sanity/cli'
+// import './tailwind.css'
 
 export default defineCliConfig({
   api: {
     projectId: 'vngrr2a1',
-    dataset: 'production'
+    dataset: 'production',
   },
   /**
    * Enable auto-updates for studios.

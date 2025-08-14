@@ -1,4 +1,3 @@
-"use"
 
 import Categories from "@/components/Categories";
 import FeaturedSite from "@/components/FeaturedSite";
@@ -7,6 +6,7 @@ import TrendingModels from "@/components/TrendingModels";
 import DailyDiscover from "@/components/DailyDiscover";
 import { Header } from "@/components";
 import { Footer } from "@/components";
+// import GoogleAd from "@/components/GoogleAd";
 
 export default function Home() {
   
@@ -15,6 +15,7 @@ export default function Home() {
       <Header />
       <HeaderMain />
       <Categories />
+      {/* <GoogleAd /> */}
       <FeaturedSite />
       <TrendingModels />
       <DailyDiscover />
