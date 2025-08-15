@@ -2,6 +2,7 @@ import type { StructureResolver, StructureBuilder } from "sanity/structure"
 // import UserTable from "../components/userTable"
 import { UserTable } from "../components/userTable"
 import { ModelTable } from "../components/modelTable"
+import { CategoryTable } from "../components/categoryTable"
 import "../global.css"
 
 export const structure: StructureResolver = (S: StructureBuilder) =>
@@ -14,5 +15,8 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
       S.listItem()
         .title('Models Table')
         .child(S.component(ModelTable).title('Models')),
+      S.listItem()
+        .title('Categoriess Table')
+        .child(S.component(CategoryTable).title('Categories')),
       // ...S.documentTypeListItems()
     ])
