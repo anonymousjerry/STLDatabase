@@ -9,10 +9,12 @@ const getAllSites = async (req, res) => {
             select: {
                 name: true,
                 url: true,
+                iconBigUrl: true,
+                iconSmallUrl: true
             }
         })
 
-        const siteLists = sites.map((item) => [item.name, item.url]);
+        const siteLists = sites.map((item) => [item.name, item.url, item.iconBigUrl, item.iconSmallUrl]);
         res.status(200).json(siteLists);
     } catch(err) {
         console.error("Error fetching categories: ", err);
