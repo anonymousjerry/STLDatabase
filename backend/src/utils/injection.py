@@ -122,3 +122,4 @@ async def inject_database(data):
     except psycopg2.Error as e:
         print(f"Error adding source site: {e}")
         conn.rollback()
+

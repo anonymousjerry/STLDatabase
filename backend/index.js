@@ -6,6 +6,7 @@ const modelRoutes = require('./src/routes/modelRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const siteRoutes = require('./src/routes/siteRoutes');
 const webhookRouter = require('./src/routes/webhook');
+const adminRoutes = require('./src/routes/adminRoutes');
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/models', modelRoutes);
 app.use('/api/subcategories', categoryRoutes);
