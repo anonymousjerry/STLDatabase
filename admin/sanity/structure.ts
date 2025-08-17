@@ -16,7 +16,7 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
         .title('Models Table')
         .child(S.component(ModelTable).title('Models')),
       S.listItem()
-        .title('Categoriess Table')
+        .title('Categories Table')
         .child(S.component(CategoryTable).title('Categories')),
       // ...S.documentTypeListItems()
     ])

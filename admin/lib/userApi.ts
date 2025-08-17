@@ -18,7 +18,7 @@ export const createUserApi = async (payload: UserPayload) => {
     console.log("create request")
     console.log(payload)
     const response = await axiosInstance.post(
-        '/userCreate',
+        '/user/create',
         {
             payload: payload
         }
@@ -29,7 +29,7 @@ export const createUserApi = async (payload: UserPayload) => {
 export const updateUserApi = async (payload: UserPayload) => {
     console.log("update request")
     const response = await axiosInstance.post(
-        '/userUpdate',
+        '/user/update',
         {
             payload: payload
         }
@@ -39,6 +39,6 @@ export const updateUserApi = async (payload: UserPayload) => {
 
 export const deleteUserApi = async (userId: string) => {
     console.log("delete request")
-    const response = await axiosInstance.delete(`/userDelete?userId=${userId}`);
+    const response = await axiosInstance.delete(`/user/delete?userId=${userId}`);
     return response.data;
 }

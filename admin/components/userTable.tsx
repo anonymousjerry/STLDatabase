@@ -9,15 +9,6 @@ export interface UserPayload {
   role: 'user' | 'admin';
 }
 
-const api = axios.create({ baseURL: process.env.BACKEND_URL })
-api.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('sanity_admin_token') : null
-  if (token) {
-    config.headers = config.headers || {}
-    config.headers['authorization'] = `Bearer ${token}`
-  }
-  return config
-})
 
 export function UserTable() {
   const [users, setUsers] = useState<User[]>([])
