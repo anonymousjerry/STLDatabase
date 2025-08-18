@@ -6,11 +6,16 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { getSubCategories } from "@/lib/categoryApi";
-import { subCategoryList } from "@/utils/categoryFormat";
+
+export interface subCategoryListItem {
+  id: number;
+  title: string;
+  src: string;
+}
 
 const Categories = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [subcategories, setSubCategories] = useState<string[]>([]);
+  const [subcategories, setSubCategories] = useState<subCategoryListItem[]>([]);
   const [columns, setColumns] = useState(2);
 
   useEffect(() => {
@@ -30,21 +35,23 @@ const Categories = () => {
   
   useEffect(() => {
     getSubCategories()
-    .then((data: Category[]) => {
-      const subcategoryNames = data.map((item) => item.name);
-      setSubCategories(subcategoryNames);
-    })
-    .catch(console.error);
+      .then((data: SubCategory[]) => {
+        // Assuming backend already returns the correct shape
+        const formatted = data.map((item, index) => ({
+          id: index + 1,
+          title: item.name,   // map name → subcategoryTitle
+          src: item.iconUrl              // map iconUrl → src
+        }));
+        setSubCategories(formatted);
+      })
+      .catch(console.error);
   }, []);
 
-
-  const categoryMenuList = subCategoryList(subcategories);
-
   const itemsPerPage = 18;
-  const totalPages = Math.ceil(categoryMenuList.length / itemsPerPage);
+  const totalPages = Math.ceil(subcategories.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedItems = categoryMenuList.slice(startIndex, endIndex);
+  const paginatedItems = subcategories.slice(startIndex, endIndex);
 
   const [direction, setDirection] = useState<"next" | "prev">("next");
   const [fadeKey, setFadeKey] = useState(0);

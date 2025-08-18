@@ -10,7 +10,14 @@ const nextConfig = {
           {
             protocol: 'https',
             hostname: 'media.printables.com',
-            port: "/**"
+            port: "",
+            pathname: "/**"
+          },
+          {
+            protocol: 'https',
+            hostname: 'img.3ddatabase.com',
+            port: "",
+            pathname: "/**"
           },
         ],
       },

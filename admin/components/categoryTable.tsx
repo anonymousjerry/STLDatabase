@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { createSubCategory, getAllCategories, updateCategory } from '../lib/categoryApi';
+import { createCategory, createSubCategory, getAllCategories, updateCategory } from '../lib/categoryApi';
 
 export interface Subcategory {
   id?: string;
@@ -38,7 +38,7 @@ const groupByCategory = (data: any[]) => {
   data.forEach((item) => {
     if (!map[item.category]) {
       map[item.category] = {
-        id: `cat-${item.category.toLowerCase().replace(/\s+/g, '-')}`,
+        id: item.id,
         name: item.category,
         subcategories: [],
       };
@@ -129,17 +129,22 @@ export function CategoryTable() {
       setLoading(true);
       const formData = new FormData();
       formData.append('name', formCategoryName.trim());
+      console.log(formCategoryName.trim())
 
       formSubcategories.forEach((sub, idx) => {
-        formData.append(`subcategories[${idx}][name]`, sub.name);
+        formData.append(`subCategories[${idx}][name]`, sub.name);
+        // console.log(sub.name)
         if (sub.iconUrl instanceof File) {
-          formData.append(`subcategories[${idx}][icon]`, sub.iconUrl);
+          // formData.append(`subcategories[${idx}][icon]`, sub.iconUrl);
+          formData.append("image", sub.iconUrl);
+          // console.log(sub.iconUrl)
         }
       });
 
-      await api.post('/categories', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      // await api.post('/categories', formData, {
+      //   headers: { 'Content-Type': 'multipart/form-data' },
+      // });
+      await createCategory(formData);
 
       showAlert('success', 'Category created!');
       setFormCategoryName('');
@@ -156,6 +161,7 @@ export function CategoryTable() {
 
   // ====== ADD SUBCATEGORY ======
   const saveNewSubcategory = async (catId: string) => {
+    console.log(catId)
     if (!newSubName.trim() || !newSubIcon) {
       showAlert('error', 'Subcategory name and icon are required.');
       return;
