@@ -1,10 +1,17 @@
 import { axiosInstance } from "./axiosInstance";
 import { User } from "../sanity/types";
 
-export interface UserPayload {
-  username: string;
-  email: string;
-  role: 'user' | 'admin';
+export interface CreateUserPayload {
+    username: string;
+    email: string;
+    role: 'user' | 'admin';
+}
+
+export interface UpdateUserPayload {
+    id: string;
+    username: string;
+    email: string;
+    role: 'user' | 'admin';
 }
 
 export const getAllUser = async () => {
@@ -14,7 +21,7 @@ export const getAllUser = async () => {
     return response.data;
 }
 
-export const createUserApi = async (payload: UserPayload) => {
+export const createUserApi = async (payload: CreateUserPayload) => {
     console.log("create request")
     console.log(payload)
     const response = await axiosInstance.post(
@@ -26,7 +33,7 @@ export const createUserApi = async (payload: UserPayload) => {
     return response.data;
 }
 
-export const updateUserApi = async (payload: UserPayload) => {
+export const updateUserApi = async (payload: UpdateUserPayload) => {
     console.log("update request")
     const response = await axiosInstance.post(
         '/user/update',

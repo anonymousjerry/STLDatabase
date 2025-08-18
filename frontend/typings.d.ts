@@ -15,6 +15,7 @@ interface SubCategory {
   id: string;
   name: string;
   categoryId: string;
+  iconUrl: string;
 }
 
 interface Category {

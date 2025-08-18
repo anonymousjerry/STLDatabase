@@ -20,7 +20,16 @@ export const updateCategory = async (formData: FormData) => {
 }
 
 export const createSubCategory = async (formData: FormData) => {
+    
     const response = await axiosInstance.post('/subcategory/create', formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+    });
+    return response.data;
+}
+
+export const createCategory = async (formData: FormData) => {
+    
+    const response = await axiosInstance.post('/category/create', formData, {
         headers: { "Content-Type": "multipart/form-data" }
     });
     return response.data;

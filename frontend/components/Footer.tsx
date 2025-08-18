@@ -1,8 +1,18 @@
+"use client";
+
 import Image from "next/image";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Link from "next/link";
+import { getPlatforms } from "@/lib/platformApi";
 
 const Footer = () => {
+
+  const [platforms, setPlatforms] = useState([]);
+  
+  useEffect(() => {
+    getPlatforms().then(setPlatforms).catch(console.error);
+  }, []);
+
   return (
     <footer className="bg-custom-light-maincolor flex flex-col" aria-labelledby="footer-heading">
       <div className="flex justify-between mx-52 mb-[53px]">
@@ -75,69 +85,16 @@ const Footer = () => {
         </div>
         <div className="flex flex-col gap-[2px] items-end justify-end mt-32 shrink-0 relative">
           <div className="flex gap-2 justify-center items-center">
-            <Image
-              src={"/Platforms/f1.png"}
-              alt="in"
-              width={25}
-              height={24}
-              className="cursor-pointer"
-            />
-            <Image
-              src={"/Platforms/f2.png"}
-              alt="in"
-              width={25}
-              height={24}
-              className="cursor-pointer"
-            />
-            <Image
-              src={"/Platforms/f3.png"}
-              alt="in"
-              width={25}
-              height={24}
-              className="cursor-pointer"
-            />
-            <Image
-              src={"/Platforms/f4.png"}
-              alt="in"
-              width={25}
-              height={24}
-              className="cursor-pointer"
-            />
-            <Image
-              src={"/Platforms/f5.png"}
-              alt="in"
-              width={25}
-              height={24}
-              className="cursor-pointer"
-            />
-            <Image
-              src={"/Platforms/f6.png"}
-              alt="in"
-              width={25}
-              height={24}
-              className="cursor-pointer"
-            />
-            <Image
-              src={"/Platforms/f7.png"}
-              alt="in"
-              width={25}
-              height={24}
-              className="cursor-pointer"
-            />
-            <Image
-              src={"/Platforms/f8.png"}
-              alt="in"
-              width={25}
-              height={24}
-              className="cursor-pointer"
-            />
-            <Image
-              src={"/Platforms/f9.png"}
-              alt="in"
-              width={25}
-              height={24}
-              className="cursor-pointer"
-            />
+             {platforms.map((platform, index) => (
+                <Image
+                  key={index}
+                  src={platform[3]}
+                  alt={platform[0]}
+                  width={25}
+                  height={24}
+                  className="cursor-pointer"
+                />
+              ))}
             <span className="text-white text-left font-medium text-lg ">
               ...more
             </span>
