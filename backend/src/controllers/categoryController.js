@@ -16,7 +16,8 @@ const getAllSubcategories = async (req, res) => {
 
         const subcategoryList = categories.map((item) => ({
             name: item.name,
-            category: item.category.name
+            category: item.category.name,
+            iconUrl: item.iconUrl
         }));
         res.status(200).json(subcategoryList);
     } catch(err) {

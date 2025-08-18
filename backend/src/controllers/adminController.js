@@ -34,7 +34,11 @@ const slugify = (str) =>
 
 const getAllUsers = async (req, res) => {
     try {
-        const users = await prisma.user.findMany({});
+        const users = await prisma.user.findMany({
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
 
         res.status(200).json(users);
     } catch(err){
@@ -45,6 +49,7 @@ const getAllUsers = async (req, res) => {
 
 const updateUser = async(req, res) => {
     try {
+        console.log(req.body.payload)
         const { id, username, email, role} = req.body.payload;
 
         if (!id) {
