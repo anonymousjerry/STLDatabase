@@ -302,6 +302,9 @@ const getAllModels = async (req, res) => {
                 sourceSite: true,
                 category: true,
                 subCategory: true
+            },
+            orderBy: {
+                createdAt: 'desc'
             }
         })
         
@@ -353,7 +356,27 @@ const updateModel = async (req, res) => {
         console.error("Error fetching models: ", err);
         res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
+
+const deleteModel = async (req, res) => {
+    try {
+        console.log(req.query);
+        const { modelId } = req.query;
+
+        if (!modelId) {
+            return res.status(400).json({error: 'Model ID is required'});
+        }
+
+        const deleteModel = await prisma.model.delete({
+            where: { id: modelId }
+        });
+
+        res.status(200).json({ message: 'Model deleted successfully'});
+    } catch(err) {
+        console.error("Error deleting models: ", err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 
 
 module.exports = { 
@@ -367,5 +390,6 @@ module.exports = {
     createCategory,
     getAllModels, 
     updateModel,
+    deleteModel,
     upload 
 };
