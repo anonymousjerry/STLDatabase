@@ -29,6 +29,7 @@
     "nanoid": "^5.0.6",
     "next": "^15.4.2",
     "next-auth": "^4.24.6",
+    "node-fetch": "^3.3.2",
     "nookies": "^2.5.2",
     "react": "^18.2.0",
     "react-apexcharts": "^1.4.1",

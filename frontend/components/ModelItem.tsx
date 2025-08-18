@@ -104,12 +104,20 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
       <Link
         href={{ pathname: `/explore/${modelSlug}`, query }}
         onClick={() => handleToggleView(model.id)}
-        className="overflow-hidden rounded-t-3xl"
+        className="overflow-hidden rounded-t-3xl  h-36 sm:h-44 md:h-48 lg:h-52 relative"
       >
-        <img
+        {/* <img
           src={model.thumbnailUrl}
           alt={model.title}
           className="w-full h-36 sm:h-44 md:h-48 object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+        /> */}
+        <Image
+          src={model.thumbnailUrl}
+          alt={model.title}
+          layout="fill"
+          objectFit="cover"
+          className="transition-transform duration-300 ease-in-out transform hover:scale-105"
+          unoptimized
         />
       </Link>
 

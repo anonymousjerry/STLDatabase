@@ -7,17 +7,17 @@ const nextConfig = {
             hostname: 'placehold.co',
             port: ""
           },
-          {
-            protocol: 'https',
-            hostname: 'media.printables.com',
-            port: "",
-            pathname: "/**"
-          },
+          // {
+          //   protocol: 'https',
+          //   hostname: 'media.printables.com',
+          //   port: "",
+          //   pathname: "/**"
+          // },
           {
             protocol: 'https',
             hostname: 'img.3ddatabase.com',
             port: "",
-            pathname: "/**"
+            pathname: '/**'
           },
         ],
       },

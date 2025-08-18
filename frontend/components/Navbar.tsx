@@ -83,13 +83,13 @@ const Navbar = () => {
             key={link.href}
             // href={link.href}
             onClick={() => resetSearch(link.href)}
-            className={`relative cursor-pointer hover:text-green-600 transition ${
+            className={`relative cursor-pointer hover:text-blue-400 transition ${
               isActive(link.href) ? ' font-medium' : ''
             }`}
           >
             {link.label}
             {isActive(link.href) && (
-              <span className="absolute left-0 -bottom-1 w-full h-1 bg-green-500 rounded"></span>
+              <span className="absolute left-0 -bottom-1 w-full h-1 bg-blue-400 rounded transition-all"></span>
             )}
           </div>
         ))}
@@ -97,13 +97,13 @@ const Navbar = () => {
           <button
             onClick={() => setCategoryOpen(!categoryOpen)}
             className={`relative flex flex-row items-center gap-1 transition ${
-              isCategoryActive ? 'font-medium' : 'hover:text-green-600'
+              isCategoryActive ? 'font-medium' : 'hover:text-blue-400'
             }`}
           >
             <span>Categories</span>
             <FaAngleDown />
             {categoryOpen && (
-              <span className="absolute left-0 -bottom-1 w-full h-1 bg-green-500 rounded" />
+              <span className="absolute left-0 -bottom-1 w-full h-1 bg-blue-500 transition-all rounded" />
             )}
           </button>
 
@@ -116,13 +116,13 @@ const Navbar = () => {
           <Link
             key={link.href}
             href={link.href}
-            className={`relative  hover:text-green-600 transition ${
+            className={`relative  hover:text-blue-400 transition ${
               isActive(link.href) ? ' font-medium' : ''
             }`}
           >
             {link.label}
             {isActive(link.href) && (
-              <span className="absolute left-0 -bottom-1 w-full h-1 bg-green-500 rounded"></span>
+              <span className="absolute left-0 -bottom-1 w-full h-1 bg-blue-500 transition-all rounded"></span>
             )}
           </Link>
         ))}
