@@ -54,17 +54,22 @@ def find_thingiverse_stpoint():
 
 async def transfer_image_to_backblaze(image_url, bucket_name, key_path):
     async with httpx.AsyncClient() as client:
-        response = await client.get(image_url)
-        response.raise_for_status()
-        print(response)
-        await asyncio.to_thread(
-            s3.put_object,
-            Bucket = bucket_name,
-            Key = key_path.lstrip('/'),
-            Body = response.content,
-            ACL = 'public-read',
-            ContentType = response.headers.get("Content-Type", "image/jpeg")
-        )
+        try:
+            response = await client.get(image_url)
+            response.raise_for_status()
+        except Exception as e:
+            raise RuntimeError(f"Failed to download {image_url}: {e}");
+        try:
+            await asyncio.to_thread(
+                s3.put_object,
+                Bucket = bucket_name,
+                Key = key_path.lstrip('/'),
+                Body = response.content,
+                ACL = 'public-read',
+                ContentType = response.headers.get("Content-Type", "image/jpeg")
+            )
+        except Exception as e:
+            raise RuntimeError(f"Failed to upload {key_path} to Backblaze: {e}")
 
 
 def generate_unique_id():
@@ -99,27 +104,31 @@ async def inject_database(data):
         model_id = generate_unique_id()
         key_path = data['platform'] + f"/{model_id}/thumb/" + format(data['title']) + "_" + data['tags'][0] + ".png"
         full_path = base_url + key_path
-        await transfer_image_to_backblaze(data['thumbnail_url'], '3ddatabase', key_path)
-        image_urls = []
-        for i in range(len(data['image_urls'])):
-            big_path = data['platform'] + f"/{model_id}/carousel/big/{i+1}/" + format(data['title']) + "_" + data['tags'][0] + ".png"
-            small_path = data['platform'] + f"/{model_id}/carousel/small/{i+1}/" + format(data['title']) + "_" + data['tags'][0] + ".png"
-            await transfer_image_to_backblaze(data['image_urls'][i][0], '3ddatabase', big_path)
-            await transfer_image_to_backblaze(data['image_urls'][i][1], '3ddatabase', small_path)
-            full_big_path = base_url + big_path
-            full_small_path = base_url + small_path
-            image_urls.append([full_big_path, full_small_path])
+        try:
+            await transfer_image_to_backblaze(data['thumbnail_url'], '3ddatabase', key_path)
+            image_urls = []
+            for i in range(len(data['image_urls'])):
+                big_path = data['platform'] + f"/{model_id}/carousel/big/{i+1}/" + format(data['title']) + "_" + data['tags'][0] + ".png"
+                small_path = data['platform'] + f"/{model_id}/carousel/small/{i+1}/" + format(data['title']) + "_" + data['tags'][0] + ".png"
+                await transfer_image_to_backblaze(data['image_urls'][i][0], '3ddatabase', big_path)
+                await transfer_image_to_backblaze(data['image_urls'][i][1], '3ddatabase', small_path)
+                full_big_path = base_url + big_path
+                full_small_path = base_url + small_path
+                image_urls.append([full_big_path, full_small_path])
+            cursor.execute(
+                """INSERT INTO "Model" (id, "sourceSiteId", title, description, "categoryId", "subCategoryId", tags, "sourceUrl", "thumbnailUrl", "imagesUrl", price, "priceValue", "createdAt", "updatedAt")
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT ("sourceUrl") Do NOTHING
+                """,
+                (model_id, source_site_id, data['title'], data['description'], category_id, subcategory_id, 
+                data['tags'],data['source_url'],full_path, Json(image_urls), data['price'],  parse_price_to_value(data['price']),now, now)
+            )
+            conn.commit()
+        except:
+            print(f"Skipping model {data['title']} because of error: {e}")
+            conn.rollback()
 
-        cursor.execute(
-            """INSERT INTO "Model" (id, "sourceSiteId", title, description, "categoryId", "subCategoryId", tags, "sourceUrl", "thumbnailUrl", "imagesUrl", price, "priceValue", "createdAt", "updatedAt")
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT ("sourceUrl") Do NOTHING
-            """,
-            (model_id, source_site_id, data['title'], data['description'], category_id, subcategory_id, 
-            data['tags'],data['source_url'],full_path, Json(image_urls), data['price'],  parse_price_to_value(data['price']),now, now)
-        )
-        conn.commit()
+        
     except psycopg2.Error as e:
         print(f"Error adding source site: {e}")
         conn.rollback()
-

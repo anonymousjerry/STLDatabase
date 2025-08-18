@@ -40,6 +40,7 @@ model Model {
   imagesUrl      Json
   price          String
   priceValue     Float?
+  isFeatured     Boolean @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -68,7 +69,7 @@ model SubCategory {
   name       String  @unique
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId String
-  iconUrl    String @default("")
+  iconUrl    String
   models     Model[]
 }
 
