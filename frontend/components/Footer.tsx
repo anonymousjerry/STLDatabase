@@ -18,7 +18,7 @@ const Footer = () => {
       <div className="flex justify-between mx-52 mb-[53px]">
         <div className="flex flex-col mt-10 gap-2 items-start jestify-start shrink-0">
           <Link href="/">
-            <img
+            <Image
               src="/Footer_Logo.png"
               alt="Logo"
               width={506}
@@ -93,6 +93,7 @@ const Footer = () => {
                   width={25}
                   height={24}
                   className="cursor-pointer"
+                  unoptimized
                 />
               ))}
             <span className="text-white text-left font-medium text-lg ">

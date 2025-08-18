@@ -42,6 +42,7 @@ const Categories = () => {
           title: item.name,   // map name → subcategoryTitle
           src: item.iconUrl              // map iconUrl → src
         }));
+        console.log(formatted)
         setSubCategories(formatted);
       })
       .catch(console.error);
@@ -102,7 +103,7 @@ const Categories = () => {
                 title={item.title}
                 className={extraClass}
               >
-                <Image src={item.src} width={120} height={95} alt={item.title} />
+                <Image src={item.src} width={120} height={95} alt={item.title} unoptimized/>
               </CategoryItem>
             );
           })}

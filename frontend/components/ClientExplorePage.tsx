@@ -136,10 +136,18 @@ export default function ClientExplorePage({
         {/* Left Side Image and Thumbnails */}
         <div className="flex flex-col basis-3/5 gap-5 w-full">
           <div className="w-full relative h-[422px] bg-white rounded-md">
-            <img
+            {/* <img
               src={bigImagesUrl[(currentPage - 1) * 5 + selectedIndex]}
               alt={`Model preview ${selectedIndex}`}
               className="w-full h-full object-cover rounded-md"
+            /> */}
+            <Image
+              src={bigImagesUrl[(currentPage - 1) * 5 + selectedIndex]}
+              alt={`Model preview ${selectedIndex}`}
+              className="rounded-md"
+              layout="fill"
+              objectFit="cover"
+              unoptimized
             />
           </div>
           <div className="flex relative items-center gap-2">
@@ -179,10 +187,17 @@ export default function ClientExplorePage({
                   } cursor-pointer`}
                   onClick={() => setSelectedIndex(index)}
                 >
-                  <img
+                  {/* <img
                     src={url}
                     alt={`Thumbnail ${index}`}
                     className="w-full h-full object-cover"
+                  /> */}
+                  <Image
+                    src={url}
+                    alt={`Thumbnail ${index}`}
+                    layout="fill"
+                    objectFit="cover"
+                    unoptimized
                   />
                 </div>
               ))}
