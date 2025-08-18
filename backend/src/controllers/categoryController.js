@@ -23,6 +23,6 @@ const getAllSubcategories = async (req, res) => {
         console.error("Error fetching categories: ", err);
         res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
 
 module.exports = { getAllSubcategories };
