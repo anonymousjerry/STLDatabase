@@ -244,6 +244,54 @@ const createSubCategory = async (req, res) => {
     }
 };
 
+const deleteSubCategory = async(req, res) => {
+    try {
+        const { subCategoryId } = req.query;
+
+        if(!subCategoryId) {
+            return res.status(400).json({ error: "subCategoryId is required" });
+        }
+
+        const subCategory = await prisma.subCategory.findUnique({
+            where: { id: subCategoryId },
+            include: {
+                category: true
+            }
+        });
+
+        if (!subCategory) {
+            return res.status(404).json({ error: "Subcategory not found"});
+        }
+        const categoryId = subCategory.category.id;
+
+        let otherSubCategory = await prisma.subCategory.findFirst({
+            where: { name: "Other"},
+        });
+
+        let otherCategory = await prisma.category.findFirst({
+            where: {name: "Other"},
+        });
+
+        await prisma.model.updateMany({
+            where: { subCategoryId },
+            data: { 
+                subCategoryId: otherSubCategory.id,
+                categoryId: otherCategory.id, 
+            },
+        });
+
+        await prisma.subCategory.delete({
+            where: { id: subCategoryId },
+        });
+
+        res.status(200).json({ message: "Subcategory deleted successfully" });
+    
+    } catch(err){
+        console.error("Error deleting subcategory: ", err);
+        res.status(500).json({ error: "Internal server error!"});
+    }
+}
+
 const createCategory = async (req, res) => {
     try {
         console.log(req.body);

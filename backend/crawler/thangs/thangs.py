@@ -52,7 +52,7 @@ async def scrape_thangs(category, subcategory, num):
             while len(collected_urls) < num:
                 for anchor in anchors:
                     href = await anchor.get_attribute("href")
-                    if href and not url_exists_in_db(href) and href not in collected_urls:
+                    if href and not url_exists_in_db("https://thangs.com" + href):
                         collected_urls.append("https://thangs.com" + href)
                         if len(collected_urls) == num:
                             break

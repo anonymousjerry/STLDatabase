@@ -5,6 +5,7 @@ import json
 load_dotenv()
 import re
 import psycopg2
+import httpx, base64
 
 conn = psycopg2.connect(
     dbname="projectdb",
@@ -30,44 +31,15 @@ categories = [[row[0], row[1]] for row in rows]
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# categories = [
-#         ["Action Figures", "Toys & Miniatures"], ["Anime", "Toys & Miniatures"], ["Board Game Part", "Toys & Miniatures"],
-#         ["Educational Toys", "Toys & Miniatures"], ["Fantasy Miniatures", "Toys & Miniatures"], ["Fidget Toys", "Toys & Miniatures"],
-#         ["Gaming Characters", "Toys & Miniatures"], ["Puzzle Games", "Toys & Miniatures"], ["RC Parts", "Toys & Miniatures"],
-#         ["Sci-Fi Miniatures", "Toys & Miniatures"], ["Superheroes", "Toys & Miniatures"], ["Tabletop Accessories", "Toys & Miniatures"],
-#         ["Terrain Scenary", "Toys & Miniatures"], ["Miniature Bases", "Toys & Miniatures"],
-#         # 14 items 
-#         ["Abstract Objects", "Art & Decorations"], ["Sculptures", "Art & Decorations"], ["Wall Art", "Art & Decorations"], 
-#         ["Movie Props", "Art & Decorations"], ["Star Wars", "Art & Decorations"], ["Masks", "Art & Decorations"], 
-#         ["Musical Instruments", "Art & Decorations"],
-#         # 7
-#         ["Bathroom Items", "Home & Living"], ["Bins", "Home & Living"], ["Boxes & Containers", "Home & Living"],
-#         ["Drawers", "Home & Living"], ["Hooks & Mounts", "Home & Living"], ["Kitchen Tools", "Home & Living"], 
-#         ["Lamps & Lighting", "Home & Living"], ["Lighting Fixtures", "Home & Living"], ["Pill Organizers", "Home & Living"], 
-#         ["Plant Pots", "Home & Living"], ["Vases", "Home & Living"], ["Furniture Accessories", "Home & Living"], 
-#         ["Sports", "Home & Living"],
-#         # 13
-#         ["Calibration Tools", "Tools & Functional Parts"], ["Engineering Part", "Tools & Functional Parts"], 
-#         ["Spinning Tools", "Tools & Functional Parts"], ["Tool Holders", "Tools & Functional Parts"], ["Tools", "Tools & Functional Parts"],
-#         # 6
-#         ["Gadgets", "Tech & Devices"], ["Phone Accessories", "Tech & Devices"], ["Photography Gear", "Tech & Devices"],
-#         ["Exercise Equipment", "Tech & Devices"], ["Wellness Tools", "Tech & Devices"], ["Drones", "Tech & Devices"], 
-#         # 6
-#         ["Armor", "Fashion & Accessories"], ["Bags & Purse", "Fashion & Accessories"], ["Bracelets", "Fashion & Accessories"], 
-#         ["Earrings", "Fashion & Accessories"], ["Helmets", "Fashion & Accessories"],
-#         ["Necklaces", "Fashion & Accessories"], ["Rings", "Fashion & Accessories"], ["Weapons", "Fashion & Accessories"],
-#         # 8 
-#         ["Christmas", "Seasonal & Holidays"], ["Easter", "Seasonal & Holidays"], ["Halloween", "Seasonal & Holidays"], ["New Year", "Seasonal & Holidays"],
-#         ["Valentine Day", "Seasonal & Holidays"],
-#         # 5
-#         ["Classroom Aids", "Educational & Scientific"], ["Geography Models", "Educational & Scientific"], 
-#         ["Math Models", "Educational & Scientific"], ["Medical Accessories", "Educational & Scientific"], ["Science Tools", "Educational & Scientific"],
-#         # 5 
-#         ["FDM Printers", "3D Printers & Mods"], ["Resin Printers", "3D Printers & Mods"], ["Printer Mods", "3D Printers & Mods"]
-#         #2
-# ]
+MAX_DESCRIPTION_LEN = 1000
+
 subcategory_to_category = {sub: cat for sub, cat in categories}
 print(subcategory_to_category)
+
+def prepare_thingiverse_image(url: str) -> str:
+    resp = httpx.get(url, timeout=30)
+    b64_img = base64.b64encode(resp.content).decode("utf-8")
+    return f"data:image/jpeg;base64,{b64_img}"
 
 def extract_json_from_response(content):
     # Try to extract JSON block inside triple backticks
@@ -82,58 +54,105 @@ def extract_json_from_response(content):
 
     return None
 
-MAX_DESCRIPTION_LEN = 1000
-
-def enrich_data(data):
-    subcategories = list(subcategory_to_category.keys())
-
+def make_description(data):
     prompt = f"""
-        You are an assistant that enriches 3D model metadata
-        Given the following input:
-        - Title: {data['title']}
-        - Desciption: {data['description'][:MAX_DESCRIPTION_LEN]}
-        - Source URL: {data['source_url']}
+    Rewrite the following into a simple, enticing product description.
+    You may use the title, description, and webpage on Source URL.
 
-        1. Rewrite description simply and make it enticing product description.
-        2. Choose exactly one subcategory from this list (copy-paste, do NOT modify or invent). 
-           You must choose exactly one string from this Python list (case-sensitive, no alterations): {subcategories}
-           If the subcategory is not in the list, your output will be discarded. So double-check it matches exactly, character for character.
-        3. Generate a list of 10~15 relevant tags by analyzing images on this urls [{data['image_urls']}]. Include the original tags: [{data['tags']}]
+    Title: {data['title']}
+    Description: {data['description']}
+    Source URL: {data['source_url']}
 
-        Respond in this JSON format:
-        {{
-            "new_description" : "...",
-            "subcategory" : "...",
-            "tags" : ["...", "..."]
-        }}
+    Respond with the new description text
+    """
+
+    response = openai.chat.completions.create(
+        model='gpt-4o',
+        messages = [{"role": "user", "content": prompt}],
+        temperature=0.7
+    )
+
+    return response.choices[0].message.content.strip()
+
+def define_subcategory(data, subcategories):
+    prompt = f"""
+    Choose exactly one subcategory from this list (copy-past exactly, do NOT modify or invent): {subcategories}
+
+    Title: {data['title']}
+    Description: {data['description']}
+
+    Respond only with the chosen subcategory(must match exactly one from the list).
+    """
+
+    response = openai.chat.completions.create(
+        model='gpt-4o',
+        messages = [{"role": "user", "content": prompt}],
+        temperature=0.7
+    )
+
+    return response.choices[0].message.content.strip()
+
+def generate_tags(image_url):
+    prompt = f"""
+    Generate SEO-friendly tags focused only on the primary 3D object(s) in the image on this URL.
+    URL: {image_url}
+
+    Rules:
+    - Exclude any environmental or background elements.
+    - Tags should describe the object's type, material, shape, brand(if applicable), function and any notable design features relevant to 3D printing
+    - Return as a JSON list of strings.
     """
 
     response = openai.chat.completions.create(
         model="gpt-4o",
-        messages=[{"role": "user", "content": prompt}],
+        messages=[
+            {"role": "user", "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {"url": image_url}}  # <-- send image here
+            ]}
+        ],
         temperature=0.7
     )
 
-    raw_content = response.choices[0].message.content
-    json_str = extract_json_from_response(raw_content)
-    if not json_str:
-        return None
-    try:
-        result = json.loads(json_str)
-    except:
-        return None
+    raw = response.choices[0].message.content.strip()
 
-    if not all(k in result for k in ["new_description", "subcategory", "tags"]):
-        return None
-    subcategory = result['subcategory']
+    # --- Clean out markdown code fences if present ---
+    if raw.startswith("```"):
+        raw = raw.strip("`")               # remove backticks
+        raw = raw.replace("json", "", 1)   # remove leading 'json' if it exists
+        raw = raw.strip()
+
+    try:
+        tags = json.loads(raw)
+    except:
+        # fallback: split manually
+        tags = [t.strip().strip('"').strip("'") for t in raw.replace("[","").replace("]","").split(",") if t.strip()]
+    return tags
+
+def enrich_data(data):
+    subcategories = list(subcategory_to_category.keys())
+
+    
+    new_description = make_description(data)
+    subcategory = define_subcategory(data, subcategories)
+    if(data['platform'] == "Thingiverse"):
+        safe_url = prepare_thingiverse_image(data['image_urls'][0][0])
+        print(safe_url)
+        tags = generate_tags(safe_url)
+    else:
+        tags = generate_tags(data['image_urls'][0][0])
+    print(new_description)
+    print(subcategory)
+    print(tags)
+
     category = subcategory_to_category.get(subcategory, "Other")
 
     enriched = {
         **data,
-        "description" : result["new_description"],
+        "description" : new_description,
         "category" : category,
         "subcategory" : subcategory,
-        "tags" : ",".join(result["tags"])
+        "tags" : ",".join(tags)
     }
     return enriched
 

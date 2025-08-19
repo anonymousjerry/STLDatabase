@@ -85,6 +85,43 @@ const getAllModels = async (req, res) => {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
+        if (sortBy === 'Featured'){
+            const [models, total] = await Promise.all([
+                prisma.model.findMany({
+                    where: {
+                        ...whereClause,
+                        isFeatured: true
+                    },
+                    include: {
+                        likes: true,
+                        favourites: true,
+                        sourceSite: true,
+                        category: true,
+                        subCategory: true
+                    },
+                    skip,
+                    take: limit,
+                    orderBy: {createdAt: 'desc'}
+                })
+            ]);
+
+            const modelsWithFlag = models.map(model => ({
+                ...model,
+                isFavourited: model.favourites?.some(f => f.userId === userId)
+            }));
+
+            const totalPages = Math.ceil(total / limit);
+            const hasMore = page < totalPages;
+
+            return res.status(200).json({
+                models: modelsWithFlag,
+                page,
+                totalPages,
+                hasMore,
+                totalCount: total
+            });
+        }
+
         if (sortBy === 'Popular' || sortBy === 'Trending'){
             const modelsBase = await prisma.model.findMany({
                 where: whereClause,
