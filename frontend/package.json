@@ -29,6 +29,7 @@
     "nanoid": "^5.0.6",
     "next": "^15.4.2",
     "next-auth": "^4.24.6",
+    "next-google-adsense": "^1.0.13",
     "node-fetch": "^3.3.2",
     "nookies": "^2.5.2",
     "react": "^18.2.0",

@@ -67,20 +67,6 @@ const Footer = () => {
               height={24}
               className="cursor-pointer"
             />
-            <Image
-              src={"/mark4 (2).png"}
-              alt="in"
-              width={24}
-              height={24}
-              className="cursor-pointer"
-            />
-            <Image
-              src={"/mark5 (2).png"}
-              alt="in"
-              width={24}
-              height={24}
-              className="cursor-pointer"
-            />
           </div>
         </div>
         <div className="flex flex-col gap-[2px] items-end justify-end mt-32 shrink-0 relative">

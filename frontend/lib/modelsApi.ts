@@ -59,6 +59,7 @@ export const searchModels = async ({key, sourcesite, category, price, favourited
     console.log(params.toString())
 
     const response = await axiosInstance.get(`/models?${params.toString()}`);
+    console.log(response.data)
     return response.data;
 }
 

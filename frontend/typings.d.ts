@@ -8,6 +8,8 @@ interface Like {
 interface SourceSite {
   id: string;
   name: string;
+  iconBigUrl: string;
+  iconSmallUrl: String;
   url: string;
 }
 
