@@ -9,6 +9,7 @@ import asyncio
 import os
 from .convertPrice import parse_price_to_value
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 
@@ -81,9 +82,16 @@ def generate_unique_id():
         if cursor.fetchone()[0] == 0:
             return id
 
-def format(text):
-    result = text.replace(" ", "_")
-    return result
+def sanitize_filename(filename: str) -> str:
+    # remove JSON markers, quotes, backticks, control chars
+    filename = re.sub(r'[`"\n\r\t]', '', filename)
+    filename = filename.replace("```json", "")
+    filename = filename.replace("```", "")
+    # remove ASCII control chars (< 32)
+    filename = ''.join(ch for ch in filename if ord(ch) >= 32)
+    # normalize spaces
+    filename = filename.strip().replace(" ", "_")
+    return filename
 
 async def inject_database(data):
     now = datetime.utcnow()
@@ -102,14 +110,14 @@ async def inject_database(data):
         if isinstance(data['image_urls'], str):
             data['image_urls'] = ast.literal_eval(data['image_urls'])
         model_id = generate_unique_id()
-        key_path = data['platform'] + f"/{model_id}/thumb/" + format(data['title']) + "_" + data['tags'][0] + ".png"
+        key_path = data['platform'] + f"/{model_id}/thumb/" + sanitize_filename(data['title']) + "_" + data['tags'][0] + ".png"
         full_path = base_url + key_path
         try:
             await transfer_image_to_backblaze(data['thumbnail_url'], '3ddatabase', key_path)
             image_urls = []
             for i in range(len(data['image_urls'])):
-                big_path = data['platform'] + f"/{model_id}/carousel/big/{i+1}/" + format(data['title']) + "_" + data['tags'][0] + ".png"
-                small_path = data['platform'] + f"/{model_id}/carousel/small/{i+1}/" + format(data['title']) + "_" + data['tags'][0] + ".png"
+                big_path = data['platform'] + f"/{model_id}/carousel/big/{i+1}/" + sanitize_filename(data['title']) + "_" + data['tags'][0] + ".png"
+                small_path = data['platform'] + f"/{model_id}/carousel/small/{i+1}/" + sanitize_filename(data['title']) + "_" + data['tags'][0] + ".png"
                 await transfer_image_to_backblaze(data['image_urls'][i][0], '3ddatabase', big_path)
                 await transfer_image_to_backblaze(data['image_urls'][i][1], '3ddatabase', small_path)
                 full_big_path = base_url + big_path

@@ -1,6 +1,11 @@
 from playwright.async_api import async_playwright
 import asyncio
 
+def normalize_url(url: str) -> str:
+    if url.startswith("//"):
+        return "https:" + url
+    return url
+
 async def get_info(url):
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
 
@@ -79,7 +84,7 @@ async def get_info(url):
 
             image_urls = []
             for i in range(len(carousel_urls)):
-                image_urls.append([carousel_urls[i], filtered_thumbnail_urls[i]])
+                image_urls.append([normalize_url(carousel_urls[i]), normalize_url(filtered_thumbnail_urls[i])])
             if len(image_urls) == 0:
                 carousel_locator = page.locator('div.position-relative img')
                 carousel_urls = await carousel_locator.evaluate_all(
@@ -90,7 +95,7 @@ async def get_info(url):
                     for url in carousel_urls
                 ]
                 for i in range(len(carousel_urls)):
-                    image_urls.append([carousel_urls[i], thumbnail_urls[i]])
+                    image_urls.append([ normalize_url(carousel_urls[i]), normalize_url(thumbnail_urls[i])])
 
             info.append({"title" : title})
             info.append({"description" : description})

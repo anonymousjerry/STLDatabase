@@ -52,8 +52,8 @@ model SourceSite {
   id           String @id @default(cuid())
   name         String
   url          String @unique
-  iconBigUrl   String
-  iconSmallUrl String
+  iconBigUrl   String?
+  iconSmallUrl String?
   models  Model[]
 }
 
@@ -69,7 +69,7 @@ model SubCategory {
   name       String  @unique
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId String
-  iconUrl    String
+  iconUrl    String?
   models     Model[]
 }
 
