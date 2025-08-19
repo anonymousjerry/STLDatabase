@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { createCategory, createSubCategory, getAllCategories, updateCategory } from '../lib/categoryApi';
+import { createCategory, createSubCategory, deleteSubCategoryApi, getAllCategories, updateCategory } from '../lib/categoryApi';
 
 export interface Subcategory {
   id?: string;
@@ -227,7 +227,9 @@ export function CategoryTable() {
 
     try {
       setLoading(true);
-      await api.delete(`/categories/${catId}/subcategories/${subEditForm.id}`);
+      // await api.delete(`/categories/${catId}/subcategories/${subEditForm.id}`);
+      await deleteSubCategoryApi(selectedSub.subId);
+
       showAlert('success', 'Subcategory deleted!');
       setSelectedSub(null);
       setSubEditForm(null);

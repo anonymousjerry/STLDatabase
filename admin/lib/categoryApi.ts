@@ -34,3 +34,9 @@ export const createCategory = async (formData: FormData) => {
     });
     return response.data;
 }
+
+export const deleteSubCategoryApi = async (subCategoryId: string) => {
+    console.log("dele", subCategoryId);
+    const response = await axiosInstance.delete(`/subCategory/delete?subCategoryId=${subCategoryId}`);
+    return response.data;
+}
