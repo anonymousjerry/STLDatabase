@@ -85,18 +85,20 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
       toast.error("Failed to view model.");
     }
   };
+  console.log(model.sourceSite?.iconBigUrl)
 
   return (
     <div className="flex flex-col w-full bg-custom-light-containercolor dark:bg-custom-dark-containercolor shadow-lg rounded-3xl border border-gray-200 overflow-hidden relative">
 
       {/* Source icon */}
-      <div className="absolute top-2 left-2 rounded-lg hover:bg-opacity-100 transition">
+      <div className="absolute top-2 left-2 rounded-lg hover:bg-opacity-100 transition z-10">
         <Image
-          src={`/Platforms/${slugify(sourceSiteName)}.png`}
+          src = {model.sourceSite?.iconBigUrl}
           alt={sourceSiteName}
           width={32}
           height={32}
-          className="sm:w-10 sm:h-10 w-8 h-8"
+          className="sm:w-10 sm:h-10 w-8 h-8 rounded-lg"
+          unoptimized
         />
       </div>
 
@@ -106,11 +108,6 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
         onClick={() => handleToggleView(model.id)}
         className="overflow-hidden rounded-t-3xl  h-36 sm:h-44 md:h-48 lg:h-52 relative"
       >
-        {/* <img
-          src={model.thumbnailUrl}
-          alt={model.title}
-          className="w-full h-36 sm:h-44 md:h-48 object-cover transition-transform duration-300 ease-in-out hover:scale-105"
-        /> */}
         <Image
           src={model.thumbnailUrl}
           alt={model.title}

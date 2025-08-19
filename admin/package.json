@@ -15,7 +15,7 @@
     "sanity"
   ],
   "dependencies": {
-    "@sanity/vision": "^4.4.1",
+    "@sanity/vision": "^4.5.0",
     "@tanstack/react-table": "^8.21.3",
     "@vgaidadei/react-tags": "^0.1.4",
     "axios": "^1.11.0",
@@ -24,7 +24,7 @@
     "next-sanity": "^10.0.10",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "sanity": "^4.4.1",
+    "sanity": "^4.5.0",
     "styled-components": "^6.1.18",
     "tailwind": "^4.0.0"
   },

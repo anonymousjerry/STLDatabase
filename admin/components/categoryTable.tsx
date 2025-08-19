@@ -141,9 +141,6 @@ export function CategoryTable() {
         }
       });
 
-      // await api.post('/categories', formData, {
-      //   headers: { 'Content-Type': 'multipart/form-data' },
-      // });
       await createCategory(formData);
 
       showAlert('success', 'Category created!');
