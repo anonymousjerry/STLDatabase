@@ -24,6 +24,18 @@
       linear-gradient(-45deg, white 50%, #3B82F6 50.99%);
 }
 
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
 @layer utilities {
   .grid-rounded-bottom {
     /* xl: 9 columns, last row 10-18 */

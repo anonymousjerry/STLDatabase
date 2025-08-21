@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SearchBar from './SearchBar';
 import SearchResultPart from './SearchResultPart';
 import NavFilter from './NavFilter';
@@ -9,6 +9,7 @@ import { FiBox } from 'react-icons/fi';
 import SideFilter from './SideFilter';
 import { useSearch } from '@/context/SearchContext';
 import { useRouter } from 'next/navigation';
+import { FaArrowUp } from 'react-icons/fa6'; // up arrow icon
 
 type ExploreMainPageClientProps = {
   initialModels: Model[];
@@ -35,6 +36,7 @@ const ExploreMainPageClient = ({
   const [hasMore, setHasMore] = useState(currentPage < totalPage);
   const [isLoading, setIsLoading] = useState(false);
   const loaderRef = useRef<HTMLDivElement | null>(null);
+  const [showUpButton, setShowUpButton] = useState(false); // <-- for UP button
 
   const {
     selectedPlatform,
@@ -45,10 +47,21 @@ const ExploreMainPageClient = ({
     userId
   } = useSearch();
 
+  // Show/hide UP button on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowUpButton(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // 1️⃣ When filters change, reset page & fetch new models
   useEffect(() => {
-    console.log(selectedFilters)
     const fetchFilteredModels = async () => {
       setIsLoading(true);
       setPage(1);
@@ -74,11 +87,8 @@ const ExploreMainPageClient = ({
     fetchFilteredModels();
   }, [selectedFilters, selectedPlatform, selectedCategory, searchPrice, favourited, searchInput]);
 
-  
-
   // 2️⃣ When page increases (lazy load), fetch and append
   useEffect(() => {
-
     const fetchMore = async () => {
       setIsLoading(true);
 
@@ -93,7 +103,6 @@ const ExploreMainPageClient = ({
         limit: 12,
       });
 
-
       setModels((prev) => {
         const existingIds = new Set(prev.map((m) => m.id));
         const uniqueModels = moreModels.filter((m: Model) => !existingIds.has(m.id));
@@ -107,7 +116,7 @@ const ExploreMainPageClient = ({
     fetchMore();
   }, [page]);
 
-   // 3️⃣ Lazy loading on scroll (Intersection Observer)
+  // 3️⃣ Lazy loading on scroll (Intersection Observer)
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -127,7 +136,7 @@ const ExploreMainPageClient = ({
   }, [hasMore, isLoading]);
 
   return (
-    <div className="flex flex-col pt-5 ">
+    <div className="flex flex-col pt-5 relative">
       <SearchBar />
       <div className="flex gap-5 pt-10">
         <div className="flex basis-1/5">
@@ -151,6 +160,17 @@ const ExploreMainPageClient = ({
           </div>
         </div>
       </div>
+
+      {/* UP Button */}
+      {showUpButton && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-10 right-10 z-50 p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-all"
+          aria-label="Scroll to top"
+        >
+          <FaArrowUp size={20} />
+        </button>
+      )}
     </div>
   );
 };

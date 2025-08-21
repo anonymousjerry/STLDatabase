@@ -5,16 +5,19 @@ import { useRouter } from "next/navigation";
 import { getPlatforms } from "@/lib/platformApi";
 import { useSearch } from "@/context/SearchContext";
 import { useSession } from "next-auth/react";
+import LoadingOverlay from "./LoadingOverlay";
 
 
 const PlatformsFilter = () => {
     const router = useRouter();
     const [platforms, setPlatforms] = useState<string[][]>([]);
+    const [loading, setLoading] = useState(true); // <-- loading state
     // const { data: session, status } = useSession();
     // const userId = (session?.user as { id?: string })?.id;
 
     useEffect(() => {
-      getPlatforms().then(setPlatforms).catch(console.error);
+      setLoading(true);
+      getPlatforms().then(setPlatforms).catch(console.error).finally(() => setLoading(false));
     }, []);
 
     const {
@@ -54,7 +57,8 @@ const PlatformsFilter = () => {
     };
 
   return (
-    <div className="ml-2 mt-1 space-y-2">
+    <div className="ml-2 mt-1 space-y-2 relative">
+      <LoadingOverlay show = {loading} size = {18} />
       {platformArray.map((option) => (
         <label
           key={option}

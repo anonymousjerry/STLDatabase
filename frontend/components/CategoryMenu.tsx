@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { getSubCategories } from "@/lib/categoryApi";
 import { useSearch } from "@/context/SearchContext";
 import { useRouter } from "next/navigation";
+import LoadingOverlay from "./LoadingOverlay";
 
 type GroupedCategory = {
   group: string;
@@ -21,7 +22,8 @@ interface CategoryMenuProps {
 
 const CategoryMenu = ({ setCategoryOpen }: CategoryMenuProps) => {
   const [groupedCategories, setGroupedCategories] = useState<GroupedCategory[]>([]);
-    const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
   const {
       selectedPlatform,
       selectedCategory,
@@ -33,6 +35,7 @@ const CategoryMenu = ({ setCategoryOpen }: CategoryMenuProps) => {
     } = useSearch();
 
   useEffect(() => {
+    setLoading(true); // start loading
     getSubCategories()
       .then((data: Category[]) => {
         const grouped = data.reduce((acc, curr) => {
@@ -48,7 +51,8 @@ const CategoryMenu = ({ setCategoryOpen }: CategoryMenuProps) => {
 
         setGroupedCategories(formatted);
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setLoading(false)); // stop loading
   }, []);
 
   const handleSubcategorySelect = (subcategory: string) => {
@@ -78,6 +82,7 @@ const CategoryMenu = ({ setCategoryOpen }: CategoryMenuProps) => {
         rounded shadow-lg z-50 
         min-w-[700px] max-h-[300px] overflow-y-auto"
     >
+        <LoadingOverlay show={loading} size={20}/>
         <div className="grid grid-cols-3 gap-4 p-6">
             {groupedCategories.map(({ group, items }) => (
                 <div key={group}>

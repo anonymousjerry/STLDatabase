@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import CategoryItem from "./CategoryItem";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { getSubCategories } from "@/lib/categoryApi";
+import LoadingOverlay from "./LoadingOverlay";
 
 export interface subCategoryListItem {
   id: number;
@@ -17,6 +17,7 @@ const Categories = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [subcategories, setSubCategories] = useState<subCategoryListItem[]>([]);
   const [columns, setColumns] = useState(2);
+  const [loading, setLoading] = useState(true); // <-- loading state
 
   useEffect(() => {
     function handleResize() {
@@ -28,24 +29,24 @@ const Categories = () => {
       else setColumns(2);
     }
 
-    handleResize(); // Initial run
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  
+
   useEffect(() => {
+    setLoading(true); // start loading
     getSubCategories()
       .then((data: SubCategory[]) => {
-        // Assuming backend already returns the correct shape
         const formatted = data.map((item, index) => ({
           id: index + 1,
-          title: item.name,   // map name → subcategoryTitle
-          src: item.iconUrl              // map iconUrl → src
+          title: item.name,
+          src: item.iconUrl,
         }));
-        console.log(formatted)
         setSubCategories(formatted);
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setLoading(false)); // stop loading
   }, []);
 
   const itemsPerPage = 18;
@@ -66,7 +67,7 @@ const Categories = () => {
 
   return (
     <section
-      className="pt-10 px-52 max-xl:px-30 max-lg:px-20 max-md:px-10 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor"
+      className="pt-10 px-52 max-xl:px-30 max-lg:px-20 max-md:px-10 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor relative"
       aria-label="Top categories"
     >
       <div className="relative bg-custom-light-containercolor dark:bg-custom-dark-containercolor rounded-[32px] max-md:px-6">
@@ -74,6 +75,7 @@ const Categories = () => {
           TOP CATEGORIES
         </h2>
 
+        <LoadingOverlay show={loading} size={50}/>
         <div
           key={fadeKey}
           className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-9 
@@ -85,7 +87,6 @@ const Categories = () => {
             }`}
         >
           {paginatedItems.map((item, index) => {
-            // const columns = useTailwindColumns();
             const total = paginatedItems.length;
             const itemsInLastRow = total % columns || columns;
             const startOfLastRow = total - itemsInLastRow;
@@ -98,12 +99,8 @@ const Categories = () => {
             if (isBottomRight) extraClass += " rounded-br-[32px]";
 
             return (
-              <CategoryItem
-                key={item.id}
-                title={item.title}
-                className={extraClass}
-              >
-                <Image src={item.src} width={120} height={95} alt={item.title} unoptimized/>
+              <CategoryItem key={item.id} title={item.title} className={extraClass}>
+                <Image src={item.src} width={120} height={95} alt={item.title} unoptimized />
               </CategoryItem>
             );
           })}
@@ -112,15 +109,10 @@ const Categories = () => {
         {/* Pagination Arrows */}
         <button
           aria-label="Previous page"
-          className={`
-            absolute left-[-1rem] top-[59%] -translate-y-1/2 z-10
+          className={`absolute left-[-1rem] top-[59%] -translate-y-1/2 z-10
             bg-white shadow p-2 rounded-full border border-custom-light-maincolor
             disabled:opacity-50 disabled:cursor-not-allowed
-            transition
-            dark:bg-gray-800
-            dark:border-gray-600
-            dark:shadow-md
-          `}
+            transition dark:bg-gray-800 dark:border-gray-600 dark:shadow-md`}
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
@@ -129,15 +121,10 @@ const Categories = () => {
 
         <button
           aria-label="Next page"
-          className={`
-            absolute right-[-1rem] top-[59%] -translate-y-1/2 z-10
+          className={`absolute right-[-1rem] top-[59%] -translate-y-1/2 z-10
             bg-white shadow p-2 rounded-full border border-custom-light-maincolor
             disabled:opacity-50 disabled:cursor-not-allowed
-            transition
-            dark:bg-gray-800
-            dark:border-gray-600
-            dark:shadow-md
-          `}
+            transition dark:bg-gray-800 dark:border-gray-600 dark:shadow-md`}
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
