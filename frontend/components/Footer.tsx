@@ -4,6 +4,7 @@ import Image from "next/image";
 import React, {useEffect, useState} from "react";
 import Link from "next/link";
 import { getPlatforms } from "@/lib/platformApi";
+import { FaSquareFacebook, FaSquareInstagram, FaXTwitter } from "react-icons/fa6";
 
 const Footer = () => {
 
@@ -19,7 +20,7 @@ const Footer = () => {
         <div className="flex flex-col mt-10 gap-2 items-start jestify-start shrink-0">
           <Link href="/">
             <Image
-              src="/Footer_Logo.png"
+              src="/logo.png"
               alt="Logo"
               width={506}
               height={64}
@@ -46,27 +47,30 @@ const Footer = () => {
             Follow us
           </div>
           <div className="flex flex-row gap-1 items-center justify-start shrink-0 relative">
-            <Image
-              src={"/mark1.png"}
-              alt="in"
-              width={24}
-              height={24}
-              className="cursor-pointer"
-            />
-            <Image
-              src={"/mark2 (2).png"}
-              alt="in"
-              width={24}
-              height={24}
-              className="cursor-pointer"
-            />
-            <Image
-              src={"/mark3 (2).png"}
-              alt="in"
-              width={24}
-              height={24}
-              className="cursor-pointer"
-            />
+            <a
+              href="https://x.com/yourusername"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-black hover:text-gray-600"
+            >
+              <FaXTwitter size={24} color="white" />
+            </a>
+            <a
+              href="https://www.facebook.com//yourusername"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-black hover:text-gray-600"
+            >
+              <FaSquareFacebook size={24} color="white" />
+            </a>
+            <a
+              href="https://www.instagram.com/yourusername"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-black hover:text-gray-600"
+            >
+              <FaSquareInstagram size={24} color="white" />
+            </a>
           </div>
         </div>
         <div className="flex flex-col gap-[2px] items-end justify-end mt-32 shrink-0 relative">
@@ -108,7 +112,7 @@ const Footer = () => {
             Term of policy
           </span>
           <span>
-            FAQs
+            Blog
           </span>
           <span>
             Contact

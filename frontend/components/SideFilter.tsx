@@ -12,7 +12,7 @@ import { BiCategory } from "react-icons/bi";
 import { AiOutlineDollarCircle } from "react-icons/ai";
 import { MdFavoriteBorder } from "react-icons/md";
 
-const filters: string[] = ["Platforms", "Categories", "Price", "favourited"];
+const filters: string[] = ["Platforms", "Categories", "Price", "Saved Models"];
 
 const SideFilter = () => {
   const [openSections, setOpenSections] = useState<{ [key: string]: boolean }>({});
@@ -43,7 +43,7 @@ const SideFilter = () => {
                 {title === "Platforms" && <CgWebsite />}
                 {title === "Categories" && <BiCategory />}
                 {title === "Price" && <AiOutlineDollarCircle />}
-                {title === "favourited" && <MdFavoriteBorder />}
+                {title === "Saved Models" && <MdFavoriteBorder />}
                 {title}
               </span>
               <span>
@@ -62,7 +62,7 @@ const SideFilter = () => {
                 {title === "Price" && (
                   <PriceFilter />
                 )}
-                {title === "favourited" && (
+                {title === "Saved Models" && (
                   <FavoriteFilter />
                 )}
               </div>

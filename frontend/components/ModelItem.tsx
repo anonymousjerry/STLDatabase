@@ -85,7 +85,20 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
       toast.error("Failed to view model.");
     }
   };
-  console.log(model.sourceSite?.iconBigUrl)
+
+  function formatPrice(priceStr: String) {
+  // Extract the currency symbol (assume it's the first non-digit char)
+  const match = priceStr.match(/[^0-9.]+/);
+  const currency = match ? match[0] : "";
+
+  // Extract the number part
+  const num = parseFloat(priceStr.replace(/[^0-9.]/g, ""));
+
+  if (isNaN(num)) return priceStr; // fallback if invalid input
+
+  // Format with 1 decimal place
+  return `${currency}${num.toFixed(1)}`;
+}
 
   return (
     <div className="flex flex-col w-full bg-custom-light-containercolor dark:bg-custom-dark-containercolor shadow-lg rounded-3xl border border-gray-200 overflow-hidden relative">
@@ -131,11 +144,11 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
         </Link>
 
         {/* Tags */}
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2">
           {model.tags.slice(0, 2).map((tag: string, index: number) => (
             <span
               key={`${tag}-${index}`}
-              className="bg-custom-light-maincolor font-medium text-xs sm:text-sm text-white py-[1px] px-2 rounded-md"
+              className="bg-custom-light-maincolor font-medium text-xs sm:text-sm text-white py-[1px] px-2 rounded-md max-w-[120px] truncate"
             >
               {tag}
             </span>
@@ -143,7 +156,7 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
         </div>
 
         {/* Meta Info */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor">
           <div className="flex items-center gap-1">
             <HiOutlineFolderDownload className="text-base" size={20} />
             <span>{model.downloads} files</span>
@@ -152,8 +165,8 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
             <FaRegHeart className="text-base" size={18} />
             <span>{count} likes</span>
           </div>
-          <div className="font-semibold text-lg sm:text-xl text-custom-light-maincolor dark:text-custom-dark-maincolor">
-            {model.price === "FREE" ? "Free" : model.price}
+          <div className="font-semibold text-lg sm:text-md text-custom-light-maincolor dark:text-custom-dark-maincolor">
+            {model.price === "FREE" ? "Free" : formatPrice(model.price)}
           </div>
         </div>
 

@@ -53,7 +53,7 @@ const FavoriteFilter = () => {
         disabled={isDisabled}
         className="w-4 h-4 accent-red-600 dark:accent-red-400"
       />
-      <span>favourited</span>
+      <span>saved Models</span>
     </label>
 
   );
