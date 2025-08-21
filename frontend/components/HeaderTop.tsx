@@ -10,74 +10,65 @@ const HeaderTop = () => {
 
   return (
     <div
-      className="grid grid-cols-2 max-md:grid-cols-1 px-52 h-[46px] max-lg:px-5 max-lg:h-16 max-sm:px-2 items-center text-white bg-custom-light-titlecolor"
+      className="grid grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-52 h-auto min-h-[46px] py-2 lg:py-0 lg:h-[46px] items-center text-white bg-custom-light-titlecolor"
       style={{ boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)" }}
     >
       {/* Left Column */}
-      <div className="flex flex-row gap-3 text-white text-left font-['Inter-Light',_sans-serif] text-base font-light max-md:justify-center max-md:py-2">
-        <div className="flex gap-2">
-          <div className="text-white text-left font-['Inter-Light',_sans-serif] text-base font-light">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 text-white text-left font-['Inter-Light',_sans-serif] text-sm sm:text-base font-light justify-center lg:justify-start">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-center lg:items-start">
+          <div className="text-white text-left font-['Inter-Light',_sans-serif] text-sm sm:text-base font-light">
             Follow us on
           </div>
-          <div className="flex flex-row gap-2 items-center justify-start shrink-0 relative">
+          <div className="flex flex-row gap-2 items-center justify-center lg:justify-start shrink-0 relative">
             <a
               href="https://x.com/yourusername"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-black hover:text-gray-600"
+              className="text-white hover:text-gray-300 transition-colors duration-200"
             >
-              <FaXTwitter size={18} color="white" />
+              <FaXTwitter size={16} className="sm:w-[18px] sm:h-[18px]" />
             </a>
             <a
               href="https://www.facebook.com//yourusername"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-black hover:text-gray-600"
+              className="text-white hover:text-gray-300 transition-colors duration-200"
             >
-              <FaSquareFacebook size={20} color="white" />
+              <FaSquareFacebook size={18} className="sm:w-[20px] sm:h-[20px]" />
             </a>
             <a
               href="https://www.instagram.com/yourusername"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-black hover:text-gray-600"
+              className="text-white hover:text-gray-300 transition-colors duration-200"
             >
-              <FaSquareInstagram size={20} color="white" />
+              <FaSquareInstagram size={18} className="sm:w-[20px] sm:h-[20px]" />
             </a>
-
-            
           </div>
         </div>
       </div>
 
       {/* Right Column */}
-      <div className="flex flex-row gap-3 justify-end  max-md:justify-center max-md:py-2">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center lg:justify-end items-center lg:items-center">
         <div className="flex flex-row items-center gap-1">
           <ThemeToggleButton />
         </div>
-        <div>|</div>
+        <div className="hidden sm:block">|</div>
         <div className="flex flex-row items-center gap-1">
-          <HiOutlineQuestionMarkCircle size={20} />
-          <div className="text-white text-left font-['Inter-Light',_sans-serif] text-base font-light">
+          <HiOutlineQuestionMarkCircle size={18} className="sm:w-[20px] sm:h-[20px]" />
+          <div className="text-white text-left font-['Inter-Light',_sans-serif] text-sm sm:text-base font-light">
             Help
           </div>
         </div>
-        <div>|</div>
+        <div className="hidden sm:block">|</div>
         <div className="flex flex-row items-center gap-1">
-          {/* <img
-            className="shrink-0 w-5 h-5 relative overflow-visible"
-            style={{ aspectRatio: "1" }}
-            src="/mark7.png"
-          /> */}
-          <CiGlobe size={20}/>
-          <div className="text-white text-left font-['Inter-Light',_sans-serif] text-base font-light">
+          <CiGlobe size={18} className="sm:w-[20px] sm:h-[20px]"/>
+          <div className="text-white text-left font-['Inter-Light',_sans-serif] text-sm sm:text-base font-light">
             Eng
           </div>
         </div>
-        
       </div>
     </div>
-
   );
 };
 
