@@ -74,7 +74,6 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
 
   const query = {
     id: model.id,
-    liked: liked.toString()
   };
 
   const handleToggleView = async (modelId: string) => {
