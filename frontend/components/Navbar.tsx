@@ -11,6 +11,7 @@ import { useModal } from "@/context/ModalContext";
 import { useSearch } from "@/context/SearchContext";
 import { FaAngleDown } from "react-icons/fa6";
 import CategoryMenu from "./CategoryMenu";
+import Image from "next/image";
 
 const Navbar = () => {
 
@@ -25,7 +26,7 @@ const Navbar = () => {
   const links = [
     { href: '/', label: 'Home' },
     { href: '/explore', label: 'Explore' },
-    { href: '/faqs', label: 'FAQs' },
+    { href: '/blog', label: 'Blog' },
     { href: '/contact', label: 'Contact' },
   ];
   const isActive = (href: string) =>
@@ -69,9 +70,11 @@ const Navbar = () => {
       {/* Logo + Navigation */}
       <div className="flex items-center space-x-80" onClick={() => resetSearch("/")}>
         {/* <Link href="/"> */}
-          <img
+          <Image
             src="/logo.png"
             alt="Logo"
+            width={256}
+            height={36}
             className="cursor-pointer"
           />
         {/* </Link> */}
@@ -81,15 +84,14 @@ const Navbar = () => {
         {[...links.slice(0, 2)].map(link => (
           <div
             key={link.href}
-            // href={link.href}
             onClick={() => resetSearch(link.href)}
-            className={`relative cursor-pointer hover:text-blue-400 transition ${
+            className={`relative cursor-pointer hover:text-[#b6e402] transition ${
               isActive(link.href) ? ' font-medium' : ''
             }`}
           >
             {link.label}
             {isActive(link.href) && (
-              <span className="absolute left-0 -bottom-1 w-full h-1 bg-blue-400 rounded transition-all"></span>
+              <span className="absolute left-0 -bottom-1 w-full h-1 bg-[#b6e402] rounded transition-all"></span>
             )}
           </div>
         ))}
@@ -97,13 +99,13 @@ const Navbar = () => {
           <button
             onClick={() => setCategoryOpen(!categoryOpen)}
             className={`relative flex flex-row items-center gap-1 transition ${
-              isCategoryActive ? 'font-medium' : 'hover:text-blue-400'
+              isCategoryActive ? 'font-medium' : 'hover:text-[#b6e402]'
             }`}
           >
             <span>Categories</span>
             <FaAngleDown />
             {categoryOpen && (
-              <span className="absolute left-0 -bottom-1 w-full h-1 bg-blue-500 transition-all rounded" />
+              <span className="absolute left-0 -bottom-1 w-full h-1 bg-[#b6e402] transition-all rounded" />
             )}
           </button>
 
@@ -116,13 +118,13 @@ const Navbar = () => {
           <Link
             key={link.href}
             href={link.href}
-            className={`relative  hover:text-blue-400 transition ${
+            className={`relative  hover:text-[#b6e402] transition ${
               isActive(link.href) ? ' font-medium' : ''
             }`}
           >
             {link.label}
             {isActive(link.href) && (
-              <span className="absolute left-0 -bottom-1 w-full h-1 bg-blue-500 transition-all rounded"></span>
+              <span className="absolute left-0 -bottom-1 w-full h-1 bg-[#b6e402] transition-all rounded"></span>
             )}
           </Link>
         ))}
