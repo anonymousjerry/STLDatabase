@@ -62,7 +62,7 @@ const FeaturedSite = () => {
               <Image
                 src={item.src}
                 alt={item.title}
-                fill
+                layout="fill"
                 sizes="(max-width: 768px) 100vw, 20vw"
                 className="object-contain"
                 unoptimized

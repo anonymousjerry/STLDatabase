@@ -120,7 +120,7 @@ const Footer = () => {
           <span className="absolute left-0 -bottom-2 w-full h-0.5 bg-white rounded"></span>
         </div>
         <div className="flex items-center justify-center text-white text-sm font-light my-[18px]">
-          Copyright @ STLDatabase.com 2025
+          Copyright @ 3DDatabase.com 2025
         </div>
       
     </footer>

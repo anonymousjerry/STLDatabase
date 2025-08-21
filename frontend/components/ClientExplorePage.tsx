@@ -15,6 +15,8 @@ import { useLikesStore } from "@/app/_zustand/useLikesStore";
 import toast from "react-hot-toast";
 import { useFavoritesStore } from "@/app/_zustand/useFavoritesStore";
 import { useDownloadsStore } from "@/app/_zustand/useDonwloadStore";
+import { useSearch } from "@/context/SearchContext";
+import { useRouter } from "next/navigation";
 
 interface ClientExplorePageProps {
   category: string;
@@ -47,6 +49,21 @@ export default function ClientExplorePage({
   const [saved, setSaved] = useState(isFavorite(id));
 
   const { addDownload, isDownload, DownloadCounts } = useDownloadsStore();
+
+  const {
+      selectedPlatform,
+      selectedCategory,
+      searchInput,
+      searchPrice,
+      favourited,
+      setSelectedPlatform,
+      setSelectedCategory,
+      setSearchInput,
+      setSearchPrice,
+      setfavourited,
+    } = useSearch();
+
+    const router = useRouter();
 
   const isDisabled = status !== "authenticated";
 
@@ -128,6 +145,23 @@ export default function ClientExplorePage({
       }
   };
 
+  const handleTagSearch = (tag: string) => {
+      const queryParams = new URLSearchParams();
+  
+      if (selectedPlatform && selectedPlatform !== "All")
+        queryParams.set("sourcesite", selectedPlatform);
+      if (selectedCategory && selectedCategory !== "All")
+        queryParams.set("category", selectedCategory);
+      setSearchInput(tag);
+      queryParams.set("key", tag);
+      if (searchPrice) queryParams.set("price", searchPrice);
+      if (favourited) queryParams.set("favourited", 'true');
+      queryParams.set("currentPage", '1');
+      
+  
+      router.push(`/explore?${queryParams.toString()}`);
+    };
+
   return (
     <div className="flex flex-col pb-10">
       <Breadcrumb category={category} subCategory={subCategory} title={title} />
@@ -136,11 +170,6 @@ export default function ClientExplorePage({
         {/* Left Side Image and Thumbnails */}
         <div className="flex flex-col basis-3/5 gap-5 w-full">
           <div className="w-full relative h-[422px] bg-white rounded-md">
-            {/* <img
-              src={bigImagesUrl[(currentPage - 1) * 5 + selectedIndex]}
-              alt={`Model preview ${selectedIndex}`}
-              className="w-full h-full object-cover rounded-md"
-            /> */}
             <Image
               src={bigImagesUrl[(currentPage - 1) * 5 + selectedIndex]}
               alt={`Model preview ${selectedIndex}`}
@@ -187,11 +216,6 @@ export default function ClientExplorePage({
                   } cursor-pointer`}
                   onClick={() => setSelectedIndex(index)}
                 >
-                  {/* <img
-                    src={url}
-                    alt={`Thumbnail ${index}`}
-                    className="w-full h-full object-cover"
-                  /> */}
                   <Image
                     src={url}
                     alt={`Thumbnail ${index}`}
@@ -230,25 +254,53 @@ export default function ClientExplorePage({
           </div>
           <div className="flex gap-2 flex-wrap">
             {result.tags.map((tag: string, index: number) => (
-              <span
+              <div
                 key={`${tag}-${index}`}
-                className="bg-gray-300 dark:bg-gray-700 font-medium text-sm text-custom-light-textcolor dark:text-custom-dark-textcolor py-[1px] px-2 rounded-md"
+                onClick={() => handleTagSearch(tag)}
+                className="
+                  bg-gray-300 dark:bg-gray-700 
+                  font-medium text-sm
+                  text-custom-light-textcolor dark:text-custom-dark-textcolor 
+                  py-[1px] px-2 rounded-md cursor-pointer
+                  transition duration-200 ease-in-out
+                  hover:bg-gray-400 dark:hover:bg-gray-600
+                  hover:scale-105
+                  active:scale-95
+                "
               >
                 {tag}
-              </span>
+              </div>
             ))}
           </div>
           <div className="flex gap-2 items-center">
-            <Image
-              src={`/Platforms/${slugify(sourceSiteName)}.png`}
-              alt={sourceSiteName}
-              width={30}
-              height={30}
-              className="rounded-lg"
-            />
-            <div className="text-[#00ABD6] font-bold text-lg">
-              {slugify(sourceSiteName)}.com
-            </div>
+            <a
+              href={result.sourceSite?.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="
+                flex items-center gap-2
+                cursor-pointer
+                transition duration-200 ease-in-out
+                hover:scale-105 active:scale-95
+                hover:text-[#008bb0]
+              "
+            >
+              <Image
+                src={result.sourceSite?.iconBigUrl}
+                alt={sourceSiteName}
+                width={30}
+                height={30}
+                className="
+                  rounded-lg
+                  transition duration-200 ease-in-out
+                  hover:shadow-md
+                "
+                unoptimized
+              />
+              <span className="text-[#00ABD6] font-bold text-lg">
+                {slugify(sourceSiteName)}.com
+              </span>
+            </a>
           </div>
           <div className="flex gap-4 font-normal text-lg text-custom-light-textcolor dark:text-custom-dark-textcolor">
             <div className="flex items-center gap-1 ">
