@@ -6,21 +6,29 @@ import Image from "next/image";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { getPlatforms } from "@/lib/platformApi";
 import { platformList } from "@/utils/platformFormat";
+import LoadingOverlay from "./LoadingOverlay";
 
 const FeaturedSite = () => {
   const [showAll, setShowAll] = useState(false);
   const [platforms, setPlatforms] = useState([]);
+  const [loading, setLoading] = useState(true); // <-- loading state
 
   useEffect(() => {
-    getPlatforms().then(setPlatforms).catch(console.error);
+    setLoading(true);
+    getPlatforms()
+      .then(setPlatforms)
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
   const PlatformMenuList = platformList(platforms);
-
   const visibleItems = showAll ? PlatformMenuList : PlatformMenuList.slice(0, 9);
 
   return (
-    <div className="pt-6 px-52 max-xl:px-30 max-lg:px-20 max-md:px-10 mx-auto bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
+    <div className="pt-6 px-52 max-xl:px-30 max-lg:px-20 max-md:px-10 mx-auto bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor relative">
+      {/* Loading Overlay */}
+      <LoadingOverlay show={loading} size={50}/>
+
       <div className="flex flex-col bg-custom-light-containercolor dark:bg-custom-dark-containercolor rounded-[32px] px-11 max-md:px-6">
         <div className="grid grid-cols-2">
           <div className="flex text-custom-light-titlecolor dark:text-custom-dark-titlecolor py-5 text-2xl font-bold">

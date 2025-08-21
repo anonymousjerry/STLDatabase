@@ -9,8 +9,8 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { SearchProvider } from "@/context/SearchContext";
 import 'svgmap/dist/svgMap.min.css';
 import { LoadingProvider } from "@/context/LoadingContext";
-import LoadingSpinner from "@/components/LoadingSpinner";
-import RouteChangeLoader from "@/components/RouteChangeLoader";
+// import LoadingSpinner from "@/components/LoadingSpinner";
+// import RouteChangeLoader from "@/components/RouteChangeLoader";
 
 
 
@@ -33,8 +33,6 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider>
-          <LoadingSpinner />
-          <RouteChangeLoader />
           <LoadingProvider>
             <SessionProvider session={session}>
               <SearchProvider>

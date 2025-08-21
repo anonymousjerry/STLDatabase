@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSearch } from "@/context/SearchContext";
 import { useSession } from "next-auth/react";
 import { getSubCategories } from "@/lib/categoryApi";
+import LoadingOverlay from "./LoadingOverlay";
 
 type Category = {
   name: string;
@@ -21,6 +22,7 @@ const CategoriesFilter = () => {
 
   const [groupedCategories, setGroupedCategories] = useState<GroupedCategory[]>([]);
   const [openGroup, setOpenGroup] = useState<string | null>(null); // <-- only one open
+  const [loading, setLoading] = useState(true); // <-- loading state
 
   const {
     selectedPlatform,
@@ -33,6 +35,7 @@ const CategoriesFilter = () => {
   } = useSearch();
 
   useEffect(() => {
+    setLoading(true);
     getSubCategories()
       .then((data: Category[]) => {
         const grouped = data.reduce((acc, curr) => {
@@ -48,7 +51,8 @@ const CategoriesFilter = () => {
 
         setGroupedCategories(formatted);
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
   const handleSubcategorySelect = (subcategory: string) => {
@@ -75,7 +79,8 @@ const CategoriesFilter = () => {
   };
 
   return (
-    <div className="ml-2 mt-1 space-y-4">
+    <div className="ml-2 mt-1 space-y-4 relative">
+      <LoadingOverlay show = {loading} size = {18} />
       {groupedCategories.map(({ group, items }) => (
         <div key={group}>
           {/* Toggleable Category Heading */}
