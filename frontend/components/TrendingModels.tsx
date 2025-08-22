@@ -6,7 +6,7 @@ import { FaChevronLeft } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa6";
 import { modelLists } from "@/lib/utils";
 import { useEffect } from "react";
-import { getTrendingModels } from "@/lib/modelsApi";
+import { searchModels } from "@/lib/modelsApi";
 import ModelItem from "./ModelItem";
 import LoadingOverlay from "./LoadingOverlay";
 
@@ -14,10 +14,19 @@ const TrendingModels = () => {
     const [showAll, setShowAll] = useState(false);
     const [trendingModels, setTrendingModels] = useState([]);
     const [loading, setLoading] = useState(true);
+    
 
     useEffect(() => {
-        setLoading(true);
-        getTrendingModels().then(setTrendingModels).catch(console.error).finally(() => setLoading(false));
+        // setLoading(true);
+        const fetchFilteredModels = async () => {
+            setLoading(true);
+            const { models: newModels, totalCount } = await searchModels({filters: ['trending'], page: 1, limit: 4 },);
+            console.log(newModels)
+            setTrendingModels(newModels);
+            setLoading(false);
+        };
+    
+        fetchFilteredModels();
     }, [])
 
 

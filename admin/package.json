@@ -24,6 +24,7 @@
     "next-sanity": "^10.0.10",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-hot-toast": "^2.6.0",
     "sanity": "^4.5.0",
     "styled-components": "^6.1.18",
     "tailwind": "^4.0.0"

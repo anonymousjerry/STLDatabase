@@ -67,8 +67,8 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   };
 
   const modelSlug = generateSlug(
-    model.category.name,
-    model.subCategory.name,
+    model.categoryNames[0],
+    model.subCategoryNames[0],
     model.title
   );
 
@@ -123,9 +123,8 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
         <Image
           src={model.thumbnailUrl}
           alt={model.title}
-          layout="fill"
-          objectFit="cover"
-          className="transition-transform duration-300 ease-in-out transform hover:scale-105"
+          fill
+          className="transition-transform duration-300 ease-in-out transform hover:scale-105 object-cover"
           unoptimized
         />
       </Link>

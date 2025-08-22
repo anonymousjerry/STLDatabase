@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { getAllScrapeJobs, createScrapeJob, updateScrapeJob, deleteScrapeJob, toggleScrapeJobActive } from '../lib/scrapeJobApi';
 import { ScrapeJob } from '../sanity/types';
 import { Plus, Search, Pencil, Trash2, Check, X, Play, Pause } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 
 interface Alert {
   type: 'success' | 'error';
@@ -13,7 +14,6 @@ interface Alert {
 export default function ScrapeJobTable() {
   const [jobs, setJobs] = useState<ScrapeJob[]>([]);
   const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState<Alert | null>(null);
   const [editingJob, setEditingJob] = useState<ScrapeJob | null>(null);
   const [formData, setFormData] = useState({
     platform: 'Printables' as ScrapeJob['platform'],
@@ -30,8 +30,9 @@ export default function ScrapeJobTable() {
     try {
       const data = await getAllScrapeJobs();
       setJobs(data);
-    } catch (error) {
-      showAlert('error', 'Failed to fetch scraping jobs');
+    } catch (err) {
+      console.error('Error fetching scraping jobs:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to fetch scraping jobs');
     } finally {
       setLoading(false);
     }
@@ -41,18 +42,13 @@ export default function ScrapeJobTable() {
     refreshJobs();
   }, []);
 
-  const showAlert = (type: 'success' | 'error', message: string) => {
-    setAlert({ type, message });
-    setTimeout(() => setAlert(null), 3000);
-  };
-
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const createJob = async () => {
     if (!formData.platform || !formData.count) {
-      showAlert('error', 'Platform and Count are required!');
+      toast.error('Platform and Count are required!');
       return;
     }
 
@@ -68,9 +64,10 @@ export default function ScrapeJobTable() {
         isActive: false,
       });
       setIsFormVisible(false);
-      showAlert('success', 'Scraping job created successfully!');
-    } catch (error) {
-      showAlert('error', 'Failed to create scraping job');
+      toast.success('Scraping job created successfully!');
+    } catch (err) {
+      console.error('Error creating scraping job:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to create scraping job');
     } finally {
       setLoading(false);
     }
@@ -91,9 +88,10 @@ export default function ScrapeJobTable() {
         endTime: '17:00',
         isActive: false,
       });
-      showAlert('success', 'Scraping job updated successfully!');
-    } catch (error) {
-      showAlert('error', 'Failed to update scraping job');
+      toast.success('Scraping job updated successfully!');
+    } catch (err) {
+      console.error('Error updating scraping job:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to update scraping job');
     } finally {
       setLoading(false);
     }
@@ -106,9 +104,10 @@ export default function ScrapeJobTable() {
       setLoading(true);
       await deleteScrapeJob(id);
       await refreshJobs();
-      showAlert('success', 'Scraping job deleted successfully!');
-    } catch (error) {
-      showAlert('error', 'Failed to delete scraping job');
+      toast.success('Scraping job deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting scraping job:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to delete scraping job');
     } finally {
       setLoading(false);
     }
@@ -119,9 +118,10 @@ export default function ScrapeJobTable() {
       setLoading(true);
       await toggleScrapeJobActive(id);
       await refreshJobs();
-      showAlert('success', 'Job status toggled successfully!');
-    } catch (error) {
-      showAlert('error', 'Failed to toggle job status');
+      toast.success('Job status toggled successfully!');
+    } catch (err) {
+      console.error('Error toggling job status:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to toggle job status');
     } finally {
       setLoading(false);
     }
@@ -196,15 +196,7 @@ export default function ScrapeJobTable() {
       </div>
 
       {/* Alert */}
-      {alert && (
-        <div className={`p-4 mx-6 mt-4 rounded-lg ${
-          alert.type === 'success' 
-            ? 'bg-green-100 text-green-800 border border-green-200' 
-            : 'bg-red-100 text-red-800 border border-red-200'
-        }`}>
-          {alert.message}
-        </div>
-      )}
+      {/* The alert state was removed, so this block is no longer relevant. */}
 
       {/* Search and Actions */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -429,6 +421,49 @@ export default function ScrapeJobTable() {
           </div>
         )}
       </div>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#1f2937',
+            color: '#fff',
+            border: '1px solid #374151',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            fontSize: '14px',
+            fontWeight: '500',
+            zIndex: 9999,
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10B981',
+              secondary: '#fff',
+            },
+            style: {
+              background: '#065f46',
+              border: '1px solid #047857',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#fff',
+            },
+            style: {
+              background: '#7f1d1d',
+              border: '1px solid #dc2626',
+            },
+          },
+        }}
+        containerStyle={{
+          top: 80,
+          right: 20,
+        }}
+      />
     </div>
   );
 }

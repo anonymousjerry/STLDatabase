@@ -17,12 +17,12 @@ interface SubCategory {
   id: string;
   name: string;
   categoryId: string;
-  iconUrl: string;
 }
 
 interface Category {
   id: string;
   name: string;
+  SVGUrl: string;
 }
 
 interface Model {
@@ -30,10 +30,10 @@ interface Model {
   title: string;
   description: string;
   sourceSiteId: string;
-  categoryId: string;
-  subCategoryId: string;
-  category: Category;
-  subCategory: SubCategory;
+  categoryId: string[];
+  subCategoryId: string[];
+  categoryNames: string[];
+  subCategoryNames: string[];
   tags: string[];
   likes: Like[];
   views: number;
@@ -42,6 +42,7 @@ interface Model {
   downloads: number;
   imagesUrl: string[];
   thumbnailUrl: string;
+  websiteUrl: string;
   sourceUrl: string;
   createdAt: string;
   updatedAt: string;

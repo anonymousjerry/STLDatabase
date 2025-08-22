@@ -4,10 +4,10 @@ import React, { useEffect, useState } from "react";
 import CategoryItem from "./CategoryItem";
 import Image from "next/image";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
-import { getSubCategories } from "@/lib/categoryApi";
+import { getCategories, getSubCategories } from "@/lib/categoryApi";
 import LoadingOverlay from "./LoadingOverlay";
 
-export interface subCategoryListItem {
+export interface categoryListItem {
   id: number;
   title: string;
   src: string;
@@ -15,7 +15,7 @@ export interface subCategoryListItem {
 
 const Categories = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [subcategories, setSubCategories] = useState<subCategoryListItem[]>([]);
+  const [categories, setCategories] = useState<categoryListItem[]>([]);
   const [columns, setColumns] = useState(2);
   const [loading, setLoading] = useState(true); // <-- loading state
 
@@ -36,24 +36,24 @@ const Categories = () => {
 
   useEffect(() => {
     setLoading(true); // start loading
-    getSubCategories()
-      .then((data: SubCategory[]) => {
+    getCategories()
+      .then((data: Category[]) => {
         const formatted = data.map((item, index) => ({
           id: index + 1,
           title: item.name,
-          src: item.iconUrl,
+          src: item.SVGUrl,
         }));
-        setSubCategories(formatted);
+        setCategories(formatted);
       })
       .catch(console.error)
       .finally(() => setLoading(false)); // stop loading
   }, []);
 
   const itemsPerPage = 18;
-  const totalPages = Math.ceil(subcategories.length / itemsPerPage);
+  const totalPages = Math.ceil(categories.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedItems = subcategories.slice(startIndex, endIndex);
+  const paginatedItems = categories.slice(startIndex, endIndex);
 
   const [direction, setDirection] = useState<"next" | "prev">("next");
   const [fadeKey, setFadeKey] = useState(0);
@@ -100,7 +100,7 @@ const Categories = () => {
 
             return (
               <CategoryItem key={item.id} title={item.title} className={extraClass}>
-                <Image src={item.src} width={120} height={95} alt={item.title} unoptimized />
+                <Image src={item.src} width={80} height={65} alt={item.title} unoptimized />
               </CategoryItem>
             );
           })}
