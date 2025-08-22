@@ -30,7 +30,6 @@ const TrendingModels = () => {
     }, [])
 
 
-    const visibleProducts = showAll ? trendingModels : trendingModels.slice(0, 4);
     return (
         <div className="pt-10 px-52 max-xl:px-30 max-lg:px-20 max-md:px-10 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor relative">
             <LoadingOverlay show={loading} size={50} />
@@ -65,7 +64,7 @@ const TrendingModels = () => {
                 </div>
 
                 <div className="grid grid-cols-4 max-xl:grid-cols-3 max-lg:grid-cols-2 max-md:grid-cols-1 max-sm:grid-cols-1 gap-6 pb-7">
-                    {visibleProducts.map((model: Model) => (
+                    {trendingModels.map((model: Model) => (
                         <ModelItem key={model.id} model={model} color="white" />
                     ))}
                 </div>
