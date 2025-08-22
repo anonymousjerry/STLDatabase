@@ -470,7 +470,7 @@ export function AdPositionTable() {
           toastOptions={{
             duration: 4000,
             style: {
-              background: '#1f2937',
+              background: '#363636',
               color: '#fff',
               border: '1px solid #374151',
               borderRadius: '8px',

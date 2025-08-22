@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DropdownButton from "./DropdownButton";
 import SearchInput from "./SearchInput";
-import { getSubCategories } from "@/lib/categoryApi";
+import { getCategories, getSubCategories } from "@/lib/categoryApi";
 import { getPlatforms } from "@/lib/platformApi";
 import { useSearch } from "@/context/SearchContext";
 import { useSession } from "next-auth/react";
@@ -41,7 +41,7 @@ const SearchBar = () => {
 
   useEffect(() => {
     getPlatforms().then(setPlatforms).catch(console.error);
-    getSubCategories()
+    getCategories()
     .then((data) => {
       const namesOnly = data.map((item: Category) => item.name);
       setCategories(namesOnly);

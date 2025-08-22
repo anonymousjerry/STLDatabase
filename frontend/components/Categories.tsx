@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import CategoryItem from "./CategoryItem";
 import Image from "next/image";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
-import { getCategories, getSubCategories } from "@/lib/categoryApi";
+import { getCategories } from "@/lib/categoryApi";
 import LoadingOverlay from "./LoadingOverlay";
 
 export interface categoryListItem {
