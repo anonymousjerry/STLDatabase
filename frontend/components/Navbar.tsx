@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import { useModal } from "@/context/ModalContext";
 import { useSearch } from "@/context/SearchContext";
 import { FaAngleDown } from "react-icons/fa6";
-import CategoryMenu from "./CategoryMenu";
+// import CategoryMenu from "./CategoryMenu";
 import Image from "next/image";
 
 const Navbar = () => {
@@ -86,7 +86,7 @@ const Navbar = () => {
             alt="Logo"
             width={256}
             height={36}
-            className="cursor-pointer"
+            className="cursor-pointer h-auto"
           />
         </div>
 
@@ -120,9 +120,9 @@ const Navbar = () => {
             </button>
 
             {/* Dropdown box */}
-            { categoryOpen && (
+            {/* { categoryOpen && (
               <CategoryMenu setCategoryOpen = {setCategoryOpen}/>
-            )}
+            )} */}
           </div>
           {[...links.slice(2)].map(link => (
             <Link
@@ -245,11 +245,11 @@ const Navbar = () => {
                 <FaAngleDown className={`transition-transform ${categoryOpen ? 'rotate-180' : ''}`} />
               </div>
               
-              {categoryOpen && (
+              {/* {categoryOpen && (
                 <div className="ml-4 mt-2 space-y-2">
                   <CategoryMenu setCategoryOpen={setCategoryOpen} />
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* Account Section */}

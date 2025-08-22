@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { createUserApi, deleteUserApi, getAllUser, updateUserApi } from "../lib/userApi";
 import { User } from "../sanity/types";
 import { Pencil, Trash2, Check, X, Plus, Search } from "lucide-react";
+import toast, { Toaster } from 'react-hot-toast';
 
 export function UserTable() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Partial<User>>({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,8 +17,9 @@ export function UserTable() {
     try {
       const res = await getAllUser();
       setUsers(res);
-    } catch {
-      setAlert({ type: "error", message: "Failed to fetch users" });
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to fetch users');
     } finally {
       setLoading(false);
     }
@@ -27,11 +28,6 @@ export function UserTable() {
   useEffect(() => {
     refresh();
   }, []);
-
-  const showAlert = (type: "success" | "error", message: string) => {
-    setAlert({ type, message });
-    setTimeout(() => setAlert(null), 3000);
-  };
 
   const startEdit = (u: User) => {
     setEditingId(u.id);
@@ -45,7 +41,7 @@ export function UserTable() {
 
   const createUser = async () => {
     if (!form.username || !form.email) {
-      showAlert("error", "Username and Email are required!");
+      toast.error("Username and Email are required!");
       return;
     }
     try {
@@ -53,10 +49,11 @@ export function UserTable() {
       await createUserApi({ username: form.username, email: form.email, role: form.role as "user" | "admin" });
       await refresh();
       setForm({});
-      showAlert("success", "User created successfully!");
+      toast.success("User created successfully!");
       setIsFormVisible(false);
-    } catch {
-      showAlert("error", "Failed to create user");
+    } catch (err) {
+      console.error('Error creating user:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to create user');
     } finally {
       setLoading(false);
     }
@@ -68,9 +65,10 @@ export function UserTable() {
       await updateUserApi({ id, username: form.username ?? "", email: form.email ?? "", role: form.role as "user" | "admin" });
       await refresh();
       cancelEdit();
-      showAlert("success", "User updated successfully!");
-    } catch {
-      showAlert("error", "Failed to update user");
+      toast.success("User updated successfully!");
+    } catch (err) {
+      console.error('Error updating user:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to update user');
     } finally {
       setLoading(false);
     }
@@ -82,9 +80,10 @@ export function UserTable() {
       setLoading(true);
       await deleteUserApi(id);
       await refresh();
-      showAlert("success", "User deleted successfully!");
-    } catch {
-      showAlert("error", "Failed to delete user");
+      toast.success("User deleted successfully!");
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to delete user');
     } finally {
       setLoading(false);
     }
@@ -113,15 +112,7 @@ export function UserTable() {
       </div>
 
       {/* Alert */}
-      {alert && (
-        <div className={`p-4 mx-6 mt-4 rounded-lg ${
-          alert.type === "success" 
-            ? "bg-green-100 text-green-800 border border-green-200" 
-            : "bg-red-100 text-red-800 border border-red-200"
-        }`}>
-          {alert.message}
-        </div>
-      )}
+      {/* The alert state was removed, so this block is no longer needed. */}
 
       {/* Search and Actions */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -304,6 +295,49 @@ export function UserTable() {
           </div>
         )}
       </div>
-    </div>
-  );
-}
+              <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#1f2937',
+              color: '#fff',
+              border: '1px solid #374151',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              fontSize: '14px',
+              fontWeight: '500',
+              zIndex: 9999,
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            },
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#10B981',
+                secondary: '#fff',
+              },
+              style: {
+                background: '#065f46',
+                border: '1px solid #047857',
+              },
+            },
+            error: {
+              duration: 4000,
+              iconTheme: {
+                primary: '#EF4444',
+                secondary: '#fff',
+              },
+              style: {
+                background: '#7f1d1d',
+                border: '1px solid #dc2626',
+              },
+            },
+          }}
+          containerStyle={{
+            top: 80,
+            right: 20,
+          }}
+        />
+      </div>
+    );
+  }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { deleteModelApi, getAllModels, updateModel } from '../lib/modelApi';
 import { Trash2, Plus, Search, Pencil, Check, X } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 
 export interface Model {
   id: string;
@@ -25,7 +26,6 @@ export function ModelTable() {
   const [editingCell, setEditingCell] = useState<{ id: string; field: keyof Model } | null>(null);
   const [form, setForm] = useState<Partial<Model>>({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
 
@@ -34,15 +34,15 @@ export function ModelTable() {
     try {
       const res = await getAllModels();
       setModels(res);
-    } catch {
-      setAlert({ type: 'error', message: 'Failed to fetch models' });
+    } catch (err) {
+      console.error('Error fetching models:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to fetch models');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => { refresh(); }, []);
-
 
   const startEdit = (m: Model, field: keyof Model) => {
     setEditingCell({ id: m.id, field });
@@ -68,9 +68,10 @@ export function ModelTable() {
       setLoading(true);
       await updateModel(id, { ...form });
       await refresh();
-      setAlert({ type: 'success', message: 'Model updated!' });
-    } catch {
-      setAlert({ type: 'error', message: 'Failed to update model' });
+      toast.success('Model updated successfully!');
+    } catch (err) {
+      console.error('Error updating model:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to update model');
     } finally {
       setEditingCell(null);
       setForm({});
@@ -86,9 +87,10 @@ export function ModelTable() {
       setLoading(true);
       await deleteModelApi(id);
       await refresh();
-      setAlert({ type: 'success', message: 'Model deleted!' });
-    } catch {
-      setAlert({ type: 'error', message: 'Failed to delete model' });
+      toast.success('Model deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting model:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to delete model');
     } finally {
       setLoading(false);
     }
@@ -122,15 +124,7 @@ export function ModelTable() {
       </div>
 
       {/* Alert */}
-      {alert && (
-        <div className={`p-4 mx-6 mt-4 rounded-lg ${
-          alert.type === 'success' 
-            ? 'bg-green-100 text-green-800 border border-green-200' 
-            : 'bg-red-100 text-red-800 border border-red-200'
-        }`}>
-          {alert.message}
-        </div>
-      )}
+      {/* The alert state was removed, so this block is no longer needed. */}
 
       {/* Search and Actions */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -318,6 +312,49 @@ export function ModelTable() {
         </div>
       )}
 
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#1f2937',
+            color: '#fff',
+            border: '1px solid #374151',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            fontSize: '14px',
+            fontWeight: '500',
+            zIndex: 9999,
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10B981',
+              secondary: '#fff',
+            },
+            style: {
+              background: '#065f46',
+              border: '1px solid #047857',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#fff',
+            },
+            style: {
+              background: '#7f1d1d',
+              border: '1px solid #dc2626',
+            },
+          },
+        }}
+        containerStyle={{
+          top: 80,
+          right: 20,
+        }}
+      />
     </div>
   );
 }

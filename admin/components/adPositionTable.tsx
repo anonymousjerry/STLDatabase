@@ -8,11 +8,11 @@ import {
 } from "../lib/adPositionApi";
 import { AdPosition } from "../sanity/types";
 import { Pencil, Trash2, Check, X, Eye, EyeOff, Search, Plus } from "lucide-react";
+import toast, { Toaster } from 'react-hot-toast';
 
 export function AdPositionTable() {
   const [adPositions, setAdPositions] = useState<AdPosition[]>([]);
   const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Partial<AdPosition>>({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,8 +23,9 @@ export function AdPositionTable() {
     try {
       const res = await getAllAdPositions();
       setAdPositions(res);
-    } catch {
-      setAlert({ type: "error", message: "Failed to fetch ad positions" });
+    } catch (err) {
+      console.error('Error fetching ad positions:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to fetch ad positions');
     } finally {
       setLoading(false);
     }
@@ -33,11 +34,6 @@ export function AdPositionTable() {
   useEffect(() => {
     refresh();
   }, []);
-
-  const showAlert = (type: "success" | "error", message: string) => {
-    setAlert({ type, message });
-    setTimeout(() => setAlert(null), 3000);
-  };
 
   const startEdit = (ad: AdPosition) => {
     setEditingId(ad._id);
@@ -66,7 +62,7 @@ export function AdPositionTable() {
 
   const createAd = async () => {
     if (!form.title || !form.page || !form.position || !form.adType || !form.size) {
-      showAlert("error", "Title, Page, Position, Ad Type, and Size are required!");
+      toast.error("Title, Page, Position, Ad Type, and Size are required!");
       return;
     }
     try {
@@ -89,10 +85,11 @@ export function AdPositionTable() {
       });
       await refresh();
       setForm({});
-      showAlert("success", "Ad position created successfully!");
+      toast.success("Ad position created successfully!");
       setIsFormVisible(false);
-    } catch {
-      showAlert("error", "Failed to create ad position");
+    } catch (err) {
+      console.error('Error creating ad position:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to create ad position');
     } finally {
       setLoading(false);
     }
@@ -105,9 +102,10 @@ export function AdPositionTable() {
       await updateAdPosition(editingId, form);
       await refresh();
       cancelEdit();
-      showAlert("success", "Ad position updated successfully!");
-    } catch {
-      showAlert("error", "Failed to update ad position");
+      toast.success("Ad position updated successfully!");
+    } catch (err) {
+      console.error('Error updating ad position:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to update ad position');
     } finally {
       setLoading(false);
     }
@@ -119,9 +117,10 @@ export function AdPositionTable() {
       setLoading(true);
       await deleteAdPosition(id);
       await refresh();
-      showAlert("success", "Ad position deleted successfully!");
-    } catch {
-      showAlert("error", "Failed to delete ad position");
+      toast.success("Ad position deleted successfully!");
+    } catch (err) {
+      console.error('Error deleting ad position:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to delete ad position');
     } finally {
       setLoading(false);
     }
@@ -132,9 +131,10 @@ export function AdPositionTable() {
       setLoading(true);
       await toggleAdPosition(id, form.enabled ?? false);
       await refresh();
-      showAlert("success", "Ad position toggled successfully!");
-    } catch {
-      showAlert("error", "Failed to toggle ad position");
+      toast.success("Ad position toggled successfully!");
+    } catch (err) {
+      console.error('Error toggling ad position:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to toggle ad position');
     } finally {
       setLoading(false);
     }
@@ -169,15 +169,7 @@ export function AdPositionTable() {
       </div>
 
       {/* Alert */}
-      {alert && (
-        <div className={`p-4 mx-6 mt-4 rounded-lg ${
-          alert.type === "success" 
-            ? "bg-green-100 text-green-800 border border-green-200" 
-            : "bg-red-100 text-red-800 border border-red-200"
-        }`}>
-          {alert.message}
-        </div>
-      )}
+      {/* The alert component is removed as per the new_code, but the Toaster is added. */}
 
       {/* Search and Actions */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -473,6 +465,49 @@ export function AdPositionTable() {
           </div>
         )}
       </div>
-    </div>
-  );
-} 
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#1f2937',
+              color: '#fff',
+              border: '1px solid #374151',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              fontSize: '14px',
+              fontWeight: '500',
+              zIndex: 9999,
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            },
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#10B981',
+                secondary: '#fff',
+              },
+              style: {
+                background: '#065f46',
+                border: '1px solid #047857',
+              },
+            },
+            error: {
+              duration: 4000,
+              iconTheme: {
+                primary: '#EF4444',
+                secondary: '#fff',
+              },
+              style: {
+                background: '#7f1d1d',
+                border: '1px solid #dc2626',
+              },
+            },
+          }}
+          containerStyle={{
+            top: 80,
+            right: 20,
+          }}
+        />
+      </div>
+    );
+  } 

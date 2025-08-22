@@ -105,33 +105,41 @@ export default function ClientExplorePage({
       try {
         toggleLike(modelId);
         await likeModel(modelId, userId, session?.accessToken || "");
+        toast.success("Model liked successfully!");
       } catch (err) {
-      console.error("Like failed:", err);
+        console.error("Like failed:", err);
+        toast.error(err instanceof Error ? err.message : "Failed to like model");
       }
   };
 
   const handleToggleFavorite = async (modelId: string) => {
-      if (saved) {
-          removeFavorite(id);
-          await saveModel(modelId, userId || "", session?.accessToken || "");
-          toast.success("Remove this model successfully!")
-      } else {
-          addFavorite(id);
-          await saveModel(modelId, userId || "", session?.accessToken || "");
-          toast.success("Add this model successfully!")
+      try {
+        if (saved) {
+            removeFavorite(id);
+            await saveModel(modelId, userId || "", session?.accessToken || "");
+            toast.success("Remove this model successfully!")
+        } else {
+            addFavorite(id);
+            await saveModel(modelId, userId || "", session?.accessToken || "");
+            toast.success("Add this model successfully!")
+        }
+        setSaved(!saved);
+      } catch (err) {
+        console.error("Toggle favorite failed:", err);
+        toast.error(err instanceof Error ? err.message : "Failed to update favorite status");
       }
-          setSaved(!saved);
   };
 
   const handleToggleDownload = async (modelId: string) => {
     try {
       const data = await downloadModel(modelId, session?.accessToken || "");
-      console.log(data.downloads)
+      console.log('Download data:', data.downloads);
       addDownload(modelId, data.downloads);
-      console.log(DownloadCounts)
+      console.log('Download counts:', DownloadCounts);
       toast.success("Model downloaded successfully!")
     } catch (error) {
-      toast.error("Failed to download model.");
+      console.error("Download failed:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to download model.");
     }
   };
 
@@ -173,10 +181,10 @@ export default function ClientExplorePage({
             <Image
               src={bigImagesUrl[(currentPage - 1) * 5 + selectedIndex]}
               alt={`Model preview ${selectedIndex}`}
-              className="rounded-md"
-              layout="fill"
-              objectFit="cover"
+              className="rounded-md object-cover"
+              fill
               unoptimized
+              priority
             />
           </div>
           <div className="flex relative items-center gap-2">
@@ -219,8 +227,8 @@ export default function ClientExplorePage({
                   <Image
                     src={url}
                     alt={`Thumbnail ${index}`}
-                    layout="fill"
-                    objectFit="cover"
+                    fill
+                    className="object-cover"
                     unoptimized
                   />
                 </div>
@@ -294,6 +302,7 @@ export default function ClientExplorePage({
                   rounded-lg
                   transition duration-200 ease-in-out
                   hover:shadow-md
+                  h-auto
                 "
                 unoptimized
               />
