@@ -122,7 +122,7 @@ const ContactPageComponent = () => {
     {
       icon: FaEnvelope,
       title: "Email Us",
-      details: "support@3dmodelpro.com",
+      details: "support@3ddatabase.com",
       description: "Send us an email anytime"
     },
     {
@@ -230,7 +230,7 @@ const ContactPageComponent = () => {
 
             {/* Advertisement Info */}
             <div className="bg-gradient-to-r from-custom-light-maincolor to-purple-600 rounded-lg p-8 text-white">
-              <h3 className="text-xl font-bold mb-4">Advertise with 3D Model Pro</h3>
+              <h3 className="text-xl font-bold mb-4">Advertise with Our Platform</h3>
               <p className="text-gray-200 mb-4">
                 Reach thousands of 3D printing enthusiasts and professionals. Our platform offers various advertising opportunities:
               </p>
@@ -245,7 +245,7 @@ const ContactPageComponent = () => {
 
             {/* Additional Info */}
             <div className="bg-white dark:bg-custom-dark-containercolor rounded-lg p-6 shadow-sm">
-              <h3 className="text-xl font-bold text-custom-light-titlecolor dark:text-custom-dark-titlecolor mb-4">Why Choose 3D Model Pro?</h3>
+              <h3 className="text-xl font-bold text-custom-light-titlecolor dark:text-custom-dark-titlecolor mb-4">Why Choose 3D Database Platform?</h3>
               <ul className="space-y-2 text-custom-light-textcolor dark:text-custom-dark-textcolor">
                 <li>• Curated collection of high-quality 3D models</li>
                 <li>• Expert support and guidance</li>

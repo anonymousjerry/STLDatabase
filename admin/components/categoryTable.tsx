@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { createCategory, createSubCategory, deleteSubCategoryApi, getAllCategories, updateCategory } from '../lib/categoryApi';
+import { Plus, Search, Pencil, Trash2, Check, X } from 'lucide-react';
 
 export interface Subcategory {
   id?: string;
   name: string;
-  iconUrl: string | File;
 }
 
 export interface Category {
   id: string;
   name: string;
+  imageUrl: string | File;
   subcategories: Subcategory[];
 }
 
@@ -40,13 +41,13 @@ const groupByCategory = (data: any[]) => {
       map[item.category] = {
         id: item.id,
         name: item.category,
+        imageUrl: item.imageUrl || '',
         subcategories: [],
       };
     }
     map[item.category].subcategories.push({
       id: item.baseId,
       name: item.name,
-      iconUrl: item.iconUrl,
     });
   });
   return Object.values(map);
@@ -56,24 +57,21 @@ export function CategoryTable() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // --- Add Category form state ---
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [formCategoryName, setFormCategoryName] = useState('');
+  const [formCategoryImage, setFormCategoryImage] = useState<File | null>(null);
   const [formSubcategories, setFormSubcategories] = useState<Subcategory[]>([]);
 
   // --- Category rename state ---
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
   const [editingCategoryName, setEditingCategoryName] = useState<string>('');
 
-  // --- Subcategory selection/edit state ---
-  const [selectedSub, setSelectedSub] = useState<{ catId: string; subId: string } | null>(null);
-  const [subEditForm, setSubEditForm] = useState<Subcategory | null>(null);
-
   // --- NEW: Add Subcategory state ---
   const [addingSubCatId, setAddingSubCatId] = useState<string | null>(null);
   const [newSubName, setNewSubName] = useState('');
-  const [newSubIcon, setNewSubIcon] = useState<File | null>(null);
 
   const refresh = async () => {
     setLoading(true);
@@ -82,6 +80,7 @@ export function CategoryTable() {
       setCategories(groupByCategory(res));
     } catch (err) {
       console.error(err);
+      setAlert({ type: 'error', message: 'Failed to fetch categories' });
     } finally {
       setLoading(false);
     }
@@ -98,381 +97,383 @@ export function CategoryTable() {
 
   // ====== CREATE CATEGORY ======
   const addSubcategory = () => {
-    setFormSubcategories((prev) => [...prev, { name: '', iconUrl: '' }]);
+    setFormSubcategories([...formSubcategories, { name: '' }]);
   };
 
-  const handleCreateSubChange = (index: number, field: 'name' | 'iconUrl', value: any) => {
-    setFormSubcategories((prev) => {
-      const next = [...prev];
-      if (field === 'iconUrl') {
-        if (value instanceof File) {
-          next[index] = { ...next[index], iconUrl: value };
-        }
-      } else {
-        next[index] = { ...next[index], name: value as string };
-      }
-      return next;
-    });
+  const removeSubcategory = (index: number) => {
+    setFormSubcategories(formSubcategories.filter((_, i) => i !== index));
   };
 
-  const saveNewCategory = async () => {
-    if (!formCategoryName.trim() || formSubcategories.length === 0) {
-      showAlert('error', 'Category name and at least one subcategory are required.');
-      return;
-    }
-    if (formSubcategories.some((s) => !s.name.trim())) {
-      showAlert('error', 'All subcategories must have a name.');
+  const updateSubcategory = (index: number, field: keyof Subcategory, value: string) => {
+    const updated = [...formSubcategories];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormSubcategories(updated);
+  };
+
+  const createCategoryWithSubs = async () => {
+    if (!formCategoryName.trim()) {
+      showAlert('error', 'Category name is required!');
       return;
     }
 
     try {
       setLoading(true);
       const formData = new FormData();
-      formData.append('name', formCategoryName.trim());
-      console.log(formCategoryName.trim())
-
-      formSubcategories.forEach((sub, idx) => {
-        formData.append(`subCategories[${idx}][name]`, sub.name);
-        // console.log(sub.name)
-        if (sub.iconUrl instanceof File) {
-          // formData.append(`subcategories[${idx}][icon]`, sub.iconUrl);
-          formData.append("image", sub.iconUrl);
-          // console.log(sub.iconUrl)
-        }
+      formData.append('name', formCategoryName);
+      if (formCategoryImage) {
+        formData.append('image', formCategoryImage);
+      }
+      
+      formSubcategories.forEach((sub, index) => {
+        formData.append(`subCategories[${index}][name]`, sub.name);
       });
 
       await createCategory(formData);
-
-      showAlert('success', 'Category created!');
+      await refresh();
       setFormCategoryName('');
+      setFormCategoryImage(null);
       setFormSubcategories([]);
       setIsFormVisible(false);
+      showAlert('success', 'Category created successfully!');
+    } catch (err) {
+      showAlert('error', 'Failed to create category');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ====== RENAME CATEGORY ======
+  const startRenameCategory = (category: Category) => {
+    setEditingCategoryId(category.id);
+    setEditingCategoryName(category.name);
+  };
+
+  const saveCategoryRename = async () => {
+    if (!editingCategoryId || !editingCategoryName.trim()) return;
+
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append('name', editingCategoryName);
+      formData.append('categoryId', editingCategoryId);
+      
+      await updateCategory(formData);
       await refresh();
-    } catch (err: any) {
-      console.error(err);
-      showAlert('error', err?.response?.data?.error || 'Failed to create category');
+      setEditingCategoryId(null);
+      setEditingCategoryName('');
+      showAlert('success', 'Category renamed successfully!');
+    } catch (err) {
+      showAlert('error', 'Failed to rename category');
     } finally {
       setLoading(false);
     }
   };
 
   // ====== ADD SUBCATEGORY ======
-  const saveNewSubcategory = async (catId: string) => {
-    console.log(catId)
-    if (!newSubName.trim() || !newSubIcon) {
-      showAlert('error', 'Subcategory name and icon are required.');
+  const addNewSubcategory = async () => {
+    if (!addingSubCatId || !newSubName.trim()) {
+      showAlert('error', 'Subcategory name is required!');
       return;
     }
+
     try {
       setLoading(true);
       const formData = new FormData();
-      formData.append('categoryId', catId)
-      formData.append('subCategoryName', newSubName.trim());
-      formData.append('image', newSubIcon);
+      formData.append('categoryId', addingSubCatId);
+      formData.append('subCategoryName', newSubName);
 
-      await createSubCategory(formData)
-
-      showAlert('success', 'Subcategory added!');
+      await createSubCategory(formData);
+      await refresh();
       setAddingSubCatId(null);
       setNewSubName('');
-      setNewSubIcon(null);
-      await refresh();
-    } catch (err: any) {
-      console.error(err);
-      showAlert('error', err?.response?.data?.error || 'Failed to add subcategory');
+      showAlert('success', 'Subcategory added successfully!');
+    } catch (err) {
+      showAlert('error', 'Failed to add subcategory');
     } finally {
       setLoading(false);
     }
   };
 
-  // ====== SUBCATEGORY SELECT / SAVE / DELETE ======
-  const selectSubcategory = (catId: string, subId: string) => {
-    setSelectedSub({ catId, subId });
-    const sub = categories
-      .find((c) => c.id === catId)
-      ?.subcategories.find((s) => s.id === subId);
-    setSubEditForm(sub ? { ...sub } : null);
-  };
-
-  const saveSubcategory = async () => {
-    if (!selectedSub || !subEditForm) return;
-
-    try {
-      setLoading(true);
-      const formData = new FormData();
-      formData.append('name', subEditForm.name);
-      if (subEditForm.iconUrl instanceof File) {
-        formData.append('image', subEditForm.iconUrl);
-      }
-      formData.append('subCategoryId', selectedSub.subId);
-
-      await updateCategory(formData);
-
-      showAlert('success', 'Subcategory updated!');
-      setSelectedSub(null);
-      setSubEditForm(null);
-      await refresh();
-    } catch (err: any) {
-      console.error(err);
-      showAlert('error', err?.response?.data?.error || 'Failed to update subcategory');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteSubcategory = async () => {
-    if (!selectedSub || !subEditForm) return;
-    const { catId } = selectedSub;
+  // ====== DELETE SUBCATEGORY ======
+  const deleteSubcategory = async (categoryId: string, subcategoryId: string) => {
     if (!confirm('Delete this subcategory?')) return;
 
     try {
       setLoading(true);
-      // await api.delete(`/categories/${catId}/subcategories/${subEditForm.id}`);
-      await deleteSubCategoryApi(selectedSub.subId);
-
-      showAlert('success', 'Subcategory deleted!');
-      setSelectedSub(null);
-      setSubEditForm(null);
+      await deleteSubCategoryApi(subcategoryId);
       await refresh();
-    } catch (err: any) {
-      console.error(err);
-      showAlert('error', err?.response?.data?.error || 'Failed to delete subcategory');
+      showAlert('success', 'Subcategory deleted successfully!');
+    } catch (err) {
+      showAlert('error', 'Failed to delete subcategory');
     } finally {
       setLoading(false);
     }
   };
 
+  // Filter categories based on search term
+  const filteredCategories = categories.filter((category) => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return (
+      category.name.toLowerCase().includes(search) ||
+      category.subcategories.some(sub => sub.name.toLowerCase().includes(search))
+    );
+  });
+
   return (
-    <div className="p-6 bg-white rounded-lg shadow flex flex-col gap-4">
-      {alert && (
-        <div
-          className={`px-4 py-2 rounded ${
-            alert.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-          }`}
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+      {/* Header */}
+      <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Category Management</h1>
+        <button
+          onClick={() => setIsFormVisible(!isFormVisible)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
         >
+          <Plus size={20} />
+          Add New Category
+        </button>
+      </div>
+
+      {/* Alert */}
+      {alert && (
+        <div className={`p-4 mx-6 mt-4 rounded-lg ${
+          alert.type === 'success' 
+            ? 'bg-green-100 text-green-800 border border-green-200' 
+            : 'bg-red-100 text-red-800 border border-red-200'
+        }`}>
           {alert.message}
         </div>
       )}
 
-      {/* HEADER */}
-      <div className="flex justify-between items-center mb-3">
-        <h2 className="text-xl font-bold">Categories</h2>
-        <button
-          onClick={() => setIsFormVisible((v) => !v)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-        >
-          {isFormVisible ? 'Cancel' : 'Add Category'}
-        </button>
+      {/* Search and Actions */}
+      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex gap-4 items-center">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Search categories or subcategories..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+          <button
+            onClick={refresh}
+            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
-      {/* ADD CATEGORY FORM */}
+      {/* Create Category Form */}
       {isFormVisible && (
-        <div className="border rounded-lg p-4 bg-gray-50 flex flex-col gap-3">
-          <input
-            type="text"
-            placeholder="Category Name"
-            value={formCategoryName}
-            onChange={(e) => setFormCategoryName(e.target.value)}
-            className="border px-3 py-2 rounded-md w-full"
-          />
-
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-medium">Subcategories</span>
-              <button
-                type="button"
-                onClick={addSubcategory}
-                className="px-2 py-1 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
-              >
-                Add
-              </button>
+        <div className="p-6 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Create New Category</h3>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category Name</label>
+              <input
+                type="text"
+                placeholder="Enter category name"
+                value={formCategoryName}
+                onChange={(e) => setFormCategoryName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
+              />
             </div>
 
-            {formSubcategories.map((sub, idx) => (
-              <div key={idx} className="flex gap-2 mb-2 items-center">
-                <input
-                  type="text"
-                  placeholder="Subcategory Name"
-                  value={sub.name}
-                  onChange={(e) => handleCreateSubChange(idx, 'name', e.target.value)}
-                  className="border px-2 py-1 rounded-md flex-1"
-                />
-                <input
-                  type="file"
-                  onChange={(e) => {
-                    const file = e.target.files && e.target.files[0];
-                    if (file) handleCreateSubChange(idx, 'iconUrl', file);
-                  }}
-                />
-              </div>
-            ))}
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category Image</label>
+              <input
+                type="file"
+                onChange={(e) => setFormCategoryImage(e.target.files?.[0] || null)}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
+              />
+            </div>
 
-          <button
-            onClick={saveNewCategory}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 w-[140px] transition"
-            disabled={loading}
-          >
-            {loading ? 'Saving...' : 'Save Category'}
-          </button>
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Subcategories</label>
+                <button
+                  type="button"
+                  onClick={addSubcategory}
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                >
+                  + Add Subcategory
+                </button>
+              </div>
+              
+              {formSubcategories.map((sub, index) => (
+                <div key={index} className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    placeholder="Subcategory name"
+                    value={sub.name}
+                    onChange={(e) => updateSubcategory(index, 'name', e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeSubcategory(index)}
+                    className="px-3 py-2 text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={createCategoryWithSubs}
+                disabled={loading}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
+              >
+                {loading ? "Creating..." : "Create Category"}
+              </button>
+              <button
+                onClick={() => {
+                  setIsFormVisible(false);
+                  setFormCategoryName('');
+                  setFormCategoryImage(null);
+                  setFormSubcategories([]);
+                }}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* CATEGORY LIST */}
-      <div className="grid gap-4">
-        {categories.map((cat) => (
-          <div
-            key={cat.id}
-            className="border rounded-lg p-4 shadow hover:shadow-lg transition flex flex-col gap-3"
-          >
-            <div className="flex justify-between items-center">
-              {editingCategoryId === cat.id ? (
-                <input
-                  type="text"
-                  value={editingCategoryName}
-                  onChange={(e) => setEditingCategoryName(e.target.value)}
-                  className="border px-2 py-1 rounded-md"
-                />
-              ) : (
-                <h3 className="text-lg font-semibold">{cat.name}</h3>
-              )}
-            </div>
-
-            {/* Subcategories Grid */}
-            <div className="flex flex-wrap gap-3">
-              {cat.subcategories.map((sub, idx) => {
-                const isSelected = selectedSub?.catId === cat.id && selectedSub?.subId === sub.id;
-                return (
-                  <div
-                    key={sub.id || idx}
-                    onClick={() => sub?.id && selectSubcategory(cat.id, sub?.id)}
-                    className={`flex flex-col items-center w-24 text-center p-2 border rounded-md cursor-pointer
-                      ${isSelected ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'}
-                    `}
-                  >
-                    <img
-                      src={sub.iconUrl instanceof File ? URL.createObjectURL(sub.iconUrl) : (sub.iconUrl as string)}
-                      alt={sub.name}
-                      className="w-12 h-12 object-cover rounded-md mb-1"
-                    />
-                    <span className="text-xs truncate w-full">{sub.name}</span>
-                  </div>
-                );
-              })}
-              <button
-                onClick={() => setAddingSubCatId(cat.id)}
-                className="w-24 h-24 flex items-center justify-center border border-dashed border-gray-300 rounded-md text-2xl text-gray-500 hover:border-blue-500 hover:text-blue-500"
-              >
-                +
-              </button>
-            </div>
-
-            {/* Add Subcategory UI */}
-            {addingSubCatId === cat.id ? (
-              <div className="mt-3 border-t pt-3 bg-gray-50 p-3 rounded-md flex flex-col gap-2">
-                <div className="font-medium text-sm">Add Subcategory</div>
-                <input
-                  type="text"
-                  value={newSubName}
-                  onChange={(e) => setNewSubName(e.target.value)}
-                  placeholder="Subcategory Name"
-                  className="border px-2 py-1 rounded-md w-full"
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files && e.target.files[0];
-                    if (file) setNewSubIcon(file);
-                  }}
-                />
-                <div className="flex gap-2 mt-2">
-                  <button
-                    onClick={() => saveNewSubcategory(cat.id)}
-                    className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700"
-                    disabled={loading}
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => {
-                      setAddingSubCatId(null);
-                      setNewSubName('');
-                      setNewSubIcon(null);
-                    }}
-                    className="px-3 py-1 bg-gray-300 rounded-md hover:bg-gray-400"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <></>
-            )}
-
-            {/* Subcategory Editing Form */}
-            {selectedSub?.catId === cat.id && subEditForm && (
-              <div className="mt-3 border-t pt-3 flex flex-col gap-2 bg-gray-50 p-3 rounded-md">
-                <div className="font-medium text-sm">Edit Subcategory</div>
-                <label className="text-xs">Name</label>
-                <input
-                  type="text"
-                  value={subEditForm.name}
-                  onChange={(e) => setSubEditForm({ ...subEditForm, name: e.target.value })}
-                  className="border px-2 py-1 rounded-md w-full"
-                  placeholder="Subcategory Name"
-                />
-                <label className="text-xs mt-2">Icon</label>
-                <div className="flex items-center gap-3">
-                  {subEditForm.iconUrl && (
-                    <img
-                      src={
-                        subEditForm.iconUrl instanceof File
-                          ? URL.createObjectURL(subEditForm.iconUrl)
-                          : subEditForm.iconUrl
-                      }
-                      alt="current"
-                      className="w-10 h-10 rounded object-cover border"
-                    />
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files && e.target.files[0];
-                      if (file) setSubEditForm({ ...subEditForm, iconUrl: file });
-                    }}
-                  />
-                </div>
-                <div className="flex gap-2 mt-2">
-                  <button
-                    onClick={saveSubcategory}
-                    className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700"
-                    disabled={loading}
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={deleteSubcategory}
-                    className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
-                    disabled={loading}
-                  >
-                    Delete
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedSub(null);
-                      setSubEditForm(null);
-                    }}
-                    className="px-3 py-1 bg-gray-300 rounded-md hover:bg-gray-400"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
+      {/* Categories Table */}
+      <div className="overflow-x-auto">
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600 dark:text-gray-400">Loading categories...</span>
           </div>
-        ))}
+        ) : (
+          <div className="space-y-4 p-6">
+            {filteredCategories.map((category) => (
+              <div key={category.id} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                {/* Category Header */}
+                <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    {category.imageUrl && (
+                      <img
+                        src={typeof category.imageUrl === 'string' ? category.imageUrl : URL.createObjectURL(category.imageUrl)}
+                        alt={category.name}
+                        className="w-8 h-8 rounded object-cover"
+                      />
+                    )}
+                    {editingCategoryId === category.id ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={editingCategoryName}
+                          onChange={(e) => setEditingCategoryName(e.target.value)}
+                          className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
+                        />
+                        <button
+                          onClick={saveCategoryRename}
+                          className="text-green-600 hover:text-green-700"
+                        >
+                          <Check size={16} />
+                        </button>
+                        <button
+                          onClick={() => setEditingCategoryId(null)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{category.name}</h3>
+                        <button
+                          onClick={() => startRenameCategory(category)}
+                          className="text-blue-600 hover:text-blue-700"
+                        >
+                          <Pencil size={16} />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setAddingSubCatId(addingSubCatId === category.id ? null : category.id)}
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  >
+                    + Add Subcategory
+                  </button>
+                </div>
+
+                {/* Add Subcategory Form */}
+                {addingSubCatId === category.id && (
+                  <div className="bg-blue-50 dark:bg-blue-900/20 px-4 py-3 border-t border-gray-200 dark:border-gray-600">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Subcategory name"
+                        value={newSubName}
+                        onChange={(e) => setNewSubName(e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
+                      />
+                      <button
+                        onClick={addNewSubcategory}
+                        disabled={loading}
+                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors disabled:opacity-50"
+                      >
+                        Add
+                      </button>
+                      <button
+                        onClick={() => {
+                          setAddingSubCatId(null);
+                          setNewSubName('');
+                        }}
+                        className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Subcategories */}
+                <div className="bg-white dark:bg-gray-800">
+                  {category.subcategories.length === 0 ? (
+                    <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                      No subcategories yet
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                      {category.subcategories.map((subcategory) => (
+                        <div key={subcategory.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex justify-between items-center">
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">{subcategory.name}</span>
+                          <button
+                            onClick={() => deleteSubcategory(category.id, subcategory.id!)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {!loading && filteredCategories.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500 dark:text-gray-400">No categories found</p>
+          </div>
+        )}
       </div>
     </div>
   );

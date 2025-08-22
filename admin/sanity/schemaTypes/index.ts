@@ -7,4 +7,4 @@ import adPosition from "./adPosition"
 // import user from "./user"
 
 // export const schemaTypes = [scrapeJob, user, model, sourceSite, category, subCategory]
-export const schemaTypes = [scrapeJob, adPosition]
+export const schemaTypes = [scrapeJob, adPosition];

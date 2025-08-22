@@ -19,7 +19,7 @@ const Footer = () => {
       <div className="flex flex-col lg:flex-row justify-between px-4 sm:px-8 md:px-16 lg:px-32 xl:px-52 mb-8 lg:mb-[53px] gap-8 lg:gap-0">
         {/* Left Section */}
         <div className="flex flex-col mt-6 lg:mt-10 gap-4 lg:gap-2 items-start lg:justify-start shrink-0">
-          <Link href="/" className="w-full lg:w-auto">
+          <Link href="/" className="w-full ">
             <Image
               src="/logo.png"
               alt="Logo"
@@ -93,14 +93,14 @@ const Footer = () => {
               ...more
             </span>
           </div>
-          <div className="text-white text-left font-bold text-xl lg:text-2xl text-center lg:text-right">
+          <div className="text-white font-bold text-xl lg:text-2xl text-center lg:text-right">
             Discover the Best of 3D Printing Models
           </div>
           <div className="flex flex-col items-center lg:items-end">
-            <span className="text-white text-left text-base lg:text-[18px] font-light text-center lg:text-right">
+            <span className="text-white text-base lg:text-[18px] font-light text-center lg:text-right">
               Your all-in-one search engine for discovering the best 3D
             </span>
-            <span className="text-white text-left text-base lg:text-lg font-light text-center lg:text-right">
+            <span className="text-white text-base lg:text-lg font-light text-center lg:text-right">
               printable models online
             </span>
           </div>
