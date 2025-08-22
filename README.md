@@ -1,4 +1,4 @@
-# 3D Model Pro 🎨
+# 3D Database Pro 🎨
 
 A comprehensive platform for discovering, managing, and sharing 3D models across multiple platforms including Printables, Thangs, and more. Built with Next.js, Sanity CMS, and a robust backend system.
 

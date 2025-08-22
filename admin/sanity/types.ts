@@ -71,21 +71,19 @@ export interface Favourite {
 }
 
 export interface ScrapeJob {
-  id: string
-  title: string
-  description?: string
-  status: 'pending' | 'running' | 'completed' | 'failed'
-  progress: number
-  totalItems: number
-  processedItems: number
-  sourceSite: string
-  category: string
-  subCategory: string
-  createdAt: string
-  updatedAt: string
-  startedAt?: string
-  completedAt?: string
-  error?: string
+  _id: string
+  _type: 'scrapeJob'
+  platform: 'Thingiverse' | 'CGTrader' | 'Makerworld' | 'Pinshape' | 'Thangs' | 'Printables'
+  count: number
+  startTime: string
+  endTime: string
+  isActive: boolean
+  lastRun?: string
+  status: 'idle' | 'running' | 'completed' | 'failed'
+  totalRuns: number
+  totalModelsScraped: number
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface AdPosition {

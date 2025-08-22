@@ -7,6 +7,7 @@ export const getAllModels = async () => {
     return response.data;
 }
 
+
 export const updateModel = async (modelId: string, modelData: any) => {
     const response = await axiosInstance.put('/model/update', 
         {

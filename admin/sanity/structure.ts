@@ -4,6 +4,7 @@ import { UserTable } from "../components/userTable"
 import { ModelTable } from "../components/modelTable"
 import { CategoryTable } from "../components/categoryTable"
 import { AdPositionTable } from "../components/adPositionTable"
+import ScrapeJobTable from "../components/scrapeJobTable"
 import "../global.css"
 
 export const structure: StructureResolver = (S: StructureBuilder) =>
@@ -22,5 +23,8 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
       S.listItem()
         .title('Ad Position Management')
         .child(S.component(AdPositionTable).title('Ad Positions')),
-      ...S.documentTypeListItems()
+      S.listItem()
+        .title('Scraping Job Management')
+        .child(S.component(ScrapeJobTable).title('Scraping Jobs')),
+      // ...S.documentTypeListItems()
     ])

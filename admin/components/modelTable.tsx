@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { deleteModelApi, getAllModels, updateModel } from '../lib/modelApi';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Plus, Search, Pencil, Check, X } from 'lucide-react';
 
 export interface Model {
   id: string;
@@ -24,10 +24,9 @@ export function ModelTable() {
   const [loading, setLoading] = useState(false);
   const [editingCell, setEditingCell] = useState<{ id: string; field: keyof Model } | null>(null);
   const [form, setForm] = useState<Partial<Model>>({});
-  const [filter, setFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [showAddModal, setShowAddModal] = useState(false); // For Add Model modal
   const pageSize = 20;
 
   const refresh = async () => {
@@ -44,21 +43,6 @@ export function ModelTable() {
 
   useEffect(() => { refresh(); }, []);
 
-  const addModel = async () => {
-    try {
-      setLoading(true);
-      // Replace with your API call
-      // await addModelApi(form);
-      await refresh();
-      setAlert({ type: 'success', message: 'Model added!' });
-      setShowAddModal(false);
-      setForm({});
-    } catch {
-      setAlert({ type: 'error', message: 'Failed to add model' });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const startEdit = (m: Model, field: keyof Model) => {
     setEditingCell({ id: m.id, field });
@@ -110,282 +94,230 @@ export function ModelTable() {
     }
   };
 
-  const filtered = models.filter((m) => {
-    if (!filter) return true;
-    const s = filter.toLowerCase();
+  // Filter models based on search term
+  const filteredModels = models.filter((model) => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
     return (
-      m.title.toLowerCase().includes(s) ||
-      m.description.toLowerCase().includes(s) ||
-      m.category.toLowerCase().includes(s) ||
-      m.subCategory.toLowerCase().includes(s)
+      model.title.toLowerCase().includes(search) ||
+      model.description.toLowerCase().includes(search) ||
+      model.category.toLowerCase().includes(search) ||
+      model.subCategory.toLowerCase().includes(search) ||
+      model.tags.some(tag => tag.toLowerCase().includes(search))
     );
   });
 
-  const totalPages = Math.ceil(filtered.length / pageSize);
-  const paginatedModels = filtered.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
-
-  const goToPage = (page: number) => {
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
-  };
-
-  const renderCell = (m: Model, field: keyof Model, children: React.ReactNode) => {
-    const isEditing = editingCell?.id === m.id && editingCell.field === field;
-    const baseClass =
-      "px-3 py-1 max-w-xs whitespace-nowrap overflow-hidden text-ellipsis";
-    const isCheckbox = field === "isFeatured";
-
-    return (
-      <td
-        className={`${baseClass} cursor-text hover:bg-gray-50`}
-        onDoubleClick={(e) => {
-          e.stopPropagation();
-          startEdit(m, field);
-        }}
-      >
-        {isEditing ? (
-          isCheckbox ? (
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={Boolean(form[field])}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, [field]: e.target.checked }))
-                }
-              />
-              <button
-                className="px-2 py-1 bg-blue-500 text-white rounded"
-                onClick={saveEdit}
-              >
-                Save
-              </button>
-              <button
-                className="px-2 py-1 bg-gray-300 rounded"
-                onClick={cancelEdit}
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <div className="flex gap-2">
-              <input
-                autoFocus
-                className="bg-white border border-gray-300 rounded px-2 py-1 w-full focus:outline-none focus:ring focus:ring-blue-200"
-                value={(form[field] as string) || ""}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, [field]: e.target.value }))
-                }
-              />
-              <button
-                className="px-2 py-1 bg-blue-500 text-white rounded"
-                onClick={saveEdit}
-              >
-                Save
-              </button>
-              <button
-                className="px-2 py-1 bg-gray-300 rounded"
-                onClick={cancelEdit}
-              >
-                Cancel
-              </button>
-            </div>
-          )
-        ) : isCheckbox ? (
-          <span className="flex items-center justify-center">
-            {m.isFeatured ? (
-              <span className="text-green-600">✔</span>
-            ) : (
-              <span className="text-gray-400">✖</span>
-            )}
-          </span>
-        ) : (
-          children
-        )}
-      </td>
-    );
-  };
+  // Pagination
+  const totalPages = Math.ceil(filteredModels.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const currentModels = filteredModels.slice(startIndex, endIndex);
 
   return (
-    <div className="p-4 bg-white text-gray-900 rounded-lg shadow-lg">
-      <div className="flex items-center justify-between mb-4">
-        <input
-          className="bg-gray-50 text-gray-900 border border-gray-300 rounded px-3 py-2 text-sm 
-                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="Search..."
-          value={filter}
-          onChange={(e) => { setFilter(e.target.value); setCurrentPage(1); }}
-        />
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+      {/* Header */}
+      <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Model Management</h1>
+        
       </div>
 
+      {/* Alert */}
       {alert && (
-        <div className={`mb-4 px-4 py-2 rounded ${alert.type === 'success' ? 'bg-green-800 text-green-200' : 'bg-red-800 text-red-200'}`}>
+        <div className={`p-4 mx-6 mt-4 rounded-lg ${
+          alert.type === 'success' 
+            ? 'bg-green-100 text-green-800 border border-green-200' 
+            : 'bg-red-100 text-red-800 border border-red-200'
+        }`}>
           {alert.message}
         </div>
       )}
 
+      {/* Search and Actions */}
+      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex gap-4 items-center">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Search models by title, description, category, or tags..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+          <button
+            onClick={refresh}
+            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* Models Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white text-left text-sm text-gray-700">
-          <thead className="bg-gray-100 sticky top-0 z-10 shadow-sm">
-            <tr>
-              {['ID','Title','Description','Source','Category','SubCategory','Tags','Download','View','Like','Thumbnail','SourceUrl','Price','Featured', 'Action'].map((h) => (
-                <th
-                  key={h}
-                  className="px-4 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide"
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 border-t border-gray-100">
-            {paginatedModels.map((m) => (
-              <tr key={m.id} className="hover:bg-gray-50 transition-colors cursor-pointer">
-                <td className="px-3 py-1">{m.id}</td>
-                {renderCell(m, 'title', m.title)}
-                {renderCell(m, 'description', m.description)}
-                <td className="px-3 py-1">{m.source}</td>
-                <td className="px-3 py-1 min-w-[150px]">{m.category}</td>
-                <td className="px-3 py-1 min-w-[150px]">{m.subCategory}</td>
-                <td className="px-3 py-1 max-w-xs whitespace-nowrap overflow-hidden text-ellipsis">{m.tags.join(', ')}</td>
-                <td className="px-3 py-1 text-center">{m.download}</td>
-                <td className="px-3 py-1 text-center">{m.view}</td>
-                <td className="px-3 py-1 text-center">{m.like}</td>
-                <td className="px-3 py-1 justify-center flex">
-                  <img src={m.thumbnailUrl} alt="" className="w-8 h-8 object-cover rounded" />
-                </td>
-                {renderCell(m, 'sourceUrl',
-                  <a href={m.sourceUrl} target="_blank" rel="noreferrer" className="text-blue-400">{m.sourceUrl}</a>
-                )}
-                <td className="px-3 py-1">{m.price}</td>
-                {renderCell(m, 'isFeatured', m.isFeatured)}
-                  <td className="px-3 py-2 flex justify-center">
-                    <button
-                      onClick={() => deleteModel(m.id)}
-                      className="text-red-600 hover:text-red-800"
-                      title="Delete model"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </td>
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600 dark:text-gray-400">Loading models...</span>
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Thumbnail</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Title</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Source</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Stats</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Featured</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {currentModels.map((model) => (
+                <tr key={model.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <img
+                      src={model.thumbnailUrl}
+                      alt={model.title}
+                      className="w-12 h-12 rounded object-cover"
+                    />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {editingCell?.id === model.id && editingCell?.field === 'title' ? (
+                      <input
+                        type="text"
+                        value={form.title || ''}
+                        onChange={(e) => setForm({ ...form, title: e.target.value })}
+                        className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
+                      />
+                    ) : (
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">{model.title}</div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900 dark:text-white">
+                      <div className="font-medium">{model.category}</div>
+                      <div className="text-gray-500 dark:text-gray-400">{model.subCategory}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900 dark:text-white">{model.source}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900 dark:text-white">
+                      <div>👁️ {model.view}</div>
+                      <div>⬇️ {model.download}</div>
+                      <div>❤️ {model.like}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {editingCell?.id === model.id && editingCell?.field === 'isFeatured' ? (
+                      <select
+                        value={form.isFeatured?.toString() || 'false'}
+                        onChange={(e) => setForm({ ...form, isFeatured: e.target.value === 'true' })}
+                        className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
+                      >
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                      </select>
+                    ) : (
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        model.isFeatured 
+                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' 
+                          : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                      }`}>
+                        {model.isFeatured ? 'Featured' : 'Regular'}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    {editingCell?.id === model.id ? (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={saveEdit}
+                          disabled={loading}
+                          className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                        >
+                          <Check size={16} />
+                        </button>
+                        <button
+                          onClick={cancelEdit}
+                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => startEdit(model, 'title')}
+                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                          title="Edit Title"
+                        >
+                          <Pencil size={16} />
+                        </button>
+                        <button
+                          onClick={() => startEdit(model, 'isFeatured')}
+                          className="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300"
+                          title="Toggle Featured"
+                        >
+                          ⭐
+                        </button>
+                        <button
+                          onClick={() => deleteModel(model.id)}
+                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                          title="Delete Model"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        
+        {!loading && filteredModels.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500 dark:text-gray-400">No models found</p>
+          </div>
+        )}
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center items-center mt-4 space-x-2">
-        <button
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-          onClick={() => goToPage(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-
-        {Array.from({ length: totalPages }, (_, i) => i + 1)
-          .filter((page) => page === 1 || page === totalPages || (page >= currentPage - 2 && page <= currentPage + 2))
-          .map((page, idx, arr) => {
-            if (idx > 0 && page - arr[idx - 1] > 1) return <span key={`dots-${page}`} className="px-2">...</span>;
-            return (
-              <button
-                key={page}
-                className={`px-3 py-1 rounded ${page === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                onClick={() => goToPage(page)}
-              >
-                {page}
-              </button>
-            );
-          })}
-
-        <button
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-          onClick={() => goToPage(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
-
-      {/* Add Model Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-20">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
-            <h2 className="text-lg font-semibold mb-4">Add New Model</h2>
-
-            <div className="grid grid-cols-1 gap-3">
-              <input
-                className="border px-3 py-2 rounded"
-                placeholder="Title"
-                value={form.title || ''}
-                onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))}
-              />
-              <input
-                className="border px-3 py-2 rounded"
-                placeholder="Description"
-                value={form.description || ''}
-                onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-              />
-              <input
-                className="border px-3 py-2 rounded"
-                placeholder="Source"
-                value={form.source || ''}
-                onChange={(e) => setForm(f => ({ ...f, source: e.target.value }))}
-              />
-              <input
-                className="border px-3 py-2 rounded"
-                placeholder="Category"
-                value={form.category || ''}
-                onChange={(e) => setForm(f => ({ ...f, category: e.target.value }))}
-              />
-              <input
-                className="border px-3 py-2 rounded"
-                placeholder="SubCategory"
-                value={form.subCategory || ''}
-                onChange={(e) => setForm(f => ({ ...f, subCategory: e.target.value }))}
-              />
-              <input
-                className="border px-3 py-2 rounded"
-                placeholder="Tags (comma separated)"
-                value={form.tags ? form.tags.join(', ') : ''}
-                onChange={(e) => setForm(f => ({ ...f, tags: e.target.value.split(',').map(t => t.trim()) }))}
-              />
-              <input
-                className="border px-3 py-2 rounded"
-                placeholder="Price"
-                value={form.price || ''}
-                onChange={(e) => setForm(f => ({ ...f, price: e.target.value }))}
-              />
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={form.isFeatured || false}
-                  onChange={(e) => setForm(f => ({ ...f, isFeatured: e.target.checked }))}
-                />
-                <span>Featured</span>
-              </label>
+      {totalPages > 1 && (
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex justify-between items-center">
+            <div className="text-sm text-gray-700 dark:text-gray-300">
+              Showing {startIndex + 1} to {Math.min(endIndex, filteredModels.length)} of {filteredModels.length} models
             </div>
-
-            <div className="flex justify-end mt-4 space-x-2">
+            <div className="flex gap-2">
               <button
-                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-                onClick={() => { setShowAddModal(false); setForm({}); }}
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                Cancel
+                Previous
               </button>
+              <span className="px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
+                Page {currentPage} of {totalPages}
+              </span>
               <button
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={addModel}
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                Add
+                Next
               </button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }
