@@ -424,7 +424,7 @@ export default function ScrapeJobTable() {
       <Toaster
         position="top-right"
         toastOptions={{
-          duration: 4000,
+          duration: 1500,
           style: {
             background: '#1f2937',
             color: '#fff',
@@ -437,7 +437,7 @@ export default function ScrapeJobTable() {
             boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
           },
           success: {
-            duration: 3000,
+            duration: 1500,
             iconTheme: {
               primary: '#10B981',
               secondary: '#fff',
@@ -448,7 +448,7 @@ export default function ScrapeJobTable() {
             },
           },
           error: {
-            duration: 4000,
+            duration: 1500,
             iconTheme: {
               primary: '#EF4444',
               secondary: '#fff',
