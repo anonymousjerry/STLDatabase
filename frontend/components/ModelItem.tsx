@@ -61,14 +61,19 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
     try {
       toggleLike(model.id);
       await likeModel(modelId, userId, session?.accessToken || "");
+      if(!liked) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+          toast.success("Model liked successfully!");
+        } else {
+          toast.success("Model disliked successfully!");
+      }
     } catch (err) {
       console.error("Like failed:", err);
     }
   };
 
   const modelSlug = generateSlug(
-    model.categoryNames[0],
-    model.subCategoryNames[0],
+    model.category.name,
+    model.subCategory.name,
     model.title
   );
 

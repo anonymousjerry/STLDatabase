@@ -111,6 +111,7 @@ export function CategoryTable() {
     setLoading(true);
     try {
       const res = await getAllCategories();
+      console.log(res)
       setCategories(groupByCategory(res));
     } catch (err) {
       console.error('Error fetching categories:', err);
@@ -299,7 +300,7 @@ export function CategoryTable() {
       <Toaster
         position="top-right"
         toastOptions={{
-          duration: 4000,
+          duration: 1500,
           style: {
             background: '#1f2937',
             color: '#fff',
@@ -312,7 +313,7 @@ export function CategoryTable() {
             boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
           },
           success: {
-            duration: 3000,
+            duration: 1500,
             iconTheme: {
               primary: '#10B981',
               secondary: '#fff',
@@ -323,7 +324,7 @@ export function CategoryTable() {
             },
           },
           error: {
-            duration: 4000,
+            duration: 1500,
             iconTheme: {
               primary: '#EF4444',
               secondary: '#fff',
@@ -348,15 +349,6 @@ export function CategoryTable() {
               <p className="mt-2 text-gray-600 dark:text-gray-400">Manage your 3D model categories and subcategories</p>
             </div>
             <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  showToast('success', 'Test success message!');
-                  setTimeout(() => showToast('error', 'Test error message!'), 1000);
-                }}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                Test Toast
-              </button>
               <button
                 onClick={() => setIsFormVisible(!isFormVisible)}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
@@ -383,9 +375,9 @@ export function CategoryTable() {
             </div>
             <button
               onClick={refresh}
-              className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-xl transition-all duration-200 flex items-center gap-2"
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
             >
-              <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+              {/* <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div> */}
               Refresh
             </button>
           </div>
@@ -532,9 +524,14 @@ export function CategoryTable() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <ImageIcon className="w-16 h-16 text-gray-400" />
-                      </div>
+                      // <div className="w-full h-full flex items-center justify-center">
+                      //   <ImageIcon className="w-16 h-16 text-gray-400" />
+                      // </div>
+                      <img
+                        src={category.imageUrl ? (typeof category.imageUrl === 'string' ? category.imageUrl : URL.createObjectURL(category.imageUrl)) : '/placeholder-image.png'}
+                        alt={category.name}                        
+                        className = 'object-cover'
+                      />
                     )
                   ) : (
                     // View mode - show current image
@@ -545,9 +542,11 @@ export function CategoryTable() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <ImageIcon className="w-16 h-16 text-gray-400" />
-                      </div>
+                      <img
+                        src={category.imageUrl}
+                        alt={category.name}                        
+                        className = 'object-cover'
+                      />
                     )
                   )}
                   <div className="absolute inset-0 bg-black bg-opacity-20"></div>

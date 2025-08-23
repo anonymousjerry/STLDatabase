@@ -30,10 +30,10 @@ interface Model {
   title: string;
   description: string;
   sourceSiteId: string;
-  categoryId: string[];
-  subCategoryId: string[];
-  categoryNames: string[];
-  subCategoryNames: string[];
+  categoryId: string;
+  category: Category;
+  subCategoryId: string;
+  subCategory: SubCategory;
   tags: string[];
   likes: Like[];
   views: number;

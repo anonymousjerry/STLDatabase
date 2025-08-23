@@ -105,7 +105,11 @@ export default function ClientExplorePage({
       try {
         toggleLike(modelId);
         await likeModel(modelId, userId, session?.accessToken || "");
-        toast.success("Model liked successfully!");
+        if(!liked) {
+          toast.success("Model liked successfully!");
+        } else {
+          toast.success("Model disliked successfully!");
+        }
       } catch (err) {
         console.error("Like failed:", err);
         toast.error(err instanceof Error ? err.message : "Failed to like model");
