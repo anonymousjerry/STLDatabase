@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { createUserApi, deleteUserApi, getAllUser, updateUserApi } from "../lib/userApi";
 import { User } from "../sanity/types";
-import { Pencil, Trash2, Check, X, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import toast, { Toaster } from 'react-hot-toast';
+import { UserForm } from "./UserForm";
+import { UserTableRow } from "./UserTableRow";
+import { UserFormData } from "./userValidation";
 
 export function UserTable() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<Partial<User>>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
 
@@ -29,26 +30,15 @@ export function UserTable() {
     refresh();
   }, []);
 
-  const startEdit = (u: User) => {
-    setEditingId(u.id);
-    setForm({ username: u.username, email: u.email, role: u.role });
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-    setForm({});
-  };
-
-  const createUser = async () => {
-    if (!form.username || !form.email) {
-      toast.error("Username and Email are required!");
-      return;
-    }
+  const handleCreateUser = async (data: UserFormData) => {
     try {
       setLoading(true);
-      await createUserApi({ username: form.username, email: form.email, role: form.role as "user" | "admin" });
+      await createUserApi({ 
+        username: data.username!, 
+        email: data.email!, 
+        role: data.role as "user" | "admin" 
+      });
       await refresh();
-      setForm({});
       toast.success("User created successfully!");
       setIsFormVisible(false);
     } catch (err) {
@@ -59,12 +49,16 @@ export function UserTable() {
     }
   };
 
-  const updateUser = async (id: string) => {
+  const handleUpdateUser = async (id: string, data: Partial<User>) => {
     try {
       setLoading(true);
-      await updateUserApi({ id, username: form.username ?? "", email: form.email ?? "", role: form.role as "user" | "admin" });
+      await updateUserApi({ 
+        id, 
+        username: data.username ?? "", 
+        email: data.email ?? "", 
+        role: data.role as "user" | "admin" 
+      });
       await refresh();
-      cancelEdit();
       toast.success("User updated successfully!");
     } catch (err) {
       console.error('Error updating user:', err);
@@ -139,48 +133,11 @@ export function UserTable() {
       {isFormVisible && (
         <div className="p-6 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
           <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Create New User</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input
-              type="text"
-              placeholder="Username"
-              value={form.username || ""}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              value={form.email || ""}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-            />
-            <select
-              value={form.role || "user"}
-              onChange={(e) => setForm({ ...form, role: e.target.value })}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          <div className="mt-4 flex gap-2">
-            <button
-              onClick={createUser}
-              disabled={loading}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
-            >
-              {loading ? "Creating..." : "Create User"}
-            </button>
-            <button
-              onClick={() => {
-                setIsFormVisible(false);
-                setForm({});
-              }}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
+          <UserForm
+            onSubmit={handleCreateUser}
+            onCancel={() => setIsFormVisible(false)}
+            loading={loading}
+          />
         </div>
       )}
 
@@ -204,104 +161,13 @@ export function UserTable() {
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {editingId === user.id ? (
-                      <input
-                        type="text"
-                        value={form.username || ""}
-                        onChange={(e) => setForm({ ...form, username: e.target.value })}
-                        className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-                      />
-                    ) : (
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">{user.username}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {editingId === user.id ? (
-                      <input
-                        type="email"
-                        value={form.email || ""}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-                      />
-                    ) : (
-                      <div className="text-sm text-gray-900 dark:text-white">{user.email}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {Array.isArray(user.favourites) && user.favourites.length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {user.favourites.map((fav) => (
-                          <a
-                            key={fav.id}
-                            href={fav.model.websiteUrl || '#'}
-                            target="_blank"
-                            className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                          >
-                            {fav.model.title}
-                          </a>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-gray-400 dark:text-gray-500 text-sm">No saved models</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {editingId === user.id ? (
-                      <select
-                        value={form.role || "user"}
-                        onChange={(e) => setForm({ ...form, role: e.target.value })}
-                        className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-                      >
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
-                      </select>
-                    ) : (
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        user.role === "admin" 
-                          ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200" 
-                          : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                      }`}>
-                        {user.role}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    {editingId === user.id ? (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => updateUser(user.id)}
-                          disabled={loading}
-                          className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
-                        >
-                          <Check size={16} />
-                        </button>
-                        <button
-                          onClick={cancelEdit}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => startEdit(user)}
-                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                        >
-                          <Pencil size={16} />
-                        </button>
-                        <button
-                          onClick={() => deleteUser(user.id)}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
+                <UserTableRow
+                  key={user.id}
+                  user={user}
+                  onUpdate={handleUpdateUser}
+                  onDelete={deleteUser}
+                  loading={loading}
+                />
               ))}
             </tbody>
           </table>
