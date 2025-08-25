@@ -16,9 +16,7 @@ export interface UpdateUserPayload {
 
 export const getAllUser = async () => {
     try {
-        console.log("Fetching all users...");
         const response = await axiosInstance.get('/users');
-        console.log('Users fetched successfully:', response.data.length);
         return response.data;
     } catch (error: any) {
         console.error('Error fetching users:', error);
@@ -34,14 +32,12 @@ export const getAllUser = async () => {
 
 export const createUserApi = async (payload: CreateUserPayload) => {
     try {
-        console.log("Creating user with payload:", payload);
         const response = await axiosInstance.post(
             '/user/create',
             {
                 payload: payload
             }
         );
-        console.log('User created successfully:', response.data);
         return response.data;
     } catch (error: any) {
         console.error('Error creating user:', error);
@@ -57,14 +53,12 @@ export const createUserApi = async (payload: CreateUserPayload) => {
 
 export const updateUserApi = async (payload: UpdateUserPayload) => {
     try {
-        console.log("Updating user with payload:", payload);
         const response = await axiosInstance.post(
             '/user/update',
             {
                 payload: payload
             }
         );
-        console.log('User updated successfully:', response.data);
         return response.data;
     } catch (error: any) {
         console.error('Error updating user:', error);
@@ -80,9 +74,7 @@ export const updateUserApi = async (payload: UpdateUserPayload) => {
 
 export const deleteUserApi = async (userId: string) => {
     try {
-        console.log("Deleting user with ID:", userId);
         const response = await axiosInstance.delete(`/user/delete?userId=${userId}`);
-        console.log('User deleted successfully:', response.data);
         return response.data;
     } catch (error: any) {
         console.error('Error deleting user:', error);

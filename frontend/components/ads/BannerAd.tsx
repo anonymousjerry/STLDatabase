@@ -34,50 +34,60 @@ const BannerAd: React.FC<BannerAdProps> = ({
       case 'header':
         return {
           width: '100%',
-          height: '90px',
-          margin: '10px 0'
+          height: '90px'
         };
       case 'footer':
         return {
           width: '100%',
-          height: '90px',
-          margin: '10px 0'
+          height: '90px'
         };
       case 'sidebar':
         return {
-          width: '300px',
-          height: '250px',
-          margin: '10px 0'
+          width: '100%',
+          height: '250px'
         };
       default:
         return {
           width: '100%',
-          height: '90px',
-          margin: '20px 0'
+          height: '90px'
         };
+    }
+  };
+
+  const getContainerClasses = () => {
+    const baseClasses = "w-full bg-custom-light-containercolor dark:bg-custom-dark-containercolor border border-gray-200 dark:border-gray-700 shadow-lg";
+    
+    switch (position) {
+      case 'header':
+        return `${baseClasses} rounded-2xl `;
+      case 'footer':
+        return `${baseClasses} rounded-2xl`;
+      case 'sidebar':
+        return `${baseClasses} rounded-3xl`;
+      default:
+        return `${baseClasses} rounded-3xl`;
     }
   };
 
   const fallbackContent = showFallback ? (
     propsFallbackContent || (
-      <div className="bg-gradient-to-r from-custom-light-maincolor to-purple-600 rounded-lg p-4 text-center text-white">
-        <div className="text-lg font-bold mb-2">Advertise with 3D Model Pro</div>
-        <div className="text-sm mb-3">Reach thousands of 3D printing enthusiasts</div>
-        <button className="bg-white text-custom-light-maincolor px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-          Get Started
-        </button>
+      <div className='flex items-center h-full justify-center bg-gradient-to-r from-custom-light-maincolor to-purple-600 rounded-3xl text-center text-white shadow-lg'>
+        <div className="text-xl font-bold">
+          Advertise with 3D Model Pro
+        </div>
+
       </div>
     )
   ) : null;
 
   return (
-    <div className={`banner-ad ${className}`}>
+    <div className={`banner-ad ${getContainerClasses()} ${className}`}>
       <GoogleAd
         adSlot={getAdSlot()}
         adFormat="banner"
         style={getStyles()}
         fallbackContent={fallbackContent}
-        className="w-full"
+        className="mx-auto rounded-3xl overflow-hidden w-[38%] max-w-[728px] min-w-[320px] aspect-[728/90] bg-gray-200"
       />
     </div>
   );

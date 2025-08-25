@@ -31,33 +31,54 @@ const SidebarAd: React.FC<SidebarAdProps> = ({
     switch (size) {
       case 'small':
         return {
-          width: '300px',
-          height: '250px',
-          margin: '10px 0'
+          width: '100%',
+          height: '180px'
         };
       case 'large':
         return {
-          width: '300px',
-          height: '600px',
-          margin: '10px 0'
+          width: '100%',
+          height: '400px'
         };
       default:
         return {
-          width: '300px',
-          height: '250px',
-          margin: '15px 0'
+          width: '100%',
+          height: '250px'
         };
+    }
+  };
+
+  const getContainerClasses = () => {
+    const baseClasses = "w-full bg-custom-light-containercolor dark:bg-custom-dark-containercolor border border-gray-200 dark:border-gray-700 shadow-lg";
+    
+    switch (size) {
+      case 'small':
+        return `${baseClasses} rounded-2xl mx-2 my-2`;
+      case 'large':
+        return `${baseClasses} rounded-3xl mx-2 my-4`;
+      default:
+        return `${baseClasses} rounded-3xl mx-2 my-3`;
+    }
+  };
+
+  const getMinHeight = () => {
+    switch (size) {
+      case 'small':
+        return 'min-h-[180px]';
+      case 'large':
+        return 'min-h-[400px]';
+      default:
+        return 'min-h-[250px]';
     }
   };
 
   const fallbackContent = showFallback ? (
     propFallbackContent || (
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 text-center border border-gray-200 dark:border-gray-700">
-        <div className="text-custom-light-maincolor font-bold text-lg mb-2">Sponsored</div>
-        <div className="text-gray-600 dark:text-gray-400 text-sm mb-3">
+      <div className="bg-custom-light-containercolor dark:bg-custom-dark-containercolor rounded-3xl p-6 text-center border border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="text-custom-light-maincolor dark:text-custom-dark-maincolor font-bold text-xl mb-3">Sponsored</div>
+        <div className="text-custom-light-textcolor dark:text-custom-dark-textcolor text-sm mb-4">
           Premium 3D Model Marketplace
         </div>
-        <div className="bg-custom-light-maincolor text-white px-3 py-1 rounded text-xs font-medium">
+        <div className="bg-custom-light-maincolor text-white px-4 py-2 rounded-xl text-sm font-medium shadow-md">
           Ad Space
         </div>
       </div>
@@ -65,13 +86,13 @@ const SidebarAd: React.FC<SidebarAdProps> = ({
   ) : null;
 
   return (
-    <div className={`sidebar-ad ${className}`}>
+    <div className={`sidebar-ad ${getContainerClasses()} ${className}`}>
       <GoogleAd
         adSlot={getAdSlot()}
         adFormat="rectangle"
         style={getStyles()}
         fallbackContent={fallbackContent}
-        className="w-full"
+        className={`w-full rounded-3xl ${getMinHeight()} overflow-hidden`}
       />
     </div>
   );

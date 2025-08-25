@@ -36,7 +36,7 @@ export function AdPositionTable() {
   }, []);
 
   const startEdit = (ad: AdPosition) => {
-    setEditingId(ad._id);
+    setEditingId(ad.id);
     setForm({
       title: ad.title,
       page: ad.page,
@@ -46,12 +46,10 @@ export function AdPositionTable() {
       enabled: ad.enabled,
       priority: ad.priority,
       adSlot: ad.adSlot,
-      fallbackContent: ad.fallbackContent,
       clientName: ad.clientName,
       clientEmail: ad.clientEmail,
       startDate: ad.startDate,
       endDate: ad.endDate,
-      notes: ad.notes,
     });
   };
 
@@ -76,12 +74,10 @@ export function AdPositionTable() {
         enabled: form.enabled ?? true,
         priority: form.priority ?? 1,
         adSlot: form.adSlot,
-        fallbackContent: form.fallbackContent,
         clientName: form.clientName,
         clientEmail: form.clientEmail,
         startDate: form.startDate,
         endDate: form.endDate,
-        notes: form.notes,
       });
       await refresh();
       setForm({});
@@ -97,15 +93,34 @@ export function AdPositionTable() {
 
   const updateAd = async () => {
     if (!editingId) return;
+
+    // find the original ad being edited
+    const originalAd = adPositions.find((ad) => ad.id === editingId);
+    if (!originalAd) return;
+
+    // build only changed fields
+    const updates: Partial<AdPosition> = {};
+    (Object.keys(form) as (keyof AdPosition)[]).forEach((key) => {
+      if (form[key] !== undefined && form[key] !== originalAd[key]) {
+        updates[key] = form[key] as any;
+      }
+    });
+
+    if (Object.keys(updates).length === 0) {
+      toast("No changes detected");
+      cancelEdit();
+      return;
+    }
+
     try {
       setLoading(true);
-      await updateAdPosition(editingId, form);
+      await updateAdPosition(editingId, updates); // send only updated fields
       await refresh();
       cancelEdit();
       toast.success("Ad position updated successfully!");
     } catch (err) {
-      console.error('Error updating ad position:', err);
-      toast.error(err instanceof Error ? err.message : 'Failed to update ad position');
+      console.error("Error updating ad position:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to update ad position");
     } finally {
       setLoading(false);
     }
@@ -126,10 +141,10 @@ export function AdPositionTable() {
     }
   };
 
-  const toggleAd = async (id: string) => {
+  const toggleAd = async (id: string, enabled: boolean) => {
     try {
       setLoading(true);
-      await toggleAdPosition(id, form.enabled ?? false);
+      await toggleAdPosition(id, enabled ?? false);
       await refresh();
       toast.success("Ad position toggled successfully!");
     } catch (err) {
@@ -168,8 +183,6 @@ export function AdPositionTable() {
         </button>
       </div>
 
-      {/* Alert */}
-      {/* The alert component is removed as per the new_code, but the Toaster is added. */}
 
       {/* Search and Actions */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -206,48 +219,84 @@ export function AdPositionTable() {
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
             />
-            
-            <select
-              value={form.page || ""}
-              onChange={(e) => setForm({ ...form, page: e.target.value as "homepage" | "detail" | "explore" })}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-            >
-              <option value="">Select Page</option>
-              <option value="homepage">Homepage</option>
-              <option value="detail">Detail</option>
-              <option value="explore">Explore</option>
-            </select>
 
-            <input
-              type="text"
-              placeholder="Position"
+            <select
               value={form.position || ""}
-              onChange={(e) => setForm({ ...form, position: e.target.value })}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-            />
-
-            <select
-              value={form.adType || ""}
-              onChange={(e) => setForm({ ...form, adType: e.target.value as "banner" | "sidebar" | "sponsored-model" })}
+              onChange={(e) => {
+                const selectedPosition = e.target.value;
+                let newPage: "homepage" | "detail" | "explore" = "homepage";
+                let newAdType: "banner" | "sidebar" | "sponsored-model" = "banner";
+                let newSize: "728x90" | "300x250" | "300x600" | "native" = "728x90";
+                
+                // Auto-populate page, ad type and size based on position
+                if (selectedPosition.startsWith("homepage")) {
+                  newPage = "homepage";
+                } else if (selectedPosition.startsWith("detail")) {
+                  newPage = "detail";
+                } else if (selectedPosition.startsWith("explore")) {
+                  newPage = "explore";
+                }
+                
+                if (selectedPosition.includes("banner")) {
+                  newAdType = "banner";
+                  newSize = "728x90";
+                } else if (selectedPosition.includes("sidebar")) {
+                  newAdType = "sidebar";
+                  newSize = "300x250";
+                } else if (selectedPosition.includes("sponsored")) {
+                  newAdType = "sponsored-model";
+                  newSize = "native";
+                }
+                
+                setForm({ 
+                  ...form, 
+                  position: selectedPosition,
+                  page: newPage,
+                  adType: newAdType,
+                  size: newSize
+                });
+              }}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
             >
-              <option value="">Select Ad Type</option>
-              <option value="banner">Banner</option>
-              <option value="sidebar">Sidebar</option>
-              <option value="sponsored">Sponsored</option>
+              <option value="">Select Position</option>
+              {/* Homepage positions */}
+              <optgroup label="Homepage Positions">
+                <option value="homepage-header-banner">Header Banner (728x90)</option>
+                <option value="homepage-mid-content-banner">Mid-Content Banner (728x90)</option>
+                <option value="homepage-sidebar-right">Right Sidebar (300x250)</option>
+                <option value="homepage-sponsored-models">Sponsored Models (Native)</option>
+                {/* <option value="homepage-footer-banner">Footer Banner (728x90)</option> */}
+              </optgroup>
+              {/* Detail page positions */}
+              <optgroup label="Detail Page Positions">
+                <option value="detail-header-banner">Detail Header Banner (728x90)</option>
+                <option value="detail-mid-content-banner">Detail Mid-Content Banner (728x90)</option>
+                {/* <option value="detail-sidebar-right">Detail Right Sidebar (300x250)</option> */}
+                <option value="detail-sponsored-similar">Detail Sponsored Similar Models (Native)</option>
+              </optgroup>
+              {/* Explore page positions */}
+              <optgroup label="Explore Page Positions">
+                <option value="explore-header-banner">Explore Header Banner (728x90)</option>
+                <option value="explore-mid-content-banner">Explore Mid-Content Banner (728x90)</option>
+                <option value="explore-sidebar-right">Explore Right Sidebar (300x250)</option>
+                <option value="explore-sponsored-listings">Explore Sponsored Listings (Native)</option>
+                {/* <option value="explore-sidebar-left">Explore Left Sidebar (300x250)</option> */}
+              </optgroup>
             </select>
 
             <input
-              type="text"
-              placeholder="Size (e.g., 728x90)"
-              value={form.size || ""}
-              onChange={(e) => setForm({ ...form, size: e.target.value as "728x90" | "300x250" | "300x600" | "native" })}
+              type="number"
+              placeholder="Priority (1-10)"
+              min="1"
+              max="10"
+              value={form.priority || 1}
+              onChange={(e) => setForm({ ...form, priority: parseInt(e.target.value) || 1 })}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
             />
 
             <input
               type="text"
-              placeholder="Ad Slot ID"
+              placeholder="Ad Slot ID: ca-pub-123456789"
               value={form.adSlot || ""}
               onChange={(e) => setForm({ ...form, adSlot: e.target.value })}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
@@ -296,26 +345,6 @@ export function AdPositionTable() {
             </div>
           </div>
 
-          <div className="mt-4">
-            <textarea
-              placeholder="Fallback Content (HTML)"
-              value={form.fallbackContent || ""}
-              onChange={(e) => setForm({ ...form, fallbackContent: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-              rows={3}
-            />
-          </div>
-
-          <div className="mt-4">
-            <textarea
-              placeholder="Notes"
-              value={form.notes || ""}
-              onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-              rows={2}
-            />
-          </div>
-
           <div className="mt-4 flex gap-2">
             <button
               onClick={createAd}
@@ -353,16 +382,20 @@ export function AdPositionTable() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Position</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Size</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Priority</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ad Slot</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Client</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Start</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">End</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {filteredAdPositions.map((ad) => (
-                <tr key={ad._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr key={ad.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {editingId === ad._id ? (
+                    {editingId === ad.id ? (
                       <input
                         type="text"
                         value={form.title || ""}
@@ -402,8 +435,26 @@ export function AdPositionTable() {
                     <div className="text-sm text-gray-900 dark:text-white">{ad.size}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900 dark:text-white">{ad.priority}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900 dark:text-white">{ad.adSlot || "-"}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900 dark:text-white">
+                      {ad.clientName && <div className="font-medium">{ad.clientName}</div>}
+                      {ad.clientEmail && <div className="text-gray-500 dark:text-gray-400">{ad.clientEmail}</div>}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900 dark:text-white">{ad.startDate || "-"}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900 dark:text-white">{ad.endDate || "-"}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <button
-                      onClick={() => toggleAd(ad._id)}
+                      onClick={() => toggleAd(ad.id, !ad.enabled)}
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
                         ad.enabled 
                           ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-200' 
@@ -413,14 +464,8 @@ export function AdPositionTable() {
                       {ad.enabled ? <Eye size={14} /> : <EyeOff size={14} />}
                     </button>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 dark:text-white">
-                      {ad.clientName && <div className="font-medium">{ad.clientName}</div>}
-                      {ad.clientEmail && <div className="text-gray-500 dark:text-gray-400">{ad.clientEmail}</div>}
-                    </div>
-                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    {editingId === ad._id ? (
+                    {editingId === ad.id ? (
                       <div className="flex gap-2">
                         <button
                           onClick={updateAd}
@@ -445,7 +490,7 @@ export function AdPositionTable() {
                           <Pencil size={16} />
                         </button>
                         <button
-                          onClick={() => deleteAd(ad._id)}
+                          onClick={() => deleteAd(ad.id)}
                           className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                         >
                           <Trash2 size={16} />

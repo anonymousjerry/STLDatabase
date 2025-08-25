@@ -3,23 +3,21 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DropdownButton from "./DropdownButton";
+import CategoryTreeDropdown from "./CategoryTreeDropdown";
 import SearchInput from "./SearchInput";
-import { getCategories, getSubCategories } from "@/lib/categoryApi";
+import { getAllCategories } from "@/lib/categoryApi";
 import { getPlatforms } from "@/lib/platformApi";
 import { useSearch } from "@/context/SearchContext";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-
-type Category = {
-  name: string;
-  category: string;
-};
+import { set } from "zod";
 
 const SearchBar = () => {
   const router = useRouter();
 
   const [platforms, setPlatforms] = useState<string[][]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [groupedCategories, setGroupedCategories] = useState<GroupedCategory[]>([]);
+  const [categoryLable, setCategoryLabel] = useState('Category');
   // const { data: session, status } = useSession();
   // const userId = (session?.user as { id?: string })?.id;
   
@@ -27,13 +25,17 @@ const SearchBar = () => {
   const {
     selectedPlatform,
     selectedCategory,
+    selectedSubCategory,
     searchInput,
+    searchTag,
     searchPrice,
     favourited,
     userId,
     setSelectedPlatform,
     setSelectedCategory,
+    setSelectedSubCategory,
     setSearchInput,
+    setSearchTag,
     setSearchPrice,
     setfavourited,
     setUserId
@@ -41,16 +43,25 @@ const SearchBar = () => {
 
   useEffect(() => {
     getPlatforms().then(setPlatforms).catch(console.error);
-    getCategories()
-    .then((data) => {
-      const namesOnly = data.map((item: Category) => item.name);
-      setCategories(namesOnly);
-    })
-    .catch(console.error);
+    getAllCategories()
+      .then((data: any[]) => {
+        // Map API response to GroupedCategory format
+        const formatted: GroupedCategory[] = data.map((category) => ({
+            group: category.name,
+            items: category.subCategories.map((sub: any) => ({
+                id: sub.id,
+                name: sub.name,
+            })),
+            icon: category.SVGUrl,
+        }));
+
+        setGroupedCategories(formatted);
+      })
+      .catch(console.error)
+    setSelectedSubCategory({id: "", name: ""})
   }, []);
 
   const platformArray = platforms?.map(([platform]) => platform) || [];
-  const categoriesArray = categories || [];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +72,8 @@ const SearchBar = () => {
       queryParams.set("sourcesite", selectedPlatform);
     if (selectedCategory && selectedCategory !== "All")
       queryParams.set("category", selectedCategory);
+    if (selectedSubCategory && selectedSubCategory.id)
+      queryParams.set("subCategory", selectedSubCategory.id);
     if (searchInput) queryParams.set("key", searchInput);
     if (searchPrice) queryParams.set("price", searchPrice);
     if (favourited) queryParams.set("favourited", 'true');
@@ -71,6 +84,25 @@ const SearchBar = () => {
     
 
     router.push(`/explore?${queryParams.toString()}`);
+  };
+
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    setSelectedSubCategory({id: "", name: ""}); 
+    setCategoryLabel('Category');
+  };
+
+  const handleSubCategorySelect = (subCategory: SubCategory) => {
+    setSelectedSubCategory(subCategory);
+    setSelectedCategory("All");
+    setCategoryLabel('SubCategory');
+  };
+
+  const getDisplayValue = () => {
+    if (selectedSubCategory.id !== "") {
+      return selectedSubCategory.name;
+    }
+    return selectedCategory;
   };
 
   return (
@@ -88,11 +120,12 @@ const SearchBar = () => {
       </div>
 
       <div className="basis-1/5">
-        <DropdownButton
-          value={selectedCategory}
-          label="Categories"
-          list={categoriesArray}
-          onSelect={setSelectedCategory}
+        <CategoryTreeDropdown
+          value={getDisplayValue()}
+          label={categoryLable}
+          categories={groupedCategories}
+          onSelect={handleCategorySelect}
+          onSubCategorySelect={handleSubCategorySelect}
         />
       </div>
 

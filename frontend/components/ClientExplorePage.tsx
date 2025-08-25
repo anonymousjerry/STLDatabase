@@ -17,6 +17,7 @@ import { useFavoritesStore } from "@/app/_zustand/useFavoritesStore";
 import { useDownloadsStore } from "@/app/_zustand/useDonwloadStore";
 import { useSearch } from "@/context/SearchContext";
 import { useRouter } from "next/navigation";
+import AdPositionManager from "./ads/AdPositionManager";
 
 interface ClientExplorePageProps {
   category: string;
@@ -53,11 +54,13 @@ export default function ClientExplorePage({
   const {
       selectedPlatform,
       selectedCategory,
+      searchTag,
       searchInput,
       searchPrice,
       favourited,
       setSelectedPlatform,
       setSelectedCategory,
+      setSearchTag,
       setSearchInput,
       setSearchPrice,
       setfavourited,
@@ -137,9 +140,7 @@ export default function ClientExplorePage({
   const handleToggleDownload = async (modelId: string) => {
     try {
       const data = await downloadModel(modelId, session?.accessToken || "");
-      console.log('Download data:', data.downloads);
       addDownload(modelId, data.downloads);
-      console.log('Download counts:', DownloadCounts);
       toast.success("Model downloaded successfully!")
     } catch (error) {
       console.error("Download failed:", error);
@@ -158,26 +159,33 @@ export default function ClientExplorePage({
   };
 
   const handleTagSearch = (tag: string) => {
-      const queryParams = new URLSearchParams();
-  
-      if (selectedPlatform && selectedPlatform !== "All")
-        queryParams.set("sourcesite", selectedPlatform);
-      if (selectedCategory && selectedCategory !== "All")
-        queryParams.set("category", selectedCategory);
-      setSearchInput(tag);
-      queryParams.set("key", tag);
-      if (searchPrice) queryParams.set("price", searchPrice);
-      if (favourited) queryParams.set("favourited", 'true');
-      queryParams.set("currentPage", '1');
-      
-  
-      router.push(`/explore?${queryParams.toString()}`);
-    };
+    // When using tag search, we clear keyword and reset category/subcategory to All
+    setSearchInput("");
+    setSelectedCategory("All");
+    setSearchTag(tag);
+
+    const queryParams = new URLSearchParams();
+    queryParams.set("tag", tag);
+    queryParams.set("key", '');
+    if (selectedPlatform && selectedPlatform !== "All")
+      queryParams.set("sourcesite", selectedPlatform);
+    if (searchPrice) queryParams.set("price", searchPrice);
+    if (favourited) queryParams.set("favourited", 'true');
+    queryParams.set("currentPage", '1');
+
+    router.push(`/explore?${queryParams.toString()}`);
+  };
 
   return (
     <div className="flex flex-col pb-10">
       <Breadcrumb category={category} subCategory={subCategory} title={title} />
       <SearchBar />
+      {/* Detail header banner ad */}
+      <AdPositionManager
+        page="detail"
+        positions={['detail-header-banner']}
+        className="w-full flex justify-center items-center pt-10"
+      />
       <div className="flex pt-7 gap-10">
         {/* Left Side Image and Thumbnails */}
         <div className="flex flex-col basis-3/5 gap-5 w-full">
@@ -430,11 +438,23 @@ export default function ClientExplorePage({
           </div>
         </div>
       </div>
+      {/* Detail mid-content banner ad */}
+      <AdPositionManager
+        page="detail"
+        positions={['detail-mid-content-banner']}
+        className="w-full flex justify-center items-center pt-10"
+      />
       <div className="flex flex-col bg-custom-light-containercolor dark:bg-custom-dark-containercolor rounded-t-[24px] border-b-4 border-custom-light-maincolor px-11 mt-10 max-md:px-6">
         <div className="flex text-custom-light-titlecolor dark:text-custom-dark-titlecolor py-3 font-bold text-2xl">
           SIMILAR DESIGN YOU MAY LIKE
         </div>
       </div>
+      {/* Sponsored models within similar section */}
+      {/* <AdPositionManager
+        page="detail"
+        positions={['detail-sponsored-similar']}
+        className="container mx-auto px-4 mt-4"
+      /> */}
       <SuggestionSection modelId={id} />
     </div>
   );

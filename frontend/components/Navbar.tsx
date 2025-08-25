@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import { useModal } from "@/context/ModalContext";
 import { useSearch } from "@/context/SearchContext";
 import { FaAngleDown } from "react-icons/fa6";
-// import CategoryMenu from "./CategoryMenu";
+import CategoryMenu from "./CategoryMenu";
 import Image from "next/image";
 
 const Navbar = () => {
@@ -120,9 +120,9 @@ const Navbar = () => {
             </button>
 
             {/* Dropdown box */}
-            {/* { categoryOpen && (
+            { categoryOpen && (
               <CategoryMenu setCategoryOpen = {setCategoryOpen}/>
-            )} */}
+            )}
           </div>
           {[...links.slice(2)].map(link => (
             <Link

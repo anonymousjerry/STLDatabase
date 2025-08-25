@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import CategoryItem from "./CategoryItem";
 import Image from "next/image";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
-import { getCategories } from "@/lib/categoryApi";
+import { getTopCategories } from "@/lib/categoryApi";
 import LoadingOverlay from "./LoadingOverlay";
 
 export interface categoryListItem {
@@ -36,7 +36,7 @@ const Categories = () => {
 
   useEffect(() => {
     setLoading(true); // start loading
-    getCategories()
+    getTopCategories()
       .then((data: Category[]) => {
         const formatted = data.map((item, index) => ({
           id: index + 1,

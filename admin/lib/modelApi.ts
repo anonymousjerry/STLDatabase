@@ -2,9 +2,7 @@ import { axiosInstance } from "./axiosInstance";
 
 export const getAllModels = async () => {
     try {
-        console.log("Fetching all models...");
         const response = await axiosInstance.get('/models');
-        console.log('Models fetched successfully:', response.data);
         return response.data;
     } catch (error: any) {
         console.error('Error fetching models:', error);
@@ -20,14 +18,12 @@ export const getAllModels = async () => {
 
 export const updateModel = async (modelId: string, modelData: any) => {
     try {
-        console.log("Updating model with ID:", modelId, "Data:", modelData);
-        const response = await axiosInstance.put('/model/update', 
+        const response = await axiosInstance.post('/model/update', 
             {
                 modelId: modelId,
-                ...modelData
+                model: modelData
             }
         );
-        console.log('Model updated successfully:', response.data);
         return response.data;
     } catch (error: any) {
         console.error('Error updating model:', error);
@@ -43,9 +39,7 @@ export const updateModel = async (modelId: string, modelData: any) => {
 
 export const deleteModelApi = async (modelId: string) => {
     try {
-        console.log("Deleting model with ID:", modelId);
         const response = await axiosInstance.delete(`/model/delete?modelId=${modelId}`);
-        console.log('Model deleted successfully:', response.data);
         return response.data;
     } catch (error: any) {
         console.error('Error deleting model:', error);

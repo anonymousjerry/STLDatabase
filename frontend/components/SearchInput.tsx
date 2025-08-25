@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useRef } from 'react';
+// import { useSearch } from '@/context/SearchContext';
+import React, { useRef, useState } from 'react';
 
-const SearchInput = ({ value, onChange }: { value: string; onChange: (val: string) => void }) => {
+const SearchInput = ({ value, onChange }: { value: string; onChange: (val: string) => void;}) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full"> 
+      
       <label className="text-custom-light-textcolor font-semibold text-lg text-left self-stretch dark:text-custom-dark-textcolor">
         3D STL models
       </label>

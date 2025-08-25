@@ -1,5 +1,5 @@
 export { default as Breadcrumb } from "./Breadcrumb";
-export { default as Categories } from "./Categories";
+export { default as Categories } from "./TopCategories";
 export { default as CategoriesFilter} from "./CategoriesFilter"
 export { default as CategoryItem } from "./CategoryItem";
 export { default as ClientExplorePage} from "./ClientExplorePage"

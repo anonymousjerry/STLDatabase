@@ -1,33 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { createCategory, createSubCategory, deleteSubCategoryApi, getAllCategories, updateCategory } from '../lib/categoryApi';
-import { Plus, Search, Pencil, Trash2, Check, X, Image as ImageIcon, Eye, Edit3, AlertCircle, CheckCircle } from 'lucide-react';
+import { createCategory, createSubCategory, deleteCategoryApi, deleteSubCategoryApi, getAllCategories, updateCategory, updateSubCategoryApi } from '../lib/categoryApi';
+import { Plus, Search, Pencil, Trash2, Trash, Check, X, Image as ImageIcon, Eye, Edit3, AlertCircle, CheckCircle } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useCustomToast, ToastManager } from './CustomToast';
+import { Category, Subcategory } from '../sanity/types';
 
-export interface Subcategory {
-  id?: string;
-  name: string;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  imageUrl: string | File;
-  subcategories: Subcategory[];
-}
 
 export interface FormDataProps {
   name: string;
   icon: File;
 }
 
-interface Toast {
-  id: string;
-  type: 'success' | 'error' | 'info';
-  message: string;
-  duration?: number;
-}
 
 const api = axios.create({ baseURL: process.env.BACKEND_URL });
 api.interceptors.request.use((config) => {
@@ -42,24 +26,16 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Convert flat data to nested categories
-const groupByCategory = (data: any[]) => {
-  const map: Record<string, Category> = {};
-  data.forEach((item) => {
-    if (!map[item.category]) {
-      map[item.category] = {
-        id: item.id,
-        name: item.category,
-        imageUrl: item.imageUrl || '',
-        subcategories: [],
-      };
-    }
-    map[item.category].subcategories.push({
-      id: item.baseId,
-      name: item.name,
-    });
-  });
-  return Object.values(map);
+const normalizeCategories = (data: any[]): Category[] => {
+  return data.map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    imageUrl: cat.SVGUrl || '',
+    subcategories: (cat.subCategories || []).map((sub: any) => ({
+      id: sub.id,
+      name: sub.name,
+    })),
+  }));
 };
 
 export function CategoryTable() {
@@ -81,6 +57,9 @@ export function CategoryTable() {
   const [editingCategoryName, setEditingCategoryName] = useState<string>('');
   const [editingCategoryImage, setEditingCategoryImage] = useState<File | null>(null);
   const [editingImagePreview, setEditingImagePreview] = useState<string | null>(null);
+
+  const [editingSubCategoryId, setEditingSubCategoryId] = useState<string | null>(null);
+  const [editingSubCategoryName, setEditingSubCategoryName] = useState<string>('');
 
   // --- NEW: Add Subcategory state ---
   const [addingSubCatId, setAddingSubCatId] = useState<string | null>(null);
@@ -111,8 +90,7 @@ export function CategoryTable() {
     setLoading(true);
     try {
       const res = await getAllCategories();
-      console.log(res)
-      setCategories(groupByCategory(res));
+      setCategories(normalizeCategories(res));
     } catch (err) {
       console.error('Error fetching categories:', err);
       showToast('error', err instanceof Error ? err.message : 'Failed to fetch categories');
@@ -129,6 +107,40 @@ export function CategoryTable() {
   const addSubcategory = () => {
     setFormSubcategories([...formSubcategories, { name: '' }]);
   };
+
+  const updateSubCategoryForm = async (categoryId: string, subCategoryId: string, name: string) => {
+    if (!name.trim()) {
+      showToast('error', 'Subcategory name cannot be empty!');
+      return;
+    }
+    try {
+      await updateSubCategoryApi(subCategoryId, name);
+      showToast('success', 'Subcategory updated successfully!');
+      setEditingSubCategoryId(null);
+      setEditingSubCategoryName('');
+      refresh();
+    } catch (err) {
+      console.error('Error updating subcategory:', err);
+      showToast('error', err instanceof Error ? err.message : 'Failed to update subcategory');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteCategory = async (categoryId: string) => {
+    if (!confirm('Delete this Category?')) return;
+
+    try {
+      await deleteCategoryApi(categoryId);
+      showToast('success', 'Category deleted successfully!');
+      refresh()
+    } catch (err) {
+      console.error('Error deleting category:', err);
+      showToast('error', err instanceof Error ? err.message : 'Failed to delete category');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const removeSubcategory = (index: number) => {
     setFormSubcategories(formSubcategories.filter((_, i) => i !== index));
@@ -236,11 +248,8 @@ export function CategoryTable() {
 
     try {
       setLoading(true);
-      const formData = new FormData();
-      formData.append('categoryId', addingSubCatId);
-      formData.append('subCategoryName', newSubName);
 
-      await createSubCategory(formData);
+      await createSubCategory(addingSubCatId, newSubName);
       await refresh();
       setAddingSubCatId(null);
       setNewSubName('');
@@ -300,7 +309,7 @@ export function CategoryTable() {
       <Toaster
         position="top-right"
         toastOptions={{
-          duration: 1500,
+          duration: 1000,
           style: {
             background: '#1f2937',
             color: '#fff',
@@ -313,7 +322,7 @@ export function CategoryTable() {
             boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
           },
           success: {
-            duration: 1500,
+            duration: 1000,
             iconTheme: {
               primary: '#10B981',
               secondary: '#fff',
@@ -324,7 +333,7 @@ export function CategoryTable() {
             },
           },
           error: {
-            duration: 1500,
+            duration: 1000,
             iconTheme: {
               primary: '#EF4444',
               secondary: '#fff',
@@ -340,7 +349,7 @@ export function CategoryTable() {
           right: 20,
         }}
       />
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-center">
@@ -349,6 +358,7 @@ export function CategoryTable() {
               <p className="mt-2 text-gray-600 dark:text-gray-400">Manage your 3D model categories and subcategories</p>
             </div>
             <div className="flex gap-3">
+              
               <button
                 onClick={() => setIsFormVisible(!isFormVisible)}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
@@ -377,7 +387,6 @@ export function CategoryTable() {
               onClick={refresh}
               className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
             >
-              {/* <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div> */}
               Refresh
             </button>
           </div>
@@ -514,24 +523,25 @@ export function CategoryTable() {
             {filteredCategories.map((category) => (
               <div key={category.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-all duration-200">
                 {/* Category Header with Image */}
-                <div className="relative h-48 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-700 dark:to-gray-800">
+                <div className="relative h-60 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-700 dark:to-gray-800">
+                  <button
+                    onClick={() => deleteCategory(category.id)}
+                    className="absolute right-3 top-3 text-red-600 hover:text-red-700 p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors cursor-pointer z-10"
+                  >
+                    <Trash2 size={24} />
+                  </button>
                   {editingCategoryId === category.id ? (
                     // Edit mode - show editing image preview
                     editingImagePreview ? (
                       <img
                         src={editingImagePreview}
                         alt={editingCategoryName}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full"
                       />
                     ) : (
-                      // <div className="w-full h-full flex items-center justify-center">
-                      //   <ImageIcon className="w-16 h-16 text-gray-400" />
-                      // </div>
-                      <img
-                        src={category.imageUrl ? (typeof category.imageUrl === 'string' ? category.imageUrl : URL.createObjectURL(category.imageUrl)) : '/placeholder-image.png'}
-                        alt={category.name}                        
-                        className = 'object-cover'
-                      />
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ImageIcon className="w-16 h-16 text-gray-400" />
+                      </div>
                     )
                   ) : (
                     // View mode - show current image
@@ -539,14 +549,12 @@ export function CategoryTable() {
                       <img
                         src={typeof category.imageUrl === 'string' ? category.imageUrl : URL.createObjectURL(category.imageUrl)}
                         alt={category.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full"
                       />
                     ) : (
-                      <img
-                        src={category.imageUrl}
-                        alt={category.name}                        
-                        className = 'object-cover'
-                      />
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ImageIcon className="w-16 h-16 text-gray-400" />
+                      </div>
                     )
                   )}
                   <div className="absolute inset-0 bg-black bg-opacity-20"></div>
@@ -662,13 +670,52 @@ export function CategoryTable() {
                     ) : (
                       category.subcategories.map((subcategory) => (
                         <div key={subcategory.id} className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                          <span className="text-sm font-medium text-gray-900 dark:text-white truncate">{subcategory.name}</span>
-                          <button
-                            onClick={() => deleteSubcategory(category.id, subcategory.id!)}
-                            className="text-red-600 hover:text-red-700 p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                          >
-                            <Trash2 size={14} />
-                          </button>
+                          {editingSubCategoryId === subcategory.id ? (
+                            <div className="flex gap-2 items-center w-full">
+                              <input
+                                type="text"
+                                value={editingSubCategoryName}
+                                onChange={(e) => setEditingSubCategoryName(e.target.value)}
+                                className="flex-1 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-800 dark:text-white"
+                              />
+                              <button
+                                onClick={() => updateSubCategoryForm(category.id, subcategory.id!, editingSubCategoryName)}
+                                className="text-green-600 hover:text-green-700 p-1 rounded"
+                              >
+                                <Check size={14} />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setEditingSubCategoryId(null);
+                                  setEditingSubCategoryName('');
+                                }}
+                                className="text-red-600 hover:text-red-700 p-1 rounded"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <span className="text-sm font-medium text-gray-900 dark:text-white truncate">{subcategory.name}</span>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => {
+                                    setEditingSubCategoryId(subcategory.id!);
+                                    setEditingSubCategoryName(subcategory.name);
+                                  }}
+                                  className="text-black/80 hover:text-black p-1 rounded transition-colors"
+                                >
+                                  <Pencil size={14} />
+                                </button>
+                                <button
+                                  onClick={() => deleteSubcategory(category.id, subcategory.id!)}
+                                  className="text-red-600 hover:text-red-700 p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </>
+                          )}
                         </div>
                       ))
                     )}
