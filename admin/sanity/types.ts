@@ -7,6 +7,19 @@ export interface User {
   role: string
   createdAt: string
   updatedAt: string
+  favourites: Favourite
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  imageUrl: string | File;
+  subcategories: Subcategory[];
+}
+
+export interface Subcategory {
+  id?: string;
+  name: string;
 }
 
 export interface Model {
@@ -17,7 +30,7 @@ export interface Model {
   sourceSiteId: string
   category: Category
   categoryId: string
-  subCategory: SubCategory
+  subCategory: Subcategory
   subCategoryId: string
   tags: string[]
   likes: Like[]
@@ -28,6 +41,7 @@ export interface Model {
   sourceUrl: string
   imagesUrl: string[]
   price: string
+  websiteUrl?: string;
   createdAt: string
   updatedAt: string
 }
@@ -39,20 +53,7 @@ export interface SourceSite {
   models: Model[]
 }
 
-export interface Category {
-  id: string
-  name: string
-  models: Model[]
-  subCategories: SubCategory[]
-}
 
-export interface SubCategory {
-  id: string
-  name: string
-  category: Category
-  categoryId: string
-  models: Model[]
-}
 
 export interface Like {
   id: string
@@ -64,30 +65,28 @@ export interface Like {
 
 export interface Favourite {
   id: string
-  user: User
   userId: string
   model: Model
   modelId: string
+  createdAt: string
 }
 
 export interface ScrapeJob {
-  _id: string
+  id: string
   _type: 'scrapeJob'
   platform: 'Thingiverse' | 'CGTrader' | 'Makerworld' | 'Pinshape' | 'Thangs' | 'Printables'
   count: number
   startTime: string
-  endTime: string
+  // startDateTime?: string; // full ISO timestamp
+  timezone?: string;
   isActive: boolean
-  lastRun?: string
   status: 'idle' | 'running' | 'completed' | 'failed'
-  totalRuns: number
-  totalModelsScraped: number
   createdAt?: string
   updatedAt?: string
 }
 
 export interface AdPosition {
-  _id: string
+  id: string
   _type: 'adPosition'
   title: string
   page: 'homepage' | 'detail' | 'explore'
@@ -97,12 +96,10 @@ export interface AdPosition {
   enabled: boolean
   priority: number
   adSlot?: string
-  fallbackContent?: string
   clientName?: string
   clientEmail?: string
   startDate?: string
   endDate?: string
-  notes?: string
   createdAt?: string
   updatedAt?: string
 }

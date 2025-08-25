@@ -106,8 +106,8 @@ const AdManager: React.FC<AdManagerProps> = ({ page, className = '' }) => {
   const renderAd = (ad: AdConfig) => {
     if (isAdBlocked) {
       return ad.fallbackContent || (
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 text-center">
-          <div className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="bg-custom-light-containercolor dark:bg-custom-dark-containercolor rounded-3xl p-6 text-center border border-gray-200 dark:border-gray-700 shadow-lg">
+          <div className="text-sm text-custom-light-textcolor dark:text-custom-dark-textcolor">
             Please disable your ad blocker to support our site
           </div>
         </div>
@@ -119,7 +119,7 @@ const AdManager: React.FC<AdManagerProps> = ({ page, className = '' }) => {
         return (
           <BannerAd
             position={ad.position as any}
-            className="my-4"
+            className="my-6"
             showFallback={true}
           />
         );
@@ -157,7 +157,7 @@ const AdManager: React.FC<AdManagerProps> = ({ page, className = '' }) => {
   };
 
   return (
-    <div className={`ad-manager ${className}`}>
+    <div className={`ad-manager space-y-4 ${className}`}>
       {ads.map(ad => (
         <div key={ad.id} className="ad-container">
           {renderAd(ad)}

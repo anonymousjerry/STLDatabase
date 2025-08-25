@@ -3,8 +3,10 @@ import { axiosInstance } from "./axiosInstance";
 
 type SearchParams = {
   key?: string;
+  tag?: string;
   sourcesite?: string;
   category?: string;
+  subCategory?: string;
   price?: string;
   favourited?: string;
   userId?: string;
@@ -27,9 +29,7 @@ type SearchParams = {
 
 export const getDailyModels = async (page: number = 1, limit: number = 12) => {
     try {
-        console.log('Fetching daily models:', { page, limit });
         const response = await axiosInstance.get(`/models/dailyDiscover?page=${page}&limit=${limit}`);
-        console.log('Daily models fetched successfully:', response.data.models.length);
         return response.data.models;
     } catch (error: any) {
         console.error('Error fetching daily models:', error);
@@ -43,18 +43,21 @@ export const getDailyModels = async (page: number = 1, limit: number = 12) => {
     }
 }
 
-export const searchModels = async ({key, sourcesite, category, price, favourited, userId, filters = [], page = 1, limit = 12}: SearchParams) => {
+export const searchModels = async ({key, tag, sourcesite, category, subCategory, price, favourited, userId, filters = [], page = 1, limit = 12}: SearchParams) => {
     try {
-        console.log('Searching models with params:', { key, sourcesite, category, price, favourited, userId, filters, page, limit });
+        console.log('Searching models with params:', { key, tag, sourcesite, category, subCategory, price, favourited, userId, filters, page, limit });
         const params = new URLSearchParams();
 
         if (key) params.append('key', key);
+        if (tag) params.append('tag', tag);
         if (sourcesite && sourcesite !== 'All') 
             params.append('sourcesite', sourcesite);
         else if (sourcesite && sourcesite === 'All')
             params.append('sourcesite', '');
         if (category && category !== 'All') 
             params.append('category', category);
+        if (subCategory && subCategory !== 'All') 
+            params.append('subCategory', subCategory);
         else if (category && category === 'All')
             params.append('category', '');
         if (price) 
@@ -91,7 +94,6 @@ export const searchModels = async ({key, sourcesite, category, price, favourited
 
 export const likeModel = async(modelId: string, userId: string, token: string) => {
     try {
-        console.log('Liking model:', { modelId, userId });
         const response = await axiosInstance.post(
             `/models/like`,
             {
@@ -104,7 +106,6 @@ export const likeModel = async(modelId: string, userId: string, token: string) =
                 }
             }
         );
-        console.log('Model liked successfully');
         return response.data;
     } catch (error: any) {
         console.error('Error liking model:', error);
@@ -120,7 +121,6 @@ export const likeModel = async(modelId: string, userId: string, token: string) =
 
 export const saveModel = async(modelId: string, userId: string, token: string) => {
     try {
-        console.log('Saving model:', { modelId, userId });
         const response = await axiosInstance.post(
             `/models/favourite`,
             {
@@ -133,7 +133,6 @@ export const saveModel = async(modelId: string, userId: string, token: string) =
                 }
             }
         );
-        console.log('Model saved successfully');
         return response.data;
     } catch (error: any) {
         console.error('Error saving model:', error);
@@ -149,7 +148,6 @@ export const saveModel = async(modelId: string, userId: string, token: string) =
 
 export const downloadModel = async(modelId: string, token: string) => {
     try {
-        console.log('Downloading model:', modelId);
         const response = await axiosInstance.post(
             `/models/download`,
             {
@@ -161,7 +159,6 @@ export const downloadModel = async(modelId: string, token: string) => {
                 }
             }
         );
-        console.log('Model download initiated successfully');
         return response.data;
     } catch (error: any) {
         console.error('Error downloading model:', error);
@@ -196,7 +193,6 @@ export const getModel = async(modelId: string) => {
 }
 
 export const getSuggestionModels = async(modelId: string) => {
-    const response = await axiosInstance.get(`/models/similar?modelId=${modelId}`);
-    console.log(response.data.similarModels)
-    return response.data.similarModels;
+    const response = await axiosInstance.get(`/models/similar?id=${modelId}`);
+    return response.data;
 }

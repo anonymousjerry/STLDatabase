@@ -10,6 +10,7 @@ import SideFilter from './SideFilter';
 import { useSearch } from '@/context/SearchContext';
 import { useRouter } from 'next/navigation';
 import { FaArrowUp } from 'react-icons/fa6'; // up arrow icon
+import AdPositionManager from './ads/AdPositionManager';
 
 type ExploreMainPageClientProps = {
   initialModels: Model[];
@@ -19,6 +20,7 @@ type ExploreMainPageClientProps = {
     key?: string;
     sourcesite?: string;
     category?: string;
+    subCategory?: string;
     price?: string;
   };
 };
@@ -32,6 +34,7 @@ const ExploreMainPageClient = ({
   const router = useRouter();
   const [models, setModels] = useState<Model[]>(initialModels);
   const [selectedFilters, setSelectedFilters] = useState<string[]>(['All']);
+  const [totalModels, setTotalModels] = useState(0);
   const [page, setPage] = useState(currentPage);
   const [hasMore, setHasMore] = useState(currentPage < totalPage);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,10 +44,13 @@ const ExploreMainPageClient = ({
   const {
     selectedPlatform,
     selectedCategory,
+    selectedSubCategory,
     searchInput,
+    searchTag,
     searchPrice,
     favourited,
-    userId
+    userId,
+    setSearchTag
   } = useSearch();
 
   // Show/hide UP button on scroll
@@ -66,11 +72,12 @@ const ExploreMainPageClient = ({
       setIsLoading(true);
       setPage(1);
       setHasMore(true);
-
       const { models: newModels, totalCount } = await searchModels({
         key: searchInput,
+        tag: searchTag,
         sourcesite: selectedPlatform,
         category: selectedCategory,
+        subCategory: selectedSubCategory.id,
         price: searchPrice,
         favourited: favourited ? 'true' : undefined,
         userId: userId,
@@ -82,10 +89,11 @@ const ExploreMainPageClient = ({
       setModels(newModels);
       setHasMore(newModels.length < totalCount);
       setIsLoading(false);
+      setTotalModels(totalCount);
     };
 
     fetchFilteredModels();
-  }, [selectedFilters, selectedPlatform, selectedCategory, searchPrice, favourited, searchInput]);
+  }, [selectedFilters, selectedPlatform, selectedCategory, selectedSubCategory, searchPrice, favourited, searchInput, searchTag]);
 
   // 2️⃣ When page increases (lazy load), fetch and append
   useEffect(() => {
@@ -94,8 +102,10 @@ const ExploreMainPageClient = ({
 
       const { models: moreModels, totalCount } = await searchModels({
         key: searchInput,
+        tag: searchTag,
         sourcesite: selectedPlatform,
         category: selectedCategory,
+        subCategory: selectedSubCategory.id,
         price: searchPrice,
         favourited: favourited ? 'true' : undefined,
         userId: userId,
@@ -111,6 +121,7 @@ const ExploreMainPageClient = ({
 
       setHasMore((prev) => page < Math.ceil(totalCount / 12));
       setIsLoading(false);
+      setTotalModels(totalCount);
     };
 
     fetchMore();
@@ -138,17 +149,59 @@ const ExploreMainPageClient = ({
   return (
     <div className="flex flex-col pt-5 relative">
       <SearchBar />
+      {/* Homepage header banner ad */}
+      <AdPositionManager
+        page="explore"
+        positions={[
+          'explore-header-banner',
+        ]}
+        className="w-full flex justify-center items-center pt-10"
+      />
       <div className="flex gap-5 pt-10">
         <div className="flex basis-1/5">
-          <SideFilter />
+          <div className="flex flex-col gap-4 w-full">
+            <SideFilter />
+          </div>
         </div>
         <div className="flex flex-col basis-4/5">
           <div className="flex items-center w-full text-lg font-medium text-custom-light-textcolor dark:text-custom-dark-textcolor relative pt-1">
             <FiBox className="mr-2" />
-            <span>Result - {models.length} models</span>
+            {searchTag ? (
+              <div className="flex items-center gap-2">
+                <span>{`Result (Tag: ${searchTag}) - ${totalModels} models`}</span>
+                <button
+                  onClick={() => {
+                    setSearchTag("");
+                    const params = new URLSearchParams();
+                    if (searchInput) params.set('key', searchInput);
+                    if (selectedPlatform && selectedPlatform !== 'All') params.set('sourcesite', selectedPlatform);
+                    if (selectedCategory && selectedCategory !== 'All') params.set('category', selectedCategory);
+                    if (selectedSubCategory?.id) params.set('subCategory', selectedSubCategory.id);
+                    if (searchPrice) params.set('price', searchPrice);
+                    if (favourited) params.set('favourited', 'true');
+                    params.set('currentPage', '1');
+                    router.push(`/explore?${params.toString()}`);
+                  }}
+                  className="ml-2 text-sm px-2 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                  aria-label="Clear tag filter"
+                >
+                  Clear
+                </button>
+              </div>
+            ) : (
+              <span>{`Result - ${totalModels} models`}</span>
+            )}
             <span className="absolute left-0 -bottom-2 w-full h-0.5 bg-custom-light-maincolor dark:bg-custom-light-containercolor rounded" />
           </div>
           <NavFilter selectedFilters={selectedFilters} onFilterChange={setSelectedFilters} />
+            {/* Explore mid-content banner ad */}
+            <AdPositionManager
+              page="explore"
+              positions={[
+                'explore-mid-content-banner',
+              ]}
+              className="w-full flex justify-center items-center pt-10"
+            />
           <SearchResultPart models={models} />
           <div ref={loaderRef} className="flex flex-col items-center justify-center py-10">
             {isLoading && (

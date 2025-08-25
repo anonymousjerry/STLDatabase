@@ -158,19 +158,16 @@ npx sanity dev
 - Mid-Content Banner (728x90)
 - Right Sidebar (300x250)
 - Sponsored Models (Native)
-- Footer Banner (728x90)
 
 **Detail Page (4 positions)**
 - Header Banner (728x90)
 - Mid-Content Banner (728x90)
-- Right Sidebar (300x250)
 - Sponsored Similar Models (Native)
 
 **Explore Page (5 positions)**
 - Header Banner (728x90)
 - Mid-Content Banner (728x90)
 - Right Sidebar (300x250)
-- Left Sidebar (300x250)
 - Sponsored Listings (Native)
 
 ### Ad Types Supported

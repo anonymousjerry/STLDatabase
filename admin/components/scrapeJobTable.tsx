@@ -1,9 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { getAllScrapeJobs, createScrapeJob, updateScrapeJob, deleteScrapeJob, toggleScrapeJobActive } from '../lib/scrapeJobApi';
+import {
+  getAllScrapeJobs,
+  createScrapeJob,
+  updateScrapeJob,
+  deleteScrapeJob,
+  toggleScrapeJobActive
+} from '../lib/scrapeJobApi';
 import { ScrapeJob } from '../sanity/types';
-import { Plus, Search, Pencil, Trash2, Check, X, Play, Pause } from 'lucide-react';
+import { Plus, Search, Pencil, Trash2, Play, Pause } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
 interface Alert {
@@ -15,15 +21,23 @@ export default function ScrapeJobTable() {
   const [jobs, setJobs] = useState<ScrapeJob[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingJob, setEditingJob] = useState<ScrapeJob | null>(null);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
   const [formData, setFormData] = useState({
     platform: 'Printables' as ScrapeJob['platform'],
     count: 10,
     startTime: '09:00',
-    endTime: '17:00',
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     isActive: false,
   });
-  const [isFormVisible, setIsFormVisible] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+
+  const [alert, setAlert] = useState<Alert | null>(null);
+
+  const showAlert = (type: 'success' | 'error', message: string) => {
+    setAlert({ type, message });
+    setTimeout(() => setAlert(null), 1500);
+  };
 
   const refreshJobs = async () => {
     setLoading(true);
@@ -32,7 +46,7 @@ export default function ScrapeJobTable() {
       setJobs(data);
     } catch (err) {
       console.error('Error fetching scraping jobs:', err);
-      toast.error(err instanceof Error ? err.message : 'Failed to fetch scraping jobs');
+      showAlert('error', err instanceof Error ? err.message : 'Failed to fetch scraping jobs');
     } finally {
       setLoading(false);
     }
@@ -48,7 +62,7 @@ export default function ScrapeJobTable() {
 
   const createJob = async () => {
     if (!formData.platform || !formData.count) {
-      toast.error('Platform and Count are required!');
+      showAlert('error', 'Platform and Count are required!');
       return;
     }
 
@@ -60,14 +74,14 @@ export default function ScrapeJobTable() {
         platform: 'Printables' as ScrapeJob['platform'],
         count: 10,
         startTime: '09:00',
-        endTime: '17:00',
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         isActive: false,
       });
       setIsFormVisible(false);
-      toast.success('Scraping job created successfully!');
+      showAlert('success', 'Scraping job created successfully!');
     } catch (err) {
       console.error('Error creating scraping job:', err);
-      toast.error(err instanceof Error ? err.message : 'Failed to create scraping job');
+      showAlert('error', err instanceof Error ? err.message : 'Failed to create scraping job');
     } finally {
       setLoading(false);
     }
@@ -78,20 +92,20 @@ export default function ScrapeJobTable() {
 
     try {
       setLoading(true);
-      await updateScrapeJob(editingJob._id, formData);
+      await updateScrapeJob(editingJob.id, formData);
       await refreshJobs();
       setEditingJob(null);
       setFormData({
         platform: 'Printables' as ScrapeJob['platform'],
         count: 10,
         startTime: '09:00',
-        endTime: '17:00',
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         isActive: false,
       });
-      toast.success('Scraping job updated successfully!');
+      showAlert('success', 'Scraping job updated successfully!');
     } catch (err) {
       console.error('Error updating scraping job:', err);
-      toast.error(err instanceof Error ? err.message : 'Failed to update scraping job');
+      showAlert('error', err instanceof Error ? err.message : 'Failed to update scraping job');
     } finally {
       setLoading(false);
     }
@@ -104,24 +118,24 @@ export default function ScrapeJobTable() {
       setLoading(true);
       await deleteScrapeJob(id);
       await refreshJobs();
-      toast.success('Scraping job deleted successfully!');
+      showAlert('success', 'Scraping job deleted successfully!');
     } catch (err) {
       console.error('Error deleting scraping job:', err);
-      toast.error(err instanceof Error ? err.message : 'Failed to delete scraping job');
+      showAlert('error', err instanceof Error ? err.message : 'Failed to delete scraping job');
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleActive = async (id: string) => {
+  const toggleActive = async (id: string, enabled: boolean) => {
     try {
       setLoading(true);
-      await toggleScrapeJobActive(id);
+      await toggleScrapeJobActive(id, enabled);
       await refreshJobs();
-      toast.success('Job status toggled successfully!');
+      showAlert('success', 'Job status toggled successfully!');
     } catch (err) {
       console.error('Error toggling job status:', err);
-      toast.error(err instanceof Error ? err.message : 'Failed to toggle job status');
+      showAlert('error', err instanceof Error ? err.message : 'Failed to toggle job status');
     } finally {
       setLoading(false);
     }
@@ -133,7 +147,7 @@ export default function ScrapeJobTable() {
       platform: job.platform,
       count: job.count,
       startTime: job.startTime,
-      endTime: job.endTime,
+      timezone: job.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
       isActive: job.isActive,
     });
   };
@@ -144,7 +158,7 @@ export default function ScrapeJobTable() {
       platform: 'Printables' as ScrapeJob['platform'],
       count: 10,
       startTime: '09:00',
-      endTime: '17:00',
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       isActive: false,
     });
   };
@@ -159,16 +173,9 @@ export default function ScrapeJobTable() {
     }
   };
 
-  const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return 'Never';
-    return new Date(dateString).toLocaleString();
-  };
-
-  // Filter jobs based on search term
-  const filteredJobs = jobs.filter((job) => {
+  const filteredJobs = jobs.filter(job => {
     if (!searchTerm) return true;
-    const search = searchTerm.toLowerCase();
-    return job.platform.toLowerCase().includes(search);
+    return job.platform.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
   return (
@@ -184,7 +191,7 @@ export default function ScrapeJobTable() {
               platform: 'Printables' as ScrapeJob['platform'],
               count: 10,
               startTime: '09:00',
-              endTime: '17:00',
+              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
               isActive: false,
             });
           }}
@@ -196,9 +203,17 @@ export default function ScrapeJobTable() {
       </div>
 
       {/* Alert */}
-      {/* The alert state was removed, so this block is no longer relevant. */}
+      {alert && (
+        <div
+          className={`fixed top-24 right-4 z-50 px-6 py-3 rounded-lg font-medium shadow-lg text-white ${
+            alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+          }`}
+        >
+          {alert.message}
+        </div>
+      )}
 
-      {/* Search and Actions */}
+      {/* Search */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex gap-4 items-center">
           <div className="flex-1 relative">
@@ -228,6 +243,7 @@ export default function ScrapeJobTable() {
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Platform */}
             <select
               value={formData.platform}
               onChange={(e) => handleInputChange('platform', e.target.value as ScrapeJob['platform'])}
@@ -241,6 +257,7 @@ export default function ScrapeJobTable() {
               <option value="Pinshape">Pinshape</option>
             </select>
 
+            {/* Count */}
             <input
               type="number"
               placeholder="Count"
@@ -249,30 +266,26 @@ export default function ScrapeJobTable() {
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
             />
 
-            <select
+            {/* Start Time */}
+            <input
+              type="time"
               value={formData.startTime}
               onChange={(e) => handleInputChange('startTime', e.target.value)}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-            >
-              {Array.from({ length: 24 }, (_, i) => (
-                <option key={i} value={`${i.toString().padStart(2, '0')}:00`}>
-                  {`${i.toString().padStart(2, '0')}:00`}
-                </option>
-              ))}
-            </select>
+            />
 
+            {/* Timezone */}
             <select
-              value={formData.endTime}
-              onChange={(e) => handleInputChange('endTime', e.target.value)}
+              value={formData.timezone}
+              onChange={(e) => handleInputChange('timezone', e.target.value)}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
             >
-              {Array.from({ length: 24 }, (_, i) => (
-                <option key={i} value={`${i.toString().padStart(2, '0')}:00`}>
-                  {`${i.toString().padStart(2, '0')}:00`}
-                </option>
+              {Intl.supportedValuesOf("timeZone").map((tz) => (
+                <option key={tz} value={tz}>{tz}</option>
               ))}
             </select>
 
+            {/* Active */}
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -284,6 +297,7 @@ export default function ScrapeJobTable() {
             </div>
           </div>
 
+          {/* Form Actions */}
           <div className="mt-4 flex gap-2">
             {editingJob ? (
               <>
@@ -317,7 +331,7 @@ export default function ScrapeJobTable() {
                       platform: 'Printables' as ScrapeJob['platform'],
                       count: 10,
                       startTime: '09:00',
-                      endTime: '17:00',
+                      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                       isActive: false,
                     });
                   }}
@@ -345,17 +359,14 @@ export default function ScrapeJobTable() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Platform</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Count</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Start Time</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">End Time</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Last Run</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Runs</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {filteredJobs.map((job) => (
-                <tr key={job._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr key={job.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900 dark:text-white">{job.platform}</div>
                   </td>
@@ -364,9 +375,7 @@ export default function ScrapeJobTable() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 dark:text-white">{job.startTime}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 dark:text-white">{job.endTime}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{job.timezone}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(job.status)}`}>
@@ -375,7 +384,7 @@ export default function ScrapeJobTable() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
-                      onClick={() => toggleActive(job._id)}
+                      onClick={() => toggleActive(job.id, !job.isActive)}
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
                         job.isActive 
                           ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-200' 
@@ -384,14 +393,6 @@ export default function ScrapeJobTable() {
                     >
                       {job.isActive ? <Play size={14} /> : <Pause size={14} />}
                     </button>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-xs">
-                    <div className="text-sm text-gray-900 dark:text-white">{formatDate(job.lastRun)}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 dark:text-white">
-                      {job.totalRuns} ({job.totalModelsScraped} models)
-                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex gap-2">
@@ -402,7 +403,7 @@ export default function ScrapeJobTable() {
                         <Pencil size={16} />
                       </button>
                       <button
-                        onClick={() => deleteJob(job._id)}
+                        onClick={() => deleteJob(job.id)}
                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                       >
                         <Trash2 size={16} />
@@ -414,56 +415,13 @@ export default function ScrapeJobTable() {
             </tbody>
           </table>
         )}
-        
+
         {!loading && filteredJobs.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500 dark:text-gray-400">No scraping jobs found</p>
           </div>
         )}
       </div>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 1500,
-          style: {
-            background: '#1f2937',
-            color: '#fff',
-            border: '1px solid #374151',
-            borderRadius: '8px',
-            padding: '12px 16px',
-            fontSize: '14px',
-            fontWeight: '500',
-            zIndex: 9999,
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-          },
-          success: {
-            duration: 1500,
-            iconTheme: {
-              primary: '#10B981',
-              secondary: '#fff',
-            },
-            style: {
-              background: '#065f46',
-              border: '1px solid #047857',
-            },
-          },
-          error: {
-            duration: 1500,
-            iconTheme: {
-              primary: '#EF4444',
-              secondary: '#fff',
-            },
-            style: {
-              background: '#7f1d1d',
-              border: '1px solid #dc2626',
-            },
-          },
-        }}
-        containerStyle={{
-          top: 80,
-          right: 20,
-        }}
-      />
     </div>
   );
 }

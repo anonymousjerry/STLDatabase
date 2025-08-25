@@ -21,7 +21,6 @@ const TrendingModels = () => {
         const fetchFilteredModels = async () => {
             setLoading(true);
             const { models: newModels, totalCount } = await searchModels({filters: ['trending'], page: 1, limit: 4 },);
-            console.log(newModels)
             setTrendingModels(newModels);
             setLoading(false);
         };

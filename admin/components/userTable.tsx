@@ -98,7 +98,7 @@ export function UserTable() {
   });
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
@@ -112,7 +112,6 @@ export function UserTable() {
       </div>
 
       {/* Alert */}
-      {/* The alert state was removed, so this block is no longer needed. */}
 
       {/* Search and Actions */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -198,6 +197,7 @@ export function UserTable() {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Username</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Saved Models</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
               </tr>
@@ -227,6 +227,24 @@ export function UserTable() {
                       />
                     ) : (
                       <div className="text-sm text-gray-900 dark:text-white">{user.email}</div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {Array.isArray(user.favourites) && user.favourites.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {user.favourites.map((fav) => (
+                          <a
+                            key={fav.id}
+                            href={fav.model.websiteUrl || '#'}
+                            target="_blank"
+                            className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                          >
+                            {fav.model.title}
+                          </a>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 dark:text-gray-500 text-sm">No saved models</span>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

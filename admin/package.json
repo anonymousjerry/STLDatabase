@@ -5,7 +5,7 @@
   "main": "package.json",
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "sanity dev",
+    "dev": "sanity dev --host=0.0.0.0",
     "start": "sanity start",
     "build": "sanity build",
     "deploy": "sanity deploy",
@@ -16,11 +16,14 @@
   ],
   "dependencies": {
     "@sanity/vision": "^4.5.0",
+    "@tailwindcss/line-clamp": "^0.4.4",
     "@tanstack/react-table": "^8.21.3",
     "@vgaidadei/react-tags": "^0.1.4",
     "axios": "^1.11.0",
+    "clsx": "^2.1.1",
     "init": "^0.1.2",
     "lucide-react": "^0.539.0",
+    "luxon": "^3.7.1",
     "next-sanity": "^10.0.10",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

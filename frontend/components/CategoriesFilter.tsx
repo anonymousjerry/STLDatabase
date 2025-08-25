@@ -4,18 +4,9 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSearch } from "@/context/SearchContext";
 import { useSession } from "next-auth/react";
-import { getSubCategories } from "@/lib/categoryApi";
+import { getAllCategories } from "@/lib/categoryApi";
 import LoadingOverlay from "./LoadingOverlay";
 
-type Category = {
-  name: string;
-  category: string;
-};
-
-type GroupedCategory = {
-  group: string;
-  items: string[];
-};
 
 const CategoriesFilter = () => {
   const router = useRouter();
@@ -27,26 +18,26 @@ const CategoriesFilter = () => {
   const {
     selectedPlatform,
     selectedCategory,
+    selectedSubCategory,
     searchInput,
     searchPrice,
     favourited,
     userId,
     setSelectedCategory,
+    setSelectedSubCategory
   } = useSearch();
 
   useEffect(() => {
     setLoading(true);
-    getSubCategories()
-      .then((data: Category[]) => {
-        const grouped = data.reduce((acc, curr) => {
-          if (!acc[curr.category]) acc[curr.category] = [];
-          acc[curr.category].push(curr.name);
-          return acc;
-        }, {} as Record<string, string[]>);
-
-        const formatted: GroupedCategory[] = Object.entries(grouped).map(([group, items]) => ({
-          group,
-          items,
+    getAllCategories()
+      .then((data: any[]) => {
+        const formatted: GroupedCategory[] = data.map((category) => ({
+            group: category.name,
+            items: category.subCategories.map((sub: any) => ({
+                id: sub.id,
+                name: sub.name,
+            })),
+            icon: category.SVGUrl,
         }));
 
         setGroupedCategories(formatted);
@@ -55,11 +46,13 @@ const CategoriesFilter = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleSubcategorySelect = (subcategory: string) => {
-    setSelectedCategory(subcategory);
+  const handleCategorySelect = (category: string) => {
+    setOpenGroup((prev) => (prev === category ? null : category));
+    setSelectedCategory(category);
+    setSelectedSubCategory({id: "", name: ""});
 
     const queryParams = new URLSearchParams();
-    queryParams.set("category", subcategory);
+    queryParams.set("category", category);
     if (selectedPlatform && selectedPlatform !== "All")
       queryParams.set("sourcesite", selectedPlatform);
     if (searchInput) queryParams.set("key", searchInput);
@@ -74,8 +67,24 @@ const CategoriesFilter = () => {
     router.push(`/explore?${queryParams.toString()}`);
   };
 
-  const toggleGroup = (group: string) => {
-    setOpenGroup((prev) => (prev === group ? null : group));
+  const handleSubcategorySelect = (subcategory: {id: string, name: string}) => {
+    setSelectedSubCategory(subcategory);
+    setSelectedCategory("All");
+
+    const queryParams = new URLSearchParams();
+    queryParams.set("subCategory", subcategory.id);
+    if (selectedPlatform && selectedPlatform !== "All")
+      queryParams.set("sourcesite", selectedPlatform);
+    if (searchInput) queryParams.set("key", searchInput);
+    if (searchPrice) queryParams.set("price", searchPrice);
+    if (favourited) {
+        queryParams.set("favourited", "true");    
+    }
+    if (userId) {
+        queryParams.set("userId", userId)
+    }
+
+    router.push(`/explore?${queryParams.toString()}`);
   };
 
   return (
@@ -85,7 +94,7 @@ const CategoriesFilter = () => {
         <div key={group}>
           {/* Toggleable Category Heading */}
           <button
-            onClick={() => toggleGroup(group)}
+            onClick={() => handleCategorySelect(group)}
             className="flex items-center justify-between w-full text-left text-base font-semibold text-custom-light-textcolor dark:text-custom-dark-textcolor hover:opacity-80 transition"
           >
             <span>{group}</span>
@@ -97,18 +106,18 @@ const CategoriesFilter = () => {
             <div className="space-y-2 ml-3 mt-2">
               {items.map((item) => (
                 <label
-                  key={item}
+                  key={item.id}
                   className="flex items-center gap-2 text-custom-light-textcolor dark:text-custom-dark-textcolor"
                 >
                   <input
                     type="radio"
                     name="subCategory"
-                    value={item}
-                    checked={selectedCategory === item}
+                    value={item.id}
+                    checked={selectedSubCategory === item}
                     onChange={() => handleSubcategorySelect(item)}
                     className="w-4 h-4 accent-blue-600 dark:accent-blue-400"
                   />
-                  <span>{item}</span>
+                  <span>{item.name}</span>
                 </label>
               ))}
             </div>

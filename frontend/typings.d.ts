@@ -16,13 +16,20 @@ interface SourceSite {
 interface SubCategory {
   id: string;
   name: string;
-  categoryId: string;
+  // categoryId: string;
 }
 
 interface Category {
   id: string;
   name: string;
   SVGUrl: string;
+}
+
+
+interface GroupedCategory {
+  group: string;       // Category name
+  items: { id: string; name: string }[];     // Subcategory names
+  icon?: string;       // Category SVGUrl
 }
 
 interface Model {
@@ -54,4 +61,24 @@ interface User {
   email: string;
   password: string | null;
   role: string;
+}
+
+interface AdPosition {
+  _id: string | undefined;
+  id?: string
+  _type?: 'adPosition'
+  title: string
+  page: 'homepage' | 'detail' | 'explore'
+  position: string
+  adType: 'banner' | 'sidebar' | 'sponsored-model'
+  size: '728x90' | '300x250' | '300x600' | 'native'
+  enabled: boolean
+  priority: number
+  adSlot?: string
+  clientName?: string
+  clientEmail?: string
+  startDate?: string
+  endDate?: string
+  createdAt?: string
+  updatedAt?: string
 }

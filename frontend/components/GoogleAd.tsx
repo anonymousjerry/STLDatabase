@@ -38,9 +38,9 @@ const GoogleAd: React.FC<AdProps> = ({
 
   // Default fallback content
   const defaultFallback = (
-    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 text-center text-gray-500 dark:text-gray-400">
-      <div className="text-sm font-medium mb-2">Advertisement</div>
-      <div className="text-xs">Ad space available</div>
+    <div className="rounded-3xl border border-gray-200 bg-custom-light-containercolor  text-center shadow-lg dark:border-gray-700 dark:bg-custom-dark-containercolor">
+      <div className="text-sm font-semibold text-custom-light-textcolor dark:text-custom-dark-textcolor mb-2">Advertisement</div>
+      <div className="text-xs text-custom-light-textcolor dark:text-custom-dark-textcolor opacity-70">Reach 3D printing enthusiasts</div>
     </div>
   );
 
@@ -53,7 +53,7 @@ const GoogleAd: React.FC<AdProps> = ({
   }
 
   return (
-    <div className={`ad-container ${className}`} style={style}>
+    <div className={`ad-container flex items-center justify-center w-full rounded-3xl border border-gray-200 bg-custom-light-containercolor shadow-lg dark:border-gray-700 dark:bg-custom-dark-containercolor ${className}`} style={style}>
       <ins
         className="adsbygoogle"
         style={{ display: 'block' }}

@@ -137,19 +137,16 @@ interface AdPosition {
 - `homepage-mid-content-banner` - Mid-content banner (728x90)
 - `homepage-sidebar-right` - Right sidebar (300x250)
 - `homepage-sponsored-models` - Sponsored models (Native)
-- `homepage-footer-banner` - Footer banner (728x90)
 
 **Detail Page (4 positions)**
 - `detail-header-banner` - Header banner (728x90)
 - `detail-mid-content-banner` - Mid-content banner (728x90)
-- `detail-sidebar-right` - Right sidebar (300x250)
 - `detail-sponsored-similar` - Sponsored similar models (Native)
 
 **Explore Page (5 positions)**
 - `explore-header-banner` - Header banner (728x90)
 - `explore-mid-content-banner` - Mid-content banner (728x90)
 - `explore-sidebar-right` - Right sidebar (300x250)
-- `explore-sidebar-left` - Left sidebar (300x250)
 - `explore-sponsored-listings` - Sponsored listings (Native)
 
 ### Ad Management Features

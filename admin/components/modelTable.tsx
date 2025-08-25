@@ -1,139 +1,237 @@
-import React, { useEffect, useState } from 'react';
-import { deleteModelApi, getAllModels, updateModel } from '../lib/modelApi';
-import { Trash2, Plus, Search, Pencil, Check, X } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+"use client";
+import React, { useEffect, useState } from "react";
+import {
+  deleteModelApi,
+  getAllModels,
+  updateModel,
+} from "../lib/modelApi";
+import {
+  Trash2,
+  Search,
+  Pencil,
+  Eye,
+  Download,
+  Heart,
+  ExternalLink,
+  X,
+  Star,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
+import toast, { Toaster } from "react-hot-toast";
+import clsx from "clsx";
+import { UserModal } from "./UserModal";
+import { getAllCategories } from "../lib/categoryApi";
+import { Category } from "../sanity/types";
 
 export interface Model {
   id: string;
   title: string;
   description: string;
-  source: string;
-  category: string;
-  subCategory: string;
-  tags: string[];
-  download: number;
-  view: number;
-  like: number;
-  thumbnailUrl: string;
-  sourceUrl: string;
-  price: string;
-  isFeatured: boolean;
+  category?: string;
+  categoryId?: string;
+  subCategory?: string;
+  subCategoryId?: string;
+  tags?: string[];
+  likes?: Array<{ id: string; user: { id: string; username: string; email: string }; userId: string }>;
+  favourites?: Array<{ id: string; user: { id: string; username: string; email: string }; userId: string }>;
+  downloads?: number;
+  views?: number;
+  thumbnailUrl?: string;
+  sourceUrl?: string;
+  websiteUrl?: string;
+  price?: string;
+  isFeatured?: boolean;
 }
+
+type SortField = 'title' | 'category' | 'downloads' | 'views' | 'price' | 'isFeatured';
+type SortDirection = 'asc' | 'desc';
+
+const normalizeCategories = (data: any[]): Category[] => {
+  return data.map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    imageUrl: cat.SVGUrl || '',
+    subcategories: (cat.subCategories || []).map((sub: any) => ({
+      id: sub.id,
+      name: sub.name,
+    })),
+  }));
+};
 
 export function ModelTable() {
   const [models, setModels] = useState<Model[]>([]);
   const [loading, setLoading] = useState(false);
-  const [editingCell, setEditingCell] = useState<{ id: string; field: keyof Model } | null>(null);
-  const [form, setForm] = useState<Partial<Model>>({});
-  const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [editingModel, setEditingModel] = useState<Model | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState<SortField>('title');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [userModal, setUserModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    users: Array<{ id: string; username: string; email: string }>;
+  }>({ isOpen: false, title: "", users: [] });
+  const [categories, setCategories] = useState<any[]>([]);
+
   const pageSize = 20;
 
   const refresh = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await getAllModels();
-      setModels(res);
+      const cat = await getAllCategories();
+      setCategories(normalizeCategories(cat));
+      setModels(res || []);
     } catch (err) {
-      console.error('Error fetching models:', err);
-      toast.error(err instanceof Error ? err.message : 'Failed to fetch models');
+      console.error(err);
+      setError(err instanceof Error ? err.message : "Failed to fetch models");
+      toast.error("Failed to fetch models");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { refresh(); }, []);
-
-  const startEdit = (m: Model, field: keyof Model) => {
-    setEditingCell({ id: m.id, field });
-    setForm({ ...m, tags: [...m.tags] });
-  };
+  useEffect(() => {
+    refresh();
+  }, []);
 
   const saveEdit = async () => {
-    console.log("Saving edit for cell:", editingCell);
-    if (!editingCell) return;
-    const { id, field } = editingCell;
-
-    if (field === "title" || field === "description" || field === "isFeatured") {
-      const confirmed = window.confirm(
-        `Are you sure you want to update the ${field}?`
-      );
-      if (!confirmed) {
-        cancelEdit();
-        return;
-      }
-    }
+    if (!editingModel) return;
+    if (!window.confirm("Update this model?")) return;
 
     try {
       setLoading(true);
-      await updateModel(id, { ...form });
+      await updateModel(editingModel.id, editingModel);
       await refresh();
-      toast.success('Model updated successfully!');
+      toast.success("Model updated!");
+      setEditingModel(null);
     } catch (err) {
-      console.error('Error updating model:', err);
-      toast.error(err instanceof Error ? err.message : 'Failed to update model');
+      console.error(err);
+      toast.error("Failed to update model");
     } finally {
-      setEditingCell(null);
-      setForm({});
       setLoading(false);
     }
   };
 
-  const cancelEdit = () => { setEditingCell(null); setForm({}); };
-
   const deleteModel = async (id: string) => {
-    if (!confirm('Delete this model?')) return;
+    if (!confirm("Delete this model?")) return;
     try {
       setLoading(true);
       await deleteModelApi(id);
       await refresh();
-      toast.success('Model deleted successfully!');
+      toast.success("Model deleted");
     } catch (err) {
-      console.error('Error deleting model:', err);
-      toast.error(err instanceof Error ? err.message : 'Failed to delete model');
+      console.error(err);
+      toast.error("Failed to delete model");
     } finally {
       setLoading(false);
     }
   };
 
-  // Filter models based on search term
+  const showUserModal = (
+    title: string,
+    users: Array<{ id: string; username: string; email: string }>
+  ) => setUserModal({ isOpen: true, title, users });
+
+  const closeUserModal = () =>
+    setUserModal({ isOpen: false, title: "", users: [] });
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1); // Reset to first page when sorting
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return <ChevronUp className="w-4 h-4 text-gray-400" />;
+    }
+    return sortDirection === 'asc' 
+      ? <ChevronUp className="w-4 h-4 text-blue-600" />
+      : <ChevronDown className="w-4 h-4 text-blue-600" />;
+  };
+
   const filteredModels = models.filter((model) => {
-    if (!searchTerm) return true;
     const search = searchTerm.toLowerCase();
     return (
+      !searchTerm ||
       model.title.toLowerCase().includes(search) ||
       model.description.toLowerCase().includes(search) ||
-      model.category.toLowerCase().includes(search) ||
-      model.subCategory.toLowerCase().includes(search) ||
-      model.tags.some(tag => tag.toLowerCase().includes(search))
+      (model.category || "").toLowerCase().includes(search) ||
+      (model.subCategory || "").toLowerCase().includes(search) ||
+      (model.tags || []).some((tag) => tag.toLowerCase().includes(search))
     );
   });
 
-  // Pagination
-  const totalPages = Math.ceil(filteredModels.length / pageSize);
+  const sortedModels = [...filteredModels].sort((a, b) => {
+    let aValue: any, bValue: any;
+    
+    switch (sortField) {
+      case 'title':
+        aValue = a.title || '';
+        bValue = b.title || '';
+        break;
+      case 'category':
+        aValue = a.category || '';
+        bValue = b.category || '';
+        break;
+      case 'downloads':
+        aValue = a.downloads || 0;
+        bValue = b.downloads || 0;
+        break;
+      case 'views':
+        aValue = a.views || 0;
+        bValue = b.views || 0;
+        break;
+      case 'price':
+        aValue = a.price || 'Free';
+        bValue = b.price || 'Free';
+        break;
+      case 'isFeatured':
+        aValue = a.isFeatured ? 1 : 0;
+        bValue = b.isFeatured ? 1 : 0;
+        break;
+      default:
+        return 0;
+    }
+    
+    if (typeof aValue === 'string' && typeof bValue === 'string') {
+      const comparison = aValue.localeCompare(bValue);
+      return sortDirection === 'asc' ? comparison : -comparison;
+    } else {
+      const comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      return sortDirection === 'asc' ? comparison : -comparison;
+    }
+  });
+
+  const totalPages = Math.ceil(sortedModels.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
-  const currentModels = filteredModels.slice(startIndex, endIndex);
+  const currentModels = sortedModels.slice(startIndex, endIndex);
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden w-full">
       {/* Header */}
-      <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Model Management</h1>
-        
-      </div>
-
-      {/* Alert */}
-      {/* The alert state was removed, so this block is no longer needed. */}
-
-      {/* Search and Actions */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex gap-4 items-center">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 border-b border-gray-200 dark:border-gray-700 gap-4">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          Model Management
+        </h1>
+        <div className="flex gap-4 w-full md:w-auto">
+          <div className="relative flex-1">
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={20}
+            />
             <input
               type="text"
-              placeholder="Search models by title, description, category, or tags..."
+              placeholder="Search models..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
@@ -141,220 +239,424 @@ export function ModelTable() {
           </div>
           <button
             onClick={refresh}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
           >
             Refresh
           </button>
         </div>
       </div>
 
-      {/* Models Table */}
+      {/* Table */}
       <div className="overflow-x-auto">
         {loading ? (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-2 text-gray-600 dark:text-gray-400">Loading models...</span>
+            <span className="ml-2 text-gray-600 dark:text-gray-400">
+              Loading models...
+            </span>
           </div>
+        ) : error ? (
+          <div className="text-center py-12 text-red-500">{error}</div>
         ) : (
-          <table className="w-full">
+          <table className="w-full min-w-[1000px] divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Thumbnail</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Title</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Category</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Source</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Stats</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Featured</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+              <tr className="text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-4 w-28">Thumbnail</th>
+                <th 
+                  className="px-6 py-4 w-96 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                  onClick={() => handleSort('title')}
+                >
+                  <div className="flex items-center gap-1">
+                    Title
+                    {getSortIcon('title')}
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-4 w-64 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                  onClick={() => handleSort('category')}
+                >
+                  <div className="flex items-center gap-1">
+                    Category
+                    {getSortIcon('category')}
+                  </div>
+                </th>
+                <th className="px-6 py-4 w-48">Tags</th>
+                <th className="px-6 py-4 w-48">Stats</th>
+                <th 
+                  className="px-6 py-4 w-48 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                  onClick={() => handleSort('price')}
+                >
+                  <div className="flex items-center gap-1">
+                    Price
+                    {getSortIcon('price')}
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-4 w-32 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                  onClick={() => handleSort('isFeatured')}
+                >
+                  <div className="flex items-center gap-1">
+                    Featured
+                    {getSortIcon('isFeatured')}
+                  </div>
+                </th>
+                <th className="px-6 py-4 w-32">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {currentModels.map((model) => (
-                <tr key={model.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                <tr
+                  key={model.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  <td className="px-6 py-6">
                     <img
-                      src={model.thumbnailUrl}
-                      alt={model.title}
-                      className="w-12 h-12 rounded object-cover"
+                      src={
+                        model.thumbnailUrl ||
+                        "https://via.placeholder.com/96x96?text=No+Image"
+                      }
+                      alt={model.title || "No Title"}
+                      className="w-20 h-20 rounded-lg object-cover shadow-sm"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          "https://via.placeholder.com/96x96?text=No+Image";
+                      }}
                     />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {editingCell?.id === model.id && editingCell?.field === 'title' ? (
-                      <input
-                        type="text"
-                        value={form.title || ''}
-                        onChange={(e) => setForm({ ...form, title: e.target.value })}
-                        className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-                      />
-                    ) : (
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">{model.title}</div>
-                    )}
+                  <td className="px-6 py-6 max-w-sm">
+                    <div className="font-semibold text-gray-900 dark:text-white">
+                      {model.title}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                      {model.description}
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 dark:text-white">
-                      <div className="font-medium">{model.category}</div>
-                      <div className="text-gray-500 dark:text-gray-400">{model.subCategory}</div>
+                  <td className="px-6 py-6 whitespace-nowrap">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {model.category || "—"}
+                    </span>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {model.subCategory || "—"}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 dark:text-white">{model.source}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 dark:text-white">
-                      <div>👁️ {model.view}</div>
-                      <div>⬇️ {model.download}</div>
-                      <div>❤️ {model.like}</div>
+                    <div className="flex flex-row flex-wrap gap-1 max-w-xs">
+                      {model.tags &&
+                        model.tags.slice(0, 4).map((tag, i) => (
+                          <span
+                            key={i}
+                            className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+
+                      {model.tags && model.tags.length > 4 && (
+                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200">
+                          +{model.tags.length - 4} more
+                        </span>
+                      )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {editingCell?.id === model.id && editingCell?.field === 'isFeatured' ? (
-                      <select
-                        value={form.isFeatured?.toString() || 'false'}
-                        onChange={(e) => setForm({ ...form, isFeatured: e.target.value === 'true' })}
-                        className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-                      >
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
-                      </select>
+                  <td className="px-6 py-6">
+                    <div
+                      className="flex items-center gap-2 text-green-600 hover:underline text-sm"
+                    >
+                      <Download size={14} /> {model.downloads || 0}
+                    </div>
+                    <button
+                      onClick={() =>
+                        showUserModal("Likes", (model.likes || []).map((l) => l.user))
+                      }
+                      className="flex items-center gap-2 text-red-500 hover:underline text-sm"
+                    >
+                      <Heart size={14} /> {(model.likes || []).length}
+                    </button>
+                    <button
+                      onClick={() =>
+                        showUserModal(
+                          "Favourites",
+                          (model.favourites || []).map((f) => f.user)
+                        )
+                      }
+                      className="flex items-center gap-2 text-yellow-400 hover:underline text-sm"
+                    >
+                      <Star size={14} /> {(model.favourites || []).length}
+                    </button>
+                    <div
+                      className="flex items-center gap-2 text-blue-600 hover:underline text-sm"
+                    >
+                      <Eye size={14} /> {(model.views || 0)}
+                    </div>
+                  </td>
+                  <td className="px-6 py-6">
+                    {model.price ? (
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {model.price}
+                      </span>
                     ) : (
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        model.isFeatured 
-                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' 
-                          : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-                      }`}>
-                        {model.isFeatured ? 'Featured' : 'Regular'}
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        Free
                       </span>
                     )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    {editingCell?.id === model.id ? (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={saveEdit}
-                          disabled={loading}
-                          className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
-                        >
-                          <Check size={16} />
-                        </button>
-                        <button
-                          onClick={cancelEdit}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => startEdit(model, 'title')}
-                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                          title="Edit Title"
-                        >
-                          <Pencil size={16} />
-                        </button>
-                        <button
-                          onClick={() => startEdit(model, 'isFeatured')}
-                          className="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300"
-                          title="Toggle Featured"
-                        >
-                          ⭐
-                        </button>
-                        <button
-                          onClick={() => deleteModel(model.id)}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                          title="Delete Model"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+                    {model.sourceUrl && (
+                      <a
+                        href={model.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-blue-600 hover:underline text-sm"
+                      >
+                        <ExternalLink size={14} /> Source
+                      </a>
                     )}
+                    {model.websiteUrl && (
+                      <a
+                        href={model.websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-blue-600 hover:underline text-sm"
+                      >
+                        <ExternalLink size={14} /> WebSite
+                      </a>
+                    )}
+                  </td>
+                  
+                  <td className="px-6 py-6">
+                    <span
+                      className={clsx(
+                        "inline-flex px-3 py-1 text-xs font-semibold rounded-full",
+                        model.isFeatured
+                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                          : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                      )}
+                    >
+                      {model.isFeatured ? "Featured" : "Regular"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-6 whitespace-nowrap ">
+                    <button
+                      onClick={() => setEditingModel(model)}
+                      className="p-2 mr-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      onClick={() => deleteModel(model.id)}
+                      className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
-        
         {!loading && filteredModels.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">No models found</p>
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+            No models found
           </div>
         )}
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex justify-between items-center">
-            <div className="text-sm text-gray-700 dark:text-gray-300">
-              Showing {startIndex + 1} to {Math.min(endIndex, filteredModels.length)} of {filteredModels.length} models
-            </div>
-            <div className="flex gap-2">
+        <div className="flex flex-col md:flex-row justify-between items-center px-6 py-4 border-t border-gray-200 dark:border-gray-700 gap-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Showing {startIndex + 1}-
+            {Math.min(endIndex, sortedModels.length)} of{" "}
+            {sortedModels.length}
+          </p>
+          <div className="flex gap-1">
+            {Array.from({ length: totalPages }).map((_, i) => (
               <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={clsx(
+                  "px-3 py-1 rounded-lg text-sm",
+                  currentPage === i + 1
+                    ? "bg-blue-600 text-white"
+                    : "border text-gray-600 dark:text-gray-300"
+                )}
               >
-                Previous
+                {i + 1}
               </button>
-              <span className="px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
-                Page {currentPage} of {totalPages}
-              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Edit Drawer */}
+      {editingModel && (
+        <div className="fixed top-24 inset-0 bg-black bg-opacity-30 z-50 flex justify-end">
+          <div className="w-full max-w-md bg-white dark:bg-gray-900 h-full flex flex-col">
+            {/* Header */}
+            <div className="flex justify-between items-center p-6 border-b">
+              <h2 className="text-xl font-semibold">Edit Model</h2>
+              <button onClick={() => setEditingModel(null)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 min-h-0 overflow-y-auto p-6 space-y-4">
+              {/* Title */}
+              <div className="flex flex-col">
+                <label className="mb-1 text-sm font-medium dark:text-gray-300">Title</label>
+                <input
+                  type="text"
+                  value={editingModel.title || ""}
+                  onChange={(e) =>
+                    setEditingModel({ ...editingModel, title: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white"
+                  placeholder="Enter title"
+                />
+              </div>
+
+              {/* Description */}
+              <div className="flex flex-col">
+                <label className="mb-1 text-sm font-medium dark:text-gray-300">Description</label>
+                <textarea
+                  value={editingModel.description || ""}
+                  onChange={(e) =>
+                    setEditingModel({ ...editingModel, description: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white"
+                  rows={3}
+                  placeholder="Enter description"
+                />
+              </div>
+
+              {/* Category */}
+              <div className="flex flex-col">
+                <label className="mb-1 text-sm font-medium dark:text-gray-300">Category</label>
+                <select
+                  value={editingModel.categoryId || ""}
+                  onChange={(e) => {
+                    const selected = categories.find(cat => cat.id === e.target.value);
+                    setEditingModel({
+                      ...editingModel,
+                      category: selected?.name || "",
+                      categoryId: selected?.id || "",
+                      subCategory: "",
+                      subCategoryId: "",
+                    });
+                  }}
+                  className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="">Select Category</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Subcategory */}
+              <div className="flex flex-col">
+                <label className="mb-1 text-sm font-medium dark:text-gray-300">Subcategory</label>
+                <select
+                  value={editingModel.subCategoryId || ""}
+                  onChange={(e) => {
+                    const selectedCat = categories.find(cat => cat.id === editingModel.categoryId);
+                    const selectedSub = selectedCat?.subcategories.find((sub: { id: string; name: string }) => sub.id === e.target.value);
+                    setEditingModel({
+                      ...editingModel,
+                      subCategory: selectedSub?.name || "",
+                      subCategoryId: selectedSub?.id || "",
+                    });
+                  }}
+                  disabled={!editingModel.categoryId}
+                  className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white disabled:opacity-50"
+                >
+                  <option value="">Select Subcategory</option>
+                  {categories
+                    .find(cat => cat.id === editingModel.categoryId)
+                    ?.subcategories.map((sub: { id: string; name: string }) => (
+                      <option key={sub.id} value={sub.id}>{sub.name}</option>
+                    ))}
+                </select>
+              </div>
+
+              {/* Tags */}
+              <div className="flex flex-col">
+                <label className="mb-1 text-sm font-medium dark:text-gray-300">Tags</label>
+                <div className="flex flex-wrap items-center gap-2 border rounded-lg px-3 py-2 dark:bg-gray-700">
+                  {(editingModel.tags || []).map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="flex items-center gap-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 rounded-full px-3 py-1 text-sm font-medium"
+                    >
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newTags = editingModel.tags?.filter((_, i) => i !== idx) || [];
+                          setEditingModel({ ...editingModel, tags: newTags });
+                        }}
+                        className="text-blue-600 dark:text-blue-200 hover:text-red-600 dark:hover:text-red-400"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    type="text"
+                    placeholder="Add tag"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === ",") {
+                        e.preventDefault();
+                        const value = e.currentTarget.value.trim();
+                        if (value && !(editingModel.tags || []).includes(value)) {
+                          setEditingModel({
+                            ...editingModel,
+                            tags: [...(editingModel.tags || []), value],
+                          });
+                          e.currentTarget.value = "";
+                        }
+                      }
+                    }}
+                    className="flex-1 px-2 py-1 focus:outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              {/* Featured */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={editingModel.isFeatured || false}
+                  onChange={(e) =>
+                    setEditingModel({ ...editingModel, isFeatured: e.target.checked })
+                  }
+                  className="w-5 h-5"
+                />
+                <label className="text-sm dark:text-gray-300">Featured</label>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex gap-3 p-6 border-t">
               <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
+                onClick={saveEdit}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
               >
-                Next
+                Save
+              </button>
+              <button
+                onClick={() => setEditingModel(null)}
+                className="flex-1 border px-4 py-2 rounded-lg"
+              >
+                Cancel
               </button>
             </div>
           </div>
         </div>
       )}
 
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 1500,
-          style: {
-            background: '#1f2937',
-            color: '#fff',
-            border: '1px solid #374151',
-            borderRadius: '8px',
-            padding: '12px 16px',
-            fontSize: '14px',
-            fontWeight: '500',
-            zIndex: 9999,
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-          },
-          success: {
-            duration: 1500,
-            iconTheme: {
-              primary: '#10B981',
-              secondary: '#fff',
-            },
-            style: {
-              background: '#065f46',
-              border: '1px solid #047857',
-            },
-          },
-          error: {
-            duration: 1500,
-            iconTheme: {
-              primary: '#EF4444',
-              secondary: '#fff',
-            },
-            style: {
-              background: '#7f1d1d',
-              border: '1px solid #dc2626',
-            },
-          },
-        }}
-        containerStyle={{
-          top: 80,
-          right: 20,
-        }}
-      />
+      {/* User Modal */}
+      <UserModal {...userModal} onClose={closeUserModal} />
+      <Toaster position="top-right" />
     </div>
   );
 }

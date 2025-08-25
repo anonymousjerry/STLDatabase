@@ -18,7 +18,6 @@ axiosInstance.interceptors.request.use(
     }
     
     // Log request for debugging
-    console.log(`Making ${config.method?.toUpperCase()} request to: ${config.url}`);
     
     return config;
   },
@@ -31,7 +30,6 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => {
     // Log successful responses for debugging
-    console.log(`Response received from ${response.config.url}:`, response.status);
     return response;
   },
   (error) => {
