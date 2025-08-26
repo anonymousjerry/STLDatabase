@@ -3,6 +3,7 @@ import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './sanity/schemaTypes'
 import { structure } from './sanity/structure'
+import { socketNotifierPlugin } from './sanity/plugins/socketNotifierPlugin'
 import './global.css';
 
 export default defineConfig({
@@ -15,7 +16,7 @@ export default defineConfig({
   plugins: [
     structureTool({structure}), 
     visionTool(),
-
+    socketNotifierPlugin()
   ],
 
   schema: {
