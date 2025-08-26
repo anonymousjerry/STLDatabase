@@ -1,4 +1,3 @@
-//sanity/plugins/socketListener.ts
 import { io, Socket } from "socket.io-client";
 
 interface ScrapSuccessPayload {
@@ -27,20 +26,20 @@ export const setupSocketListeners = (notify: NotifyFn) => {
   }
 
   socket.on("connect", () => {
-    console.log("Connected to socket:", socket?.id);
+    console.log("âœ… Connected to socket:", socket?.id);
   });
 
   socket.on("scrap_success", (data: ScrapSuccessPayload) => {
-    console.log("Scrap Success:", data);
+    console.log("ðŸ“¥ Scrap Success:", data);
     notify(data.status, data.message);
   });
 
   socket.on("scrape_summary", (data: ScrapeSummaryPayload) => {
-    console.log("Scrape Summary:", data);
+    console.log("ðŸ“¥ Scrape Summary:", data);
     notify(data.status, data.message);
   });
 
   socket.on("disconnect", () => {
-    console.log("Disconnected from socket");
+    console.log("âŒ Disconnected from socket");
   });
 };

@@ -9,8 +9,8 @@ import { FiBox } from 'react-icons/fi';
 import SideFilter from './SideFilter';
 import { useSearch } from '@/context/SearchContext';
 import { useRouter } from 'next/navigation';
-import { FaArrowUp } from 'react-icons/fa6'; // up arrow icon
 import AdPositionManager from './ads/AdPositionManager';
+import ScrollToTopButton from './ScrollToTopButton';
 
 type ExploreMainPageClientProps = {
   initialModels: Model[];
@@ -54,17 +54,17 @@ const ExploreMainPageClient = ({
   } = useSearch();
 
   // Show/hide UP button on scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowUpButton(window.scrollY > 300);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     setShowUpButton(window.scrollY > 300);
+  //   };
+  //   window.addEventListener('scroll', handleScroll);
+  //   return () => window.removeEventListener('scroll', handleScroll);
+  // }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  // const scrollToTop = () => {
+  //   window.scrollTo({ top: 0, behavior: 'smooth' });
+  // };
 
   // 1️⃣ When filters change, reset page & fetch new models
   useEffect(() => {
@@ -195,13 +195,13 @@ const ExploreMainPageClient = ({
           </div>
           <NavFilter selectedFilters={selectedFilters} onFilterChange={setSelectedFilters} />
             {/* Explore mid-content banner ad */}
-            <AdPositionManager
-              page="explore"
-              positions={[
-                'explore-mid-content-banner',
-              ]}
-              className="w-full flex justify-center items-center pt-10"
-            />
+          <AdPositionManager
+            page="explore"
+            positions={[
+              'explore-mid-content-banner',
+            ]}
+            className="w-full flex justify-center items-center pt-10"
+          />
           <SearchResultPart models={models} />
           <div ref={loaderRef} className="flex flex-col items-center justify-center py-10">
             {isLoading && (
@@ -215,7 +215,7 @@ const ExploreMainPageClient = ({
       </div>
 
       {/* UP Button */}
-      {showUpButton && (
+      {/* {showUpButton && (
         <button
           onClick={scrollToTop}
           className="fixed bottom-10 right-10 z-50 p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-all"
@@ -223,7 +223,8 @@ const ExploreMainPageClient = ({
         >
           <FaArrowUp size={20} />
         </button>
-      )}
+      )} */}
+      <ScrollToTopButton />
     </div>
   );
 };
