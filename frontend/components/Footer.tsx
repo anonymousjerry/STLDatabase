@@ -21,7 +21,7 @@ const Footer = () => {
         <div className="flex flex-col mt-6 lg:mt-10 gap-4 lg:gap-2 items-start lg:justify-start shrink-0">
           <Link href="/" className="w-full ">
             <Image
-              src="/logo.png"
+              src="/Logo.png"
               alt="Logo"
               width={506}
               height={64}
