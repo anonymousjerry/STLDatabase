@@ -5,6 +5,7 @@ import { ModelTable } from "../components/modelTable"
 import { CategoryTable } from "../components/categoryTable"
 import { AdPositionTable } from "../components/adPositionTable"
 import ScrapeJobTable from "../components/scrapeJobTable"
+import { ScrapingAlarmComponent } from "./plugins/scrapingAlarmPlugin"
 import "../global.css"
 
 export const structure: StructureResolver = (S: StructureBuilder) =>
@@ -26,5 +27,8 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
       S.listItem()
         .title('Scraping Job Management')
         .child(S.component(ScrapeJobTable).title('Scraping Jobs')),
+      S.listItem()
+        .title('Scraping Alarm System')
+        .child(S.component(ScrapingAlarmComponent).title('Scraping Alarms')),
       // ...S.documentTypeListItems()
     ])
