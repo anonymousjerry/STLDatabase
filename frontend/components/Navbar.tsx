@@ -82,7 +82,7 @@ const Navbar = () => {
         {/* Logo + Navigation */}
         <div className="flex items-center" onClick={() => resetSearch("/")}>
           <Image
-            src="/logo.png"
+            src="/Logo.png"
             alt="Logo"
             width={256}
             height={36}
@@ -190,7 +190,7 @@ const Navbar = () => {
         {/* Mobile Logo */}
         <div className="flex items-center" onClick={() => resetSearch("/")}>
           <Image
-            src="/logo.png"
+            src="/Logo.png"
             alt="Logo"
             width={180}
             height={25}

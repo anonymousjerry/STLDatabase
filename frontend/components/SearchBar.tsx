@@ -8,6 +8,7 @@ import SearchInput from "./SearchInput";
 import { getAllCategories } from "@/lib/categoryApi";
 import { getPlatforms } from "@/lib/platformApi";
 import { useSearch } from "@/context/SearchContext";
+import { IoIosSearch } from "react-icons/io";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { set } from "zod";
@@ -141,14 +142,7 @@ const SearchBar = () => {
           <div className="text-white text-lg font-medium text-left relative select-none">
             Search
           </div>
-          <Image
-            className="shrink-0 relative overflow-visible"
-            src="/search.png"
-            alt="search icon"
-            width={24}
-            height={24}
-            draggable={false}
-          />
+          <IoIosSearch size={24} color="white"/>
         </button>
       </div>
     </form>
