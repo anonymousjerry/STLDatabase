@@ -13,9 +13,7 @@ const LikeFilter = () => {
     selectedCategory,
     selectedSubCategory,
     searchPrice,
-    favourited,
     liked,
-    setfavourited,
     setliked,
     setUserId
   } = useSearch();
@@ -36,11 +34,10 @@ const LikeFilter = () => {
       queryParams.set("sourcesite", selectedPlatform);
     if (selectedCategory && selectedCategory !== "All")
       queryParams.set("category", selectedCategory);
-    // if (selectedSubCategory?.id)
-    //   queryParams.set("subCategory", selectedSubCategory.id);
+    if (selectedSubCategory?.id)
+      queryParams.set("subCategory", selectedSubCategory.id);
     if (searchPrice && searchPrice !== "All")
       queryParams.set("price", searchPrice);
-    if (favourited) queryParams.set("favourited", "true");
     if (checked) {
       queryParams.set("liked", "true");
       queryParams.set("userId", userId)

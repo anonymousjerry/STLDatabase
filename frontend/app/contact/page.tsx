@@ -4,7 +4,9 @@ import ContactPageComponent from "@/components/ContactPageComponent"
 
 const contactPage = () => {
     return(
-        <ContactPageComponent />
+        <>
+            <ContactPageComponent />
+        </>
     )
 }
 

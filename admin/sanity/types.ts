@@ -7,7 +7,7 @@ export interface User {
   role: string
   createdAt: string
   updatedAt: string
-  favourites: Favourite
+  likes: Like
 }
 
 export interface Category {
@@ -34,7 +34,6 @@ export interface Model {
   subCategoryId: string
   tags: string[]
   likes: Like[]
-  favourites: Favourite[]
   deleted: boolean
   downloads: number
   thumbnailUrl: string
@@ -56,14 +55,6 @@ export interface SourceSite {
 
 
 export interface Like {
-  id: string
-  user: User
-  userId: string
-  model: Model
-  modelId: string
-}
-
-export interface Favourite {
   id: string
   userId: string
   model: Model

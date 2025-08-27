@@ -6,7 +6,6 @@ import { GoTriangleRight, GoTriangleDown } from "react-icons/go";
 import PlatformsFilter from "./PlatformsFilter";
 import CategoriesFilter from "./CategoriesFilter";
 import PriceFilter from "./PriceFilter";
-import FavoriteFilter from "./FavoriteFilter";
 import LikeFilter from "./LikeFilter";
 import { CgWebsite } from "react-icons/cg";
 import { AiFillLike, AiOutlineDollarCircle } from "react-icons/ai";
@@ -24,7 +23,7 @@ const SideFilter = () => {
 
   useEffect(() => {
     if (liked) {
-      setOpenSection("Liked Models");
+      setOpenSection("Saved Models");
     }
   }, [liked]);
 
@@ -35,11 +34,11 @@ const SideFilter = () => {
   // build filters dynamically
   const filters: string[] = ["Platforms", "Categories", "Price"];
   if (isEnabled) {
-    filters.push("Saved Models", "Liked Models");
+    filters.push("Saved Models");
   }
 
   return (
-    <aside className="flex flex-col w-full bg-white dark:bg-custom-dark-containercolor border rounded-lg shadow p-4 h-screen overflow-y-auto">
+    <aside className="flex flex-col w-full bg-white dark:bg-custom-dark-containercolor border rounded-lg shadow p-4 h-[70vh] max-h-[70vh] md:max-h-[80vh] overflow-y-auto">
       <div className="flex items-center justify-center text-custom-light-textcolor dark:text-custom-dark-textcolor text-lg font-medium relative pt-2 gap-2">
         <BiFilterAlt />
         Search Filter
@@ -58,7 +57,6 @@ const SideFilter = () => {
                 {title === "Categories" && <BiCategory />}
                 {title === "Price" && <AiOutlineDollarCircle />}
                 {title === "Saved Models" && <MdFavoriteBorder />}
-                {title === "Liked Models" && <AiFillLike />}
                 {title}
               </span>
               <span>
@@ -71,8 +69,7 @@ const SideFilter = () => {
                 {title === "Platforms" && <PlatformsFilter />}
                 {title === "Categories" && <CategoriesFilter />}
                 {title === "Price" && <PriceFilter />}
-                {userId && title === "Saved Models" && <FavoriteFilter />}
-                {userId && title === "Liked Models" && <LikeFilter />}
+                {userId && title === "Saved Models" && <LikeFilter />}
               </div>
             )}
           </div>

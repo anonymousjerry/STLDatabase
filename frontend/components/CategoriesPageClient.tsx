@@ -44,7 +44,7 @@ const CategoriesPageClient = ({ categories, selectedCategory }: CategoriesPageCl
   const endIndex = startIndex + itemsPerPage;
   const paginatedCategories = filteredCategories.slice(startIndex, endIndex);
 
-  const {searchInput, selectedPlatform, searchTag, favourited, liked, searchPrice, setSelectedCategory, setSelectedSubCategory} = useSearch();
+  const {searchInput, selectedPlatform, searchTag, liked, searchPrice, setSelectedCategory, setSelectedSubCategory} = useSearch();
 
   const handleCategory = (category: string) => {
     setSelectedCategory(category);
@@ -56,7 +56,6 @@ const CategoriesPageClient = ({ categories, selectedCategory }: CategoriesPageCl
     if (selectedPlatform && selectedPlatform !== "All")
       queryParams.set("sourcesite", selectedPlatform);
     if (searchPrice) queryParams.set("price", searchPrice);
-    if (favourited) queryParams.set("favourited", 'true');
     if (liked) queryParams.set("liked", 'true');
     if (searchTag) queryParams.set("tag", searchTag);
     queryParams.set("currentPage", '1');
@@ -74,22 +73,12 @@ const CategoriesPageClient = ({ categories, selectedCategory }: CategoriesPageCl
     if (selectedPlatform && selectedPlatform !== "All")
       queryParams.set("sourcesite", selectedPlatform);
     if (searchPrice) queryParams.set("price", searchPrice);
-    if (favourited) queryParams.set("favourited", 'true');
     if (liked) queryParams.set("liked", "true");
     if (searchTag) queryParams.set("tag", searchTag);
     queryParams.set("currentPage", '1');
 
     router.push(`/explore?${queryParams.toString()}`);
   }
-  // const handleCategoryClick = (categoryName: string) => {
-  //   setLoading(true);
-  //   router.push(`/explore?category=${encodeURIComponent(categoryName)}`);
-  // };
-
-  // const handleSubcategoryClick = (subcategoryId: string) => {
-  //   setLoading(true);
-  //   router.push(`/explore?subCategory=${encodeURIComponent(subcategoryId)}`);
-  // };
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
@@ -101,8 +90,8 @@ const CategoriesPageClient = ({ categories, selectedCategory }: CategoriesPageCl
     <>
       
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-custom-light-maincolor to-purple-800 text-white py-16 px-4 sm:px-8 lg:px-16 xl:px-20 2xl:px-32">
-        <div className="max-w-6xl mx-auto text-center">
+      <div className="w-full bg-gradient-to-br from-custom-light-maincolor to-purple-800 text-white py-16">
+        <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 md:px-8 text-center">
           <div className="flex justify-center mb-6">
             <div className="bg-white/20 rounded-full p-4">
               <FiGrid className="text-4xl" />
@@ -119,8 +108,8 @@ const CategoriesPageClient = ({ categories, selectedCategory }: CategoriesPageCl
       </div>
 
       {/* Search Section */}
-      <div className="bg-white dark:bg-gray-900 py-8 px-4 sm:px-8 lg:px-16 xl:px-20 2xl:px-32">
-        <div className="max-w-4xl mx-auto">
+      <div className="w-full bg-white dark:bg-gray-900 py-8">
+        <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 md:px-8">
           <div className="relative">
             <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
             <input
@@ -135,8 +124,8 @@ const CategoriesPageClient = ({ categories, selectedCategory }: CategoriesPageCl
       </div>
 
       {/* Categories Grid */}
-      <div className="bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor py-12 px-4 sm:px-8 lg:px-16 xl:px-20 2xl:px-32">
-        <div className="max-w-7xl mx-auto">
+      <div className="bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor py-12">
+        <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 md:px-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
             <div>
@@ -240,17 +229,17 @@ const CategoriesPageClient = ({ categories, selectedCategory }: CategoriesPageCl
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-4 mt-12">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center gap-3 sm:gap-4 mt-12">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <FaChevronLeft size={16} />
                 Previous
               </button>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-center gap-2">
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   let pageNum;
                   if (totalPages <= 5) {
@@ -267,7 +256,7 @@ const CategoriesPageClient = ({ categories, selectedCategory }: CategoriesPageCl
                     <button
                       key={pageNum}
                       onClick={() => handlePageChange(pageNum)}
-                      className={`w-10 h-10 rounded-lg border transition-colors ${
+                      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg border transition-colors ${
                         currentPage === pageNum
                           ? 'bg-custom-light-maincolor dark:bg-purple-600 text-white border-custom-light-maincolor dark:border-purple-600'
                           : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -282,7 +271,7 @@ const CategoriesPageClient = ({ categories, selectedCategory }: CategoriesPageCl
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Next
                 <FaChevronRight size={16} />

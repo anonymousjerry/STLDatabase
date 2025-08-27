@@ -30,7 +30,7 @@ const TrendingModels = () => {
 
 
     return (
-        <div className="pt-10 px-52 max-xl:px-30 max-lg:px-20 max-md:px-10 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor relative">
+        <div className="pt-10 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor relative">
             <LoadingOverlay show={loading} size={50} />
             <div className="flex flex-col bg-custom-light-containercolor dark:bg-custom-dark-containercolor rounded-[32px] px-11 max-md:px-6">
                 <div className="grid grid-cols-2">

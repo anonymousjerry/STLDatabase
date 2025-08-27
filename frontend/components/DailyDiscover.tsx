@@ -63,7 +63,7 @@ const DailyDiscover = () => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="py-10 px-52 max-xl:px-30 max-lg:px-20 max-md:px-10 flex flex-col bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
+    <div className="py-10 flex flex-col bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
       <div className="flex flex-col bg-custom-light-containercolor dark:bg-custom-dark-containercolor rounded-t-[24px] border-b-4 border-custom-light-maincolor px-11 mt-10 max-md:px-6">
         <div className="flex text-custom-light-titlecolor dark:text-custom-dark-titlecolor py-3 font-['Inter-Bold',_sans-serif] text-2xl font-bold">
           NEW 3D PRINTABLE FILES

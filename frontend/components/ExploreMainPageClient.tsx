@@ -48,13 +48,14 @@ const ExploreMainPageClient = ({
     searchInput,
     searchTag,
     searchPrice,
-    favourited,
     liked,
     userId,
     setSelectedPlatform,
     setSelectedCategory,
     setSelectedSubCategory,
     setSearchInput,
+    setSearchPrice,
+    setliked,
     setSearchTag
   } = useSearch();
 
@@ -69,10 +70,13 @@ const ExploreMainPageClient = ({
     
     // Handle category and subcategory initialization
     if (initialSearchParams.subCategory) {
-      // If subcategory is provided, we need to find the parent category
-      // For now, we'll set category to "All" and let the SearchBar handle the display
+      // If subcategory is provided, preserve both id and name
       setSelectedCategory("All");
-      setSelectedSubCategory({ id: initialSearchParams.subCategory, name: '' });
+      // Set subcategory with id as name if not already set
+      setSelectedSubCategory({ 
+        id: initialSearchParams.subCategory, 
+        name: initialSearchParams.subCategory 
+      });
     } else if (initialSearchParams.category) {
       // If only category is provided (no subcategory)
       setSelectedCategory(initialSearchParams.category);
@@ -106,8 +110,7 @@ const ExploreMainPageClient = ({
         category: selectedCategory,
         subCategory: selectedSubCategory.id,
         price: searchPrice,
-        favourited: favourited ? 'true' : undefined,
-        liked: liked ? 'true' : undefined,
+        liked: liked ? 'true' : 'false',
         userId: userId,
         filters: selectedFilters,
         page: 1,
@@ -121,7 +124,7 @@ const ExploreMainPageClient = ({
     };
 
     fetchFilteredModels();
-  }, [selectedFilters, selectedPlatform, selectedCategory, selectedSubCategory, searchPrice, favourited, liked, searchInput, searchTag]);
+  }, [selectedFilters, selectedPlatform, selectedCategory, selectedSubCategory, searchPrice, liked, searchInput, searchTag]);
 
   // 2️⃣ When page increases (lazy load), fetch and append
   useEffect(() => {
@@ -135,8 +138,7 @@ const ExploreMainPageClient = ({
         category: selectedCategory,
         subCategory: selectedSubCategory.id,
         price: searchPrice,
-        favourited: favourited ? 'true' : undefined,
-        liked: liked ? 'true' : undefined,
+        liked: liked ? 'true' : 'false',
         userId: userId,
         page,
         limit: 12,
@@ -180,6 +182,42 @@ const ExploreMainPageClient = ({
       <div className="flex-1">
         <div className="pt-5">
           <SearchBar />
+          
+          {/* Hero Section with Category Title and Description */}
+          {((selectedCategory && selectedCategory !== 'All') || selectedSubCategory?.id) && (
+            <div className="w-full py-8 mt-8">
+              <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 md:px-8">
+                <div className="text-center text-custom-light-textcolor dark:text-custom-dark-textcolor">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+                    {selectedSubCategory?.id
+                      ? `${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} STL Files | 3D Printable ${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} Models`
+                      : `${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} STL Files | 3D Printable ${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} Models`}
+                  </h1>
+                  <p className="text-lg sm:text-xl text-custom-light-textcolor dark:text-custom-dark-textcolor max-w-4xl mx-auto leading-relaxed">
+                    {selectedSubCategory?.id
+                      ? `Explore 3D printable ${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} STL files. Browse curated collections of ${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} models, discover popular designs, and download files to start printing today.`
+                      : `Explore 3D printable ${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} STL files. Browse curated collections of ${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} models, discover popular designs, and download files to start printing today.`}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {searchTag && selectedCategory === "All" && !selectedSubCategory?.id && (
+            <div className="w-full py-8 mt-8">
+              <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 md:px-8">
+                <div className="text-center text-custom-light-textcolor dark:text-custom-dark-textcolor">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+                    {`${searchTag.replace(/\b\w/g, (char) => char.toUpperCase())} STL Files | 3D Printable ${searchTag.replace(/\b\w/g, (char) => char.toUpperCase())} Models to Download - 3DDatabase`}
+                  </h1>
+                  <p className="text-lg sm:text-xl text-custom-light-textcolor dark:text-custom-dark-textcolor max-w-4xl mx-auto leading-relaxed">
+                    {`Discover free and premium 3D printable ${searchTag.replace(/\b\w/g, (char) => char.toUpperCase())} STL files. Download popular ${searchTag.replace(/\b\w/g, (char) => char.toUpperCase())} models, explore unique designs, and start printing today.`}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
           {/* Homepage header banner ad */}
           <OptimizedAdPositionManager
             page="explore"
@@ -188,13 +226,13 @@ const ExploreMainPageClient = ({
             ]}
             className="w-full flex justify-center items-center pt-10"
           />
-          <div className="flex gap-5 pt-10">
-            <div className="flex basis-1/5">
+          <div className="flex flex-col md:flex-row gap-5 pt-10 w-full">
+            <div className="flex w-full md:basis-1/5 min-w-0">
               <div className="flex flex-col gap-4 w-full">
                 <SideFilter />
               </div>
             </div>
-            <div className="flex flex-col basis-4/5">
+            <div className="flex flex-col w-full md:basis-4/5 min-w-0">
               <div className="flex items-center w-full text-lg font-medium text-custom-light-textcolor dark:text-custom-dark-textcolor relative pt-1">
                 <FiBox className="mr-2" />
                 {searchTag ? (
@@ -209,7 +247,6 @@ const ExploreMainPageClient = ({
                         if (selectedCategory && selectedCategory !== 'All') params.set('category', selectedCategory);
                         if (selectedSubCategory?.id) params.set('subCategory', selectedSubCategory.id);
                         if (searchPrice) params.set('price', searchPrice);
-                        if (favourited) params.set('favourited', 'true');
                         if (liked) params.set('liked', 'true');
                         params.set('currentPage', '1');
                         router.push(`/explore?${params.toString()}`);
@@ -221,9 +258,113 @@ const ExploreMainPageClient = ({
                     </button>
                   </div>
                 ) : (
-                  <span>{`Result - ${totalModels} models`}</span>
+                  <span>
+                    {selectedSubCategory?.id
+                      ? `Result (Subcategory: ${selectedSubCategory.name || selectedSubCategory.id}) - ${totalModels} models`
+                      : selectedCategory && selectedCategory !== 'All'
+                        ? `Result (Category: ${selectedCategory}) - ${totalModels} models`
+                        : `Result - ${totalModels} models`}
+                  </span>
                 )}
                 <span className="absolute left-0 -bottom-2 w-full h-0.5 bg-custom-light-maincolor dark:bg-custom-light-containercolor rounded" />
+              </div>
+              {/* Active filter summary */}
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                {selectedPlatform && selectedPlatform !== 'All' && (
+                  <button
+                    onClick={() => {
+                      setSelectedPlatform('All');
+                      const queryParams = new URLSearchParams();
+                      if (selectedCategory && selectedCategory !== 'All') queryParams.set("category", selectedCategory);
+                      if (selectedSubCategory?.id) queryParams.set("subCategory", selectedSubCategory.id);
+                      if (searchInput) queryParams.set("key", searchInput);
+                      if (searchPrice) queryParams.set("price", searchPrice);
+                      if (liked) queryParams.set("liked", 'true');
+                      if (userId) queryParams.set("userId", userId);
+                      queryParams.set("currentPage", '1');
+                      router.push(`/explore?${queryParams.toString()}`);
+                    }}
+                    className="px-2 py-1 rounded-full border border-gray-300 dark:border-gray-600 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-600 transition-colors cursor-pointer"
+                  >
+                    Platform: {selectedPlatform} ✕
+                  </button>
+                )}
+                {selectedCategory && selectedCategory !== 'All' && !selectedSubCategory?.id && (
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('All');
+                      const queryParams = new URLSearchParams();
+                      if (selectedPlatform && selectedPlatform !== 'All') queryParams.set("sourcesite", selectedPlatform);
+                      if (selectedSubCategory?.id) queryParams.set("subCategory", selectedSubCategory.id);
+                      if (searchInput) queryParams.set("key", searchInput);
+                      if (searchPrice) queryParams.set("price", searchPrice);
+                      if (liked) queryParams.set("liked", 'true');
+                      if (userId) queryParams.set("userId", userId);
+                      queryParams.set("currentPage", '1');
+                      router.push(`/explore?${queryParams.toString()}`);
+                    }}
+                    className="px-2 py-1 rounded-full border border-gray-300 dark:border-gray-600 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-600 transition-colors cursor-pointer"
+                  >
+                    Category: {selectedCategory} ✕
+                  </button>
+                )}
+                {selectedSubCategory?.id && (
+                  <button
+                    onClick={() => {
+                      setSelectedSubCategory({ id: "", name: "" });
+                      const queryParams = new URLSearchParams();
+                      if (selectedPlatform && selectedPlatform !== 'All') queryParams.set("sourcesite", selectedPlatform);
+                      if (selectedCategory && selectedCategory !== 'All') queryParams.set("category", selectedCategory);
+                      if (searchInput) queryParams.set("key", searchInput);
+                      if (searchPrice) queryParams.set("price", searchPrice);
+                      if (liked) queryParams.set("liked", 'true');
+                      if (userId) queryParams.set("userId", userId);
+                      queryParams.set("currentPage", '1');
+                      router.push(`/explore?${queryParams.toString()}`);
+                    }}
+                    className="px-2 py-1 rounded-full border border-gray-300 dark:border-gray-600 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-600 transition-colors cursor-pointer"
+                  >
+                    Subcategory: {selectedSubCategory.name || selectedSubCategory.id} ✕
+                  </button>
+                )}
+                {searchPrice && (
+                  <button
+                    onClick={() => {
+                      setSearchPrice("");
+                      const queryParams = new URLSearchParams();
+                      if (selectedPlatform && selectedPlatform !== 'All') queryParams.set("sourcesite", selectedPlatform);
+                      if (selectedCategory && selectedCategory !== 'All') queryParams.set("category", selectedCategory);
+                      if (selectedSubCategory?.id) queryParams.set("subCategory", selectedSubCategory.id);
+                      if (searchInput) queryParams.set("key", searchInput);
+                      if (liked) queryParams.set("liked", 'true');
+                      if (userId) queryParams.set("userId", userId);
+                      queryParams.set("currentPage", '1');
+                      router.push(`/explore?${queryParams.toString()}`);
+                    }}
+                    className="px-2 py-1 rounded-full border border-gray-300 dark:border-gray-600 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-600 transition-colors cursor-pointer"
+                  >
+                    Price: {searchPrice} ✕
+                  </button>
+                )}
+                {liked && (
+                  <button
+                    onClick={() => {
+                      setliked(false);
+                      const queryParams = new URLSearchParams();
+                      if (selectedPlatform && selectedPlatform !== 'All') queryParams.set("sourcesite", selectedPlatform);
+                      if (selectedCategory && selectedCategory !== 'All') queryParams.set("category", selectedCategory);
+                      if (selectedSubCategory?.id) queryParams.set("subCategory", selectedSubCategory.id);
+                      if (searchInput) queryParams.set("key", searchInput);
+                      if (searchPrice) queryParams.set("price", searchPrice);
+                      if (userId) queryParams.set("userId", userId);
+                      queryParams.set("currentPage", '1');
+                      router.push(`/explore?${queryParams.toString()}`);
+                    }}
+                    className="px-2 py-1 rounded-full border border-gray-300 dark:border-gray-600 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-600 transition-colors cursor-pointer"
+                  >
+                    Liked ✕
+                  </button>
+                )}
               </div>
               <NavFilter selectedFilters={selectedFilters} onFilterChange={setSelectedFilters} />
                 {/* Explore mid-content banner ad */}
@@ -249,17 +390,6 @@ const ExploreMainPageClient = ({
           </div>
         </div>
       </div>
-
-      {/* UP Button */}
-      {/* {showUpButton && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-10 right-10 z-50 p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-all"
-          aria-label="Scroll to top"
-        >
-          <FaArrowUp size={20} />
-        </button>
-      )} */}
       <ScrollToTopButton />
     </div>
   );

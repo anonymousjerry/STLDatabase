@@ -21,7 +21,7 @@ const SearchResultPart = ({ models }: { models: Model[] }) => {
   }
 
   return (
-    <div className="grid grid-cols-3 justify-between gap-x-12 gap-y-8 max-xl:grid-cols-2 max-md:grid-cols-2 max-sm:grid-cols-1 pt-5">
+    <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 xl:gap-8 pt-5">
       {models.map((model: Model) => (
         <ModelItem key={model.id} model={model} color="white" />
       ))}

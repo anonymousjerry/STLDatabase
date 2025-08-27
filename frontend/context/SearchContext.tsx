@@ -9,7 +9,6 @@ type SearchContextType = {
   searchInput: string;
   searchPrice: string;
   searchTag: string;
-  favourited: boolean;
   liked: boolean;
   userId: string;
   setSelectedPlatform: (value: string) => void;
@@ -18,7 +17,6 @@ type SearchContextType = {
   setSearchInput: (value: string) => void;
   setSearchPrice: (value: string) => void;
   setSearchTag: (value: string) => void;
-  setfavourited: (value: boolean) => void;
   setliked: (value: boolean) => void;
   setUserId: (value: string) => void;
   resetSearch: () => void;
@@ -36,7 +34,6 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
   const [searchInput, setSearchInput] = useState("");
   const [searchPrice, setSearchPrice] = useState("");
   const [searchTag, setSearchTag] = useState("");
-  const [favourited, setfavourited] = useState(false);
   const [liked, setliked] = useState(false);
   const [userId, setUserId] = useState("");
 
@@ -65,10 +62,6 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
     setSearchTag(value);
   }, []);
 
-  const memoizedSetFavourited = useCallback((value: boolean) => {
-    setfavourited(value);
-  }, []);
-
   const memoizedSetLiked = useCallback((value: boolean) => {
     setliked(value);
   }, []);
@@ -84,7 +77,6 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
     setSearchInput("");
     setSearchPrice("");
     setSearchTag("");
-    setfavourited(false);
     setliked(false);
   }, []);
 
@@ -96,11 +88,10 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
       searchInput,
       searchPrice,
       searchTag,
-      favourited,
       liked,
       userId,
     };
-  }, [selectedPlatform, selectedCategory, selectedSubCategory, searchInput, searchPrice, searchTag, favourited, liked, userId]);
+  }, [selectedPlatform, selectedCategory, selectedSubCategory, searchInput, searchPrice, searchTag, liked, userId]);
 
   // Memoized context value to prevent unnecessary re-renders
   const contextValue = useMemo(() => ({
@@ -110,7 +101,6 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
     searchInput,
     searchPrice,
     searchTag,
-    favourited,
     liked,
     userId,
     setSelectedPlatform: memoizedSetSelectedPlatform,
@@ -119,7 +109,6 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
     setSearchInput: memoizedSetSearchInput,
     setSearchPrice: memoizedSetSearchPrice,
     setSearchTag: memoizedSetSearchTag,
-    setfavourited: memoizedSetFavourited,
     setliked: memoizedSetLiked,
     setUserId: memoizedSetUserId,
     resetSearch,
@@ -131,7 +120,6 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
     searchInput,
     searchPrice,
     searchTag,
-    favourited,
     liked,
     userId,
     memoizedSetSelectedPlatform,
@@ -140,7 +128,6 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
     memoizedSetSearchInput,
     memoizedSetSearchPrice,
     memoizedSetSearchTag,
-    memoizedSetFavourited,
     memoizedSetLiked,
     memoizedSetUserId,
     resetSearch,
