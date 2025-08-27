@@ -24,15 +24,18 @@ const PriceFilter = () => {
   const {
       selectedPlatform,
       selectedCategory,
+      selectedSubCategory,
       searchInput,
       searchPrice,
       favourited,
+      liked,
       userId,
       setSelectedPlatform,
       setSelectedCategory,
       setSearchInput,
       setSearchPrice,
       setfavourited,
+      setliked
     } = useSearch();
 
   const handleRadioChange = (value: string) => {
@@ -43,10 +46,12 @@ const PriceFilter = () => {
         if (selectedPlatform && selectedPlatform !== "All")
         queryParams.set("sourcesite", selectedPlatform);
         if (selectedCategory && selectedCategory !== "All")
-        queryParams.set("category", selectedCategory);
+          queryParams.set("category", selectedCategory);
+        if (selectedSubCategory) queryParams.set("subCategory", selectedSubCategory.id);
         if (searchInput) queryParams.set("key", searchInput);
         if (value) queryParams.set("price", value);
         if (favourited) queryParams.set("favourited", 'true');
+        if (liked) queryParams.set("liked", 'true');
         if (userId) {
           queryParams.set("userId", userId)
         }

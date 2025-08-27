@@ -2,6 +2,7 @@ export { default as Breadcrumb } from "./Breadcrumb";
 export { default as Categories } from "./TopCategories";
 export { default as CategoriesFilter} from "./CategoriesFilter"
 export { default as CategoryItem } from "./CategoryItem";
+export { default as CategoriesPageClient } from "./CategoriesPageClient";
 export { default as ClientExplorePage} from "./ClientExplorePage"
 export { default as DailyDiscover } from "./DailyDiscover";
 export { default as DropdownButton } from "./DropdownButton";

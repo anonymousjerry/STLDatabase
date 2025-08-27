@@ -11,6 +11,7 @@ import {
 import { ScrapeJob } from '../sanity/types';
 import { Plus, Search, Pencil, Trash2, Play, Pause } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import { setupSocketListeners } from '../sanity/plugins/socketListener';
 
 interface Alert {
   type: 'success' | 'error';
@@ -23,6 +24,9 @@ export default function ScrapeJobTable() {
   const [editingJob, setEditingJob] = useState<ScrapeJob | null>(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [updatingJobs, setUpdatingJobs] = useState<Set<string>>(new Set());
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
   const [formData, setFormData] = useState({
     platform: 'Printables' as ScrapeJob['platform'],
@@ -44,6 +48,7 @@ export default function ScrapeJobTable() {
     try {
       const data = await getAllScrapeJobs();
       setJobs(data);
+      setLastRefresh(new Date());
     } catch (err) {
       console.error('Error fetching scraping jobs:', err);
       showAlert('error', err instanceof Error ? err.message : 'Failed to fetch scraping jobs');
@@ -54,6 +59,65 @@ export default function ScrapeJobTable() {
 
   useEffect(() => {
     refreshJobs();
+  }, []);
+
+  // Socket integration for real-time status updates
+  useEffect(() => {
+    const handleStatusUpdate = (id: string, status: string, platform: string) => {
+      console.log(`Updating job ${id} status to ${status} for platform ${platform}`);
+      
+      // Add job to updating set
+      setUpdatingJobs(prev => new Set(prev).add(id));
+      
+      // Update local state directly (backend already updated the database)
+      setJobs(prevJobs => 
+        prevJobs.map(job => 
+          job.id === id 
+            ? { ...job, status: status as ScrapeJob['status'] }
+            : job
+        )
+      );
+            
+      // Remove job from updating set after a delay to show the update effect
+      setTimeout(() => {
+        setUpdatingJobs(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(id);
+          return newSet;
+        });
+      }, 2000);
+    };
+
+    // Setup socket listeners
+    setupSocketListeners(
+      (status, message) => {
+        // Handle general notifications
+        if (status === 'success') {
+          toast.success(message);
+        } else if (status === 'error') {
+          toast.error(message);
+        } else if (status === 'warning') {
+          toast(message, { icon: '⚠️' });
+        } else {
+          toast(message);
+        }
+      },
+      handleStatusUpdate
+    );
+
+    // Track socket connection status
+    const checkSocketConnection = () => {
+      // This is a simple way to track if socket is working
+      // In a real implementation, you might want to expose connection status from socketListener
+      setSocketConnected(true);
+    };
+
+    // Set connected after a short delay to simulate connection
+    const connectionTimer = setTimeout(checkSocketConnection, 1000);
+    
+    return () => {
+      clearTimeout(connectionTimer);
+    };
   }, []);
 
   const handleInputChange = (field: string, value: any) => {
@@ -129,15 +193,32 @@ export default function ScrapeJobTable() {
 
   const toggleActive = async (id: string, enabled: boolean) => {
     try {
-      setLoading(true);
+      // Update local state immediately for better UX
+      setJobs(prevJobs => 
+        prevJobs.map(job => 
+          job.id === id 
+            ? { ...job, isActive: enabled }
+            : job
+        )
+      );
+      
+      // Make API call in background
       await toggleScrapeJobActive(id, enabled);
-      await refreshJobs();
-      showAlert('success', 'Job status toggled successfully!');
+      
+      // Show success message
+      showAlert('success', `Job ${enabled ? 'activated' : 'deactivated'} successfully!`);
     } catch (err) {
+      // Revert local state if API call fails
+      setJobs(prevJobs => 
+        prevJobs.map(job => 
+          job.id === id 
+            ? { ...job, isActive: !enabled }
+            : job
+        )
+      );
+      
       console.error('Error toggling job status:', err);
       showAlert('error', err instanceof Error ? err.message : 'Failed to toggle job status');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -182,7 +263,9 @@ export default function ScrapeJobTable() {
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
       {/* Header */}
       <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Scraping Job Management</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Scraping Job Management</h1>
+        </div>
         <button
           onClick={() => {
             setIsFormVisible(!isFormVisible);
@@ -226,12 +309,19 @@ export default function ScrapeJobTable() {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             />
           </div>
-          <button
-            onClick={refreshJobs}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            Refresh
-          </button>
+          <div className="flex flex-col items-end gap-1">
+            <button
+              onClick={refreshJobs}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Refresh
+            </button>
+            {lastRefresh && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                Last updated: {lastRefresh.toLocaleTimeString()}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -366,7 +456,14 @@ export default function ScrapeJobTable() {
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {filteredJobs.map((job) => (
-                <tr key={job.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr 
+                  key={job.id} 
+                  className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 ${
+                    updatingJobs.has(job.id) 
+                      ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500' 
+                      : ''
+                  }`}
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900 dark:text-white">{job.platform}</div>
                   </td>
@@ -378,20 +475,26 @@ export default function ScrapeJobTable() {
                     <div className="text-xs text-gray-500 dark:text-gray-400">{job.timezone}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(job.status)}`}>
-                      {job.status}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(job.status)}`}>
+                        {job.status}
+                      </span>
+                      {updatingJobs.has(job.id) && (
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       onClick={() => toggleActive(job.id, !job.isActive)}
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
                         job.isActive 
-                          ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-200' 
-                          : 'bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-200'
+                          ? 'bg-green-100 text-green-700 border border-green-300 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700' 
+                          : 'bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600'
                       }`}
                     >
-                      {job.isActive ? <Play size={14} /> : <Pause size={14} />}
+                      <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${job.isActive ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                      {job.isActive ? 'ON' : 'OFF'}
                     </button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

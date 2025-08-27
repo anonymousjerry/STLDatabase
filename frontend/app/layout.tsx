@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { SearchProvider } from "@/context/SearchContext";
 import 'svgmap/dist/svgMap.min.css';
 import { LoadingProvider } from "@/context/LoadingContext";
+import { AdProvider } from "@/context/AdContext";
 // import LoadingSpinner from "@/components/LoadingSpinner";
 // import RouteChangeLoader from "@/components/RouteChangeLoader";
 
@@ -36,9 +37,11 @@ export default async function RootLayout({
           <LoadingProvider>
             <SessionProvider session={session}>
               <SearchProvider>
-                <Providers>
-                {children}
-                </Providers>
+                <AdProvider>
+                  <Providers>
+                  {children}
+                  </Providers>
+                </AdProvider>
               </SearchProvider>
             </SessionProvider>
           </LoadingProvider>

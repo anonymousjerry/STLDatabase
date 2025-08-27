@@ -5,7 +5,7 @@ import { useSearch } from "@/context/SearchContext";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
-const FavoriteFilter = () => {
+const LikeFilter = () => {
   const router = useRouter();
   const {
     searchInput,
@@ -16,6 +16,7 @@ const FavoriteFilter = () => {
     favourited,
     liked,
     setfavourited,
+    setliked,
     setUserId
   } = useSearch();
   const { data: session, status } = useSession();
@@ -24,7 +25,8 @@ const FavoriteFilter = () => {
 
   const handleCheckboxChange = (checked: boolean) => {
     if (isDisabled || !userId) return;
-    setfavourited(checked);
+    console.log("checked", checked)
+    setliked(checked);
     setUserId(userId);
 
     const queryParams = new URLSearchParams();
@@ -38,11 +40,11 @@ const FavoriteFilter = () => {
     //   queryParams.set("subCategory", selectedSubCategory.id);
     if (searchPrice && searchPrice !== "All")
       queryParams.set("price", searchPrice);
+    if (favourited) queryParams.set("favourited", "true");
     if (checked) {
-      queryParams.set("favourited", "true");
+      queryParams.set("liked", "true");
       queryParams.set("userId", userId)
     }
-    if (liked) queryParams.set("liked", "true")
 
     setTimeout(() => {
       router.push(`/explore?${queryParams.toString()}`);
@@ -53,14 +55,13 @@ const FavoriteFilter = () => {
     <label className="flex items-center gap-2 mt-2 font-normal text-lg text-custom-light-textcolor dark:text-custom-dark-textcolor">
       <input
         type="checkbox"
-        checked={favourited}
+        checked={liked}
         onChange={(e) => handleCheckboxChange(e.target.checked)}
         className="w-4 h-4 accent-red-600 dark:accent-red-400"
       />
-      <span>saved Models</span>
+      <span>liked Models</span>
     </label>
-
   );
 };
 
-export default FavoriteFilter;
+export default LikeFilter;

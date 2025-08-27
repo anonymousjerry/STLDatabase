@@ -4,6 +4,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
   }

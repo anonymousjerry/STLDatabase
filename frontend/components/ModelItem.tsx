@@ -9,20 +9,43 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLikesStore } from "@/app/_zustand/useLikesStore";
 import { useViewsStore } from "@/app/_zustand/useViewStore";
+import { useSearch } from "@/context/SearchContext";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   const { data: session, status } = useSession();
   const userId = (session?.user as { id?: string })?.id;
   const isDisabled = status !== "authenticated";
 
+  const router = useRouter();
+
+
   const { likedModels, likesCount, toggleLike } = useLikesStore();
-  const liked = likedModels[model.id] ?? model.likes?.some((like: Like) => like.userId === userId) ?? false;
+  const likedModel = likedModels[model.id] ?? model.likes?.some((like: Like) => like.userId === userId) ?? false;
   const count = likesCount[model.id] ?? model.likes.length;
 
   const { addView, isView, ViewCounts } = useViewsStore();
 
   const sourceSiteName = model.sourceSite?.name ?? "";
+
+  const {
+      selectedPlatform,
+      selectedCategory,
+      searchTag,
+      searchInput,
+      searchPrice,
+      favourited,
+      liked,
+      setSelectedPlatform,
+      setSelectedCategory,
+      setSelectedSubCategory,
+      setSearchTag,
+      setSearchInput,
+      setSearchPrice,
+      setfavourited,
+      setliked
+    } = useSearch();
 
   useEffect(() => {
     if (!model || !userId) return;
@@ -56,12 +79,15 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
     `${slugify(category)}/${slugify(subCategory)}/${slugify(title)}`;
 
   const handleModelOnClick = async (modelId: string) => {
-    if (!userId) return;
+    if (!userId) {
+      toast.error("Please log in to like this model.");
+      return;
+    }
 
     try {
       toggleLike(model.id);
       await likeModel(modelId, userId, session?.accessToken || "");
-      if(!liked) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+      if(!likedModel) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
           toast.success("Model liked successfully!");
         } else {
           toast.success("Model disliked successfully!");
@@ -82,13 +108,43 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   };
 
   const handleToggleView = async (modelId: string) => {
+    
     try {
       const data = await viewModel(modelId, session?.accessToken || "");
       addView(modelId, data.count);
+      setSearchInput("");
+      setSelectedCategory("All");
+      setSelectedSubCategory({name: "", id: ""});
     } catch (error) {
       toast.error("Failed to view model.");
     }
   };
+
+  const handleTagSearch = (tag: string) => {
+    setSearchInput("");
+    setSelectedCategory("All");
+    setSearchTag(tag);
+
+    const queryParams = new URLSearchParams();
+    queryParams.set("tag", tag);
+    queryParams.set("key", '');
+    if (selectedPlatform && selectedPlatform !== "All")
+      queryParams.set("sourcesite", selectedPlatform);
+    if (searchPrice) queryParams.set("price", searchPrice);
+    if (favourited) queryParams.set("favourited", 'true');
+    if (liked) queryParams.set("liked", 'true');
+    queryParams.set("currentPage", '1');
+
+    router.push(`/explore?${queryParams.toString()}`);
+  };
+
+  const handlePlatformSearchByImage = (platform: string) => {
+    setSelectedPlatform(platform);
+
+    const queryParams = new URLSearchParams();
+    queryParams.set("sourcesite", platform);
+    router.push(`/explore?${queryParams.toString()}`);
+  }
 
   function formatPrice(priceStr: String) {
   // Extract the currency symbol (assume it's the first non-digit char)
@@ -109,14 +165,17 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
 
       {/* Source icon */}
       <div className="absolute top-2 left-2 rounded-lg hover:bg-opacity-100 transition z-10">
-        <Image
-          src = {model.sourceSite?.iconBigUrl}
-          alt={sourceSiteName}
-          width={32}
-          height={32}
-          className="sm:w-10 sm:h-10 w-8 h-8 rounded-lg"
-          unoptimized
-        />
+        <div className="relative w-8 h-8 sm:w-10 sm:h-10">
+          <Image
+            src={model.sourceSite?.iconBigUrl}
+            onClick={() => handlePlatformSearchByImage(model.sourceSite?.name)}
+            alt={sourceSiteName}
+            fill
+            className="rounded-lg object-contain cursor-pointer transition-transform duration-200 hover:scale-105 hover:shadow-md"
+            sizes="(max-width: 640px) 32px, 40px"
+            unoptimized
+          />
+        </div>
       </div>
 
       {/* Image */}
@@ -130,7 +189,7 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
           alt={model.title}
           fill
           className="transition-transform duration-300 ease-in-out transform hover:scale-105 object-cover"
-          unoptimized
+          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
       </Link>
 
@@ -149,12 +208,13 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
         {/* Tags */}
         <div className="flex gap-2">
           {model.tags.slice(0, 2).map((tag: string, index: number) => (
-            <span
+            <div
               key={`${tag}-${index}`}
-              className="bg-custom-light-maincolor font-medium text-xs sm:text-sm text-white py-[1px] px-2 rounded-md max-w-[120px] truncate"
+              onClick={() => handleTagSearch(tag)}
+              className="max-w-[120px] truncate cursor-pointer rounded-md bg-custom-light-maincolor px-2 py-0.5 text-xs font-medium text-white sm:text-sm transition-colors hover:bg-custom-light-maincolor/90"
             >
               {tag}
-            </span>
+            </div>
           ))}
         </div>
 
@@ -177,20 +237,17 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pb-2">
           <button
             aria-label="Like"
-            disabled={isDisabled}
             onClick={() => handleModelOnClick(model.id)}
             className={`
               flex items-center justify-center w-full sm:w-12 h-12 border rounded-xl transition-transform duration-200
               ${
-                isDisabled
-                  ? "border-gray-300 text-gray-300 cursor-not-allowed dark:border-gray-600 dark:text-gray-500"
-                  : liked
+                likedModel
                   ? "border-red-500 text-white bg-red-600 scale-105 dark:bg-red-700 dark:border-red-600 dark:text-red-300 dark:shadow-md dark:shadow-red-600"
                   : "border-custom-light-maincolor text-custom-light-maincolor hover:bg-[#f0f0f0] hover:scale-110 dark:border-gray-500 dark:text-gray-300 dark:hover:bg-gray-600"
               }
             `}
           >
-            {liked ? (
+            {likedModel ? (
               <FaHeart className="text-white" size={24} />
             ) : (
               <FaRegHeart size={24} />

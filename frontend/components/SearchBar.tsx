@@ -19,6 +19,7 @@ const SearchBar = () => {
   const [platforms, setPlatforms] = useState<string[][]>([]);
   const [groupedCategories, setGroupedCategories] = useState<GroupedCategory[]>([]);
   const [categoryLable, setCategoryLabel] = useState('Category');
+  const [categoryValue, setCategoryValue] = useState("All");
   // const { data: session, status } = useSession();
   // const userId = (session?.user as { id?: string })?.id;
   
@@ -31,6 +32,7 @@ const SearchBar = () => {
     searchTag,
     searchPrice,
     favourited,
+    liked,
     userId,
     setSelectedPlatform,
     setSelectedCategory,
@@ -39,6 +41,7 @@ const SearchBar = () => {
     setSearchTag,
     setSearchPrice,
     setfavourited,
+    setliked,
     setUserId
   } = useSearch();
 
@@ -59,8 +62,31 @@ const SearchBar = () => {
         setGroupedCategories(formatted);
       })
       .catch(console.error)
-    setSelectedSubCategory({id: "", name: ""})
+    if (selectedSubCategory?.id) {
+      setCategoryLabel("SubCategory");
+      setCategoryValue(selectedSubCategory.name)
+    } else if (selectedCategory && selectedCategory !== "All") {
+      setCategoryLabel("Category");
+      setCategoryValue(selectedCategory)
+    } else {
+      setCategoryLabel("Category");
+      setCategoryValue("All") // fallback
+    }
+      
   }, []);
+
+  useEffect(() => {
+    if (selectedSubCategory?.id) {
+      setCategoryLabel("SubCategory");
+      setCategoryValue(selectedSubCategory.name)
+    } else if (selectedCategory && selectedCategory !== "All") {
+      setCategoryLabel("Category");
+      setCategoryValue(selectedCategory)
+    } else {
+      setCategoryLabel("Category");
+      setCategoryValue("All") // fallback
+    }
+  }, [selectedCategory, selectedSubCategory]);
 
   const platformArray = platforms?.map(([platform]) => platform) || [];
 
@@ -78,6 +104,7 @@ const SearchBar = () => {
     if (searchInput) queryParams.set("key", searchInput);
     if (searchPrice) queryParams.set("price", searchPrice);
     if (favourited) queryParams.set("favourited", 'true');
+    if (liked) queryParams.set("liked", 'true');
     if (userId) {
       queryParams.set("userId", userId)
     }
@@ -122,7 +149,7 @@ const SearchBar = () => {
 
       <div className="basis-1/5">
         <CategoryTreeDropdown
-          value={getDisplayValue()}
+          value={categoryValue}
           label={categoryLable}
           categories={groupedCategories}
           onSelect={handleCategorySelect}

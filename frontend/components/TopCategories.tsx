@@ -100,7 +100,15 @@ const Categories = () => {
 
             return (
               <CategoryItem key={item.id} title={item.title} className={extraClass}>
-                <Image src={item.src} width={80} height={65} alt={item.title} unoptimized />
+                <div className="relative w-20 h-16">
+                  <Image 
+                    src={item.src} 
+                    alt={item.title} 
+                    fill
+                    className="object-contain"
+                    sizes="80px"
+                  />
+                </div>
               </CategoryItem>
             );
           })}

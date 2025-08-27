@@ -33,13 +33,13 @@ const SponsoredModelAd: React.FC<SponsoredModelAdProps> = ({
         </div>
       )}
       
-      <div className="relative">
+      <div className="relative h-48">
         <Image
           src={model.thumbnailUrl}
           alt={model.title}
-          width={300}
-          height={200}
-          className="w-full h-48 object-cover"
+          fill
+          className="object-cover"
+          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 300px"
         />
         <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-lg">
           {model.platform}

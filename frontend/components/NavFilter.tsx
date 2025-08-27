@@ -4,9 +4,6 @@ import React from 'react';
 
 const allFilterOptions = [
   'New Release',
-  'Ending',
-  'Popular',
-  'Pledge',
   'Trending',
   'Featured',
 ];

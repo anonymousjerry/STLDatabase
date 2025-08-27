@@ -10,13 +10,14 @@ interface ExplorePageProps {
     subCategory?: string;
     price?: string;
     favourited?: string;
+    liked?: string;
     userId?: string;
     currentPage?: number;
   };
 }
 
 const ExploreMainPage = async ({ searchParams }: ExplorePageProps) => {
-  const { key, tag, sourcesite, category, subCategory, price, favourited, userId, currentPage} =  await searchParams;
+  const { key, tag, sourcesite, category, subCategory, price, favourited, liked, userId, currentPage} =  await searchParams;
 
   const { models, totalPage, page, hasMore } = await searchModels({
     key: key || '',
@@ -26,6 +27,7 @@ const ExploreMainPage = async ({ searchParams }: ExplorePageProps) => {
     subCategory: subCategory || '',
     price: price || '',
     favourited: favourited || 'false',
+    liked: liked || 'false',
     userId: userId || '',
     page: currentPage || 1,
     limit: 12,

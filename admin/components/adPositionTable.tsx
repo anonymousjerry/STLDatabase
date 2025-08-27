@@ -130,15 +130,32 @@ export function AdPositionTable() {
 
   const handleToggle = async (id: string, enabled: boolean) => {
     try {
-      setLoading(true);
+      // Update local state immediately for better UX
+      setAdPositions(prevPositions => 
+        prevPositions.map(position => 
+          position.id === id 
+            ? { ...position, enabled: enabled }
+            : position
+        )
+      );
+      
+      // Make API call in background
       await toggleAdPosition(id, enabled);
-      await refresh();
-      toast.success("Ad position toggled successfully!");
+      
+      // Show success message
+      toast.success(`Ad position ${enabled ? 'enabled' : 'disabled'} successfully!`);
     } catch (err) {
+      // Revert local state if API call fails
+      setAdPositions(prevPositions => 
+        prevPositions.map(position => 
+          position.id === id 
+            ? { ...position, enabled: !enabled }
+            : position
+        )
+      );
+      
       console.error('Error toggling ad position:', err);
       toast.error(err instanceof Error ? err.message : 'Failed to toggle ad position');
-    } finally {
-      setLoading(false);
     }
   };
 

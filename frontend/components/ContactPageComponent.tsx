@@ -123,20 +123,8 @@ const ContactPageComponent = () => {
     {
       icon: FaEnvelope,
       title: "Email Us",
-      details: "support@3ddatabase.com",
+      details: "hello@3ddatabase.com",
       description: "Send us an email anytime"
-    },
-    {
-      icon: FaPhone,
-      title: "Call Us",
-      details: "+1 (555) 123-4567",
-      description: "Mon-Fri from 8am to 6pm"
-    },
-    {
-      icon: FaMapMarkerAlt,
-      title: "Visit Us",
-      details: "123 3D Street, Tech City",
-      description: "Innovation District, TC 12345"
     },
     {
       icon: FaClock,

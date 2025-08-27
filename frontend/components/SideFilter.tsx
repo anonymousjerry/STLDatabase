@@ -1,28 +1,42 @@
 "use client";
 
-import React, { useState } from "react";
-import { BiFilterAlt } from "react-icons/bi";
+import React, { useEffect, useState } from "react";
+import { BiFilterAlt, BiCategory } from "react-icons/bi";
 import { GoTriangleRight, GoTriangleDown } from "react-icons/go";
 import PlatformsFilter from "./PlatformsFilter";
 import CategoriesFilter from "./CategoriesFilter";
 import PriceFilter from "./PriceFilter";
 import FavoriteFilter from "./FavoriteFilter";
+import LikeFilter from "./LikeFilter";
 import { CgWebsite } from "react-icons/cg";
-import { BiCategory } from "react-icons/bi";
-import { AiOutlineDollarCircle } from "react-icons/ai";
+import { AiFillLike, AiOutlineDollarCircle } from "react-icons/ai";
 import { MdFavoriteBorder } from "react-icons/md";
-
-const filters: string[] = ["Platforms", "Categories", "Price", "Saved Models"];
+import { useSession } from "next-auth/react";
+import { useSearch } from "@/context/SearchContext";
 
 const SideFilter = () => {
-  const [openSections, setOpenSections] = useState<{ [key: string]: boolean }>({});
+  const [openSection, setOpenSection] = useState<string | null>(null);
+  const { data: session, status } = useSession();
+  const userId = (session?.user as { id?: string })?.id;
+  const isEnabled = status === "authenticated";
+
+  const {liked} = useSearch();
+
+  useEffect(() => {
+    if (liked) {
+      setOpenSection("Liked Models");
+    }
+  }, [liked]);
 
   const toggleSection = (title: string) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [title]: !prev[title],
-    }));
+    setOpenSection((prev) => (prev === title ? null : title));
   };
+
+  // build filters dynamically
+  const filters: string[] = ["Platforms", "Categories", "Price"];
+  if (isEnabled) {
+    filters.push("Saved Models", "Liked Models");
+  }
 
   return (
     <aside className="flex flex-col w-full bg-white dark:bg-custom-dark-containercolor border rounded-lg shadow p-4 h-screen overflow-y-auto">
@@ -44,27 +58,21 @@ const SideFilter = () => {
                 {title === "Categories" && <BiCategory />}
                 {title === "Price" && <AiOutlineDollarCircle />}
                 {title === "Saved Models" && <MdFavoriteBorder />}
+                {title === "Liked Models" && <AiFillLike />}
                 {title}
               </span>
               <span>
-                {openSections[title] ? <GoTriangleDown /> : <GoTriangleRight />}
+                {openSection === title ? <GoTriangleDown /> : <GoTriangleRight />}
               </span>
             </button>
 
-            {openSections[title] && (
+            {openSection === title && (
               <div className="mt-2 ml-1">
-                {title === "Platforms" && (
-                  <PlatformsFilter />
-                )}
-                {title === "Categories" && (
-                  <CategoriesFilter />
-                )}
-                {title === "Price" && (
-                  <PriceFilter />
-                )}
-                {title === "Saved Models" && (
-                  <FavoriteFilter />
-                )}
+                {title === "Platforms" && <PlatformsFilter />}
+                {title === "Categories" && <CategoriesFilter />}
+                {title === "Price" && <PriceFilter />}
+                {userId && title === "Saved Models" && <FavoriteFilter />}
+                {userId && title === "Liked Models" && <LikeFilter />}
               </div>
             )}
           </div>
@@ -75,4 +83,3 @@ const SideFilter = () => {
 };
 
 export default SideFilter;
-

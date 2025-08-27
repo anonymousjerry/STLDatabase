@@ -32,7 +32,7 @@ const FeaturedSite = () => {
       <div className="flex flex-col bg-custom-light-containercolor dark:bg-custom-dark-containercolor rounded-[32px] px-11 max-md:px-6">
         <div className="grid grid-cols-2">
           <div className="flex text-custom-light-titlecolor dark:text-custom-dark-titlecolor py-5 text-2xl font-bold">
-            FEATURED SITE
+            TRUSTED MODEL SOURCES
           </div>
           {PlatformMenuList.length > 9 && (
             <div className="flex items-center justify-end">
