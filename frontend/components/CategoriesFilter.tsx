@@ -21,7 +21,6 @@ const CategoriesFilter = () => {
     selectedSubCategory,
     searchInput,
     searchPrice,
-    favourited,
     liked,
     userId,
     setSelectedCategory,
@@ -58,9 +57,6 @@ const CategoriesFilter = () => {
       queryParams.set("sourcesite", selectedPlatform);
     if (searchInput) queryParams.set("key", searchInput);
     if (searchPrice) queryParams.set("price", searchPrice);
-    if (favourited) {
-        queryParams.set("favourited", "true");    
-    }
     if (liked) {
         queryParams.set("liked", "true");    
     }
@@ -81,9 +77,6 @@ const CategoriesFilter = () => {
       queryParams.set("sourcesite", selectedPlatform);
     if (searchInput) queryParams.set("key", searchInput);
     if (searchPrice) queryParams.set("price", searchPrice);
-    if (favourited) {
-        queryParams.set("favourited", "true");    
-    }
     if (liked) {
         queryParams.set("liked", "true");    
     }

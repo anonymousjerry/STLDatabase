@@ -34,7 +34,6 @@ export interface Model {
   subCategoryId?: string;
   tags?: string[];
   likes?: Array<{ id: string; user: { id: string; username: string; email: string }; userId: string }>;
-  favourites?: Array<{ id: string; user: { id: string; username: string; email: string }; userId: string }>;
   downloads?: number;
   views?: number;
   thumbnailUrl?: string;
@@ -376,17 +375,6 @@ export function ModelTable() {
                       className="flex items-center gap-2 text-red-500 hover:underline text-sm"
                     >
                       <Heart size={14} /> {(model.likes || []).length}
-                    </button>
-                    <button
-                      onClick={() =>
-                        showUserModal(
-                          "Favourites",
-                          (model.favourites || []).map((f) => f.user)
-                        )
-                      }
-                      className="flex items-center gap-2 text-yellow-400 hover:underline text-sm"
-                    >
-                      <Star size={14} /> {(model.favourites || []).length}
                     </button>
                     <div
                       className="flex items-center gap-2 text-blue-600 hover:underline text-sm"

@@ -25,7 +25,7 @@ const FeaturedSite = () => {
   const visibleItems = showAll ? PlatformMenuList : PlatformMenuList.slice(0, 9);
 
   return (
-    <div className="pt-6 px-52 max-xl:px-30 max-lg:px-20 max-md:px-10 mx-auto bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor relative">
+    <div className="pt-6 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor relative">
       {/* Loading Overlay */}
       <LoadingOverlay show={loading} size={50}/>
 

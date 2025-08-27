@@ -11,7 +11,7 @@ type BreadcrumbProps = {
 };
 
 const Breadcrumb = ({ category, subCategory, title }: BreadcrumbProps) => {
-  const {searchInput, selectedPlatform, searchTag, favourited, liked, searchPrice, setSelectedCategory, setSelectedSubCategory} = useSearch();
+  const {searchInput, selectedPlatform, searchTag, liked, searchPrice, setSelectedCategory, setSelectedSubCategory} = useSearch();
   const router = useRouter();
 
   const handleCategory = (category: string) => {
@@ -24,7 +24,6 @@ const Breadcrumb = ({ category, subCategory, title }: BreadcrumbProps) => {
     if (selectedPlatform && selectedPlatform !== "All")
       queryParams.set("sourcesite", selectedPlatform);
     if (searchPrice) queryParams.set("price", searchPrice);
-    if (favourited) queryParams.set("favourited", 'true');
     if (liked) queryParams.set("liked", 'true');
     if (searchTag) queryParams.set("tag", searchTag);
     queryParams.set("currentPage", '1');
@@ -42,7 +41,6 @@ const Breadcrumb = ({ category, subCategory, title }: BreadcrumbProps) => {
     if (selectedPlatform && selectedPlatform !== "All")
       queryParams.set("sourcesite", selectedPlatform);
     if (searchPrice) queryParams.set("price", searchPrice);
-    if (favourited) queryParams.set("favourited", 'true');
     if (liked) queryParams.set("liked", "true");
     if (searchTag) queryParams.set("tag", searchTag);
     queryParams.set("currentPage", '1');

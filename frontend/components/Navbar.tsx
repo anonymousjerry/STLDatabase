@@ -57,12 +57,14 @@ const Navbar = () => {
       selectedCategory,
       selectedSubCategory,
       searchPrice,
-      favourited,
       liked,
       setSelectedPlatform,
       setSelectedCategory,
       setSelectedSubCategory,
+      setSearchPrice,
+      setSearchTag,
       setliked,
+      setUserId,
       setSearchInput
   } = useSearch();
 
@@ -71,6 +73,9 @@ const Navbar = () => {
       setSelectedCategory('All');
       setSelectedSubCategory({id: "", name: ""});
       setSearchInput('');
+      setSearchPrice("");
+      setSearchTag("");
+      setliked(false);
       setMobileMenuOpen(false);
       router.push(href);
   };
@@ -84,7 +89,9 @@ const Navbar = () => {
       toast.error("Please log in to like this model.");
       return;
     }
+    console.log("userIDuserID", userId)
     setliked(true);
+    setUserId(userId);
     const queryParams = new URLSearchParams();
     queryParams.set("liked", 'true');
     queryParams.set("userId", userId)
@@ -93,17 +100,17 @@ const Navbar = () => {
       queryParams.set("sourcesite", selectedPlatform);
     if (selectedCategory && selectedCategory !== "All")
       queryParams.set("category", selectedCategory);
-    // if (selectedSubCategory?.id)
-    //   queryParams.set("subCategory", selectedSubCategory.id);
+    if (selectedSubCategory?.id)
+      queryParams.set("subCategory", selectedSubCategory.id);
     if (searchPrice && searchPrice !== "All")
       queryParams.set("price", searchPrice);
-    if (favourited) queryParams.set("favourited", "true");
     router.push(`/explore?${queryParams.toString()}`);
   }
 
 
   return (
-    <nav className="bg-custom-light-maincolor px-4 sm:px-8 md:px-16 lg:px-32 xl:px-52 py-4 relative">
+    <nav className="w-full bg-custom-light-maincolor py-4 relative">
+      <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 md:px-8">
       {/* Desktop Navigation */}
       <div className="hidden lg:grid lg:grid-cols-3 items-center justify-between text-white">
         {/* Logo + Navigation */}
@@ -223,7 +230,7 @@ const Navbar = () => {
           ref={mobileMenuRef}
           className="lg:hidden absolute top-full left-0 right-0 bg-custom-light-maincolor border-t border-white/20 z-50"
         >
-          <div className="px-4 py-6 space-y-4">
+          <div className="mx-auto w-full max-w-[1300px] px-4 py-6 space-y-4">
             {/* Navigation Links */}
             <div className="space-y-3">
               {links.map(link => (
@@ -307,6 +314,7 @@ const Navbar = () => {
           </div>
         </div>
       )}
+      </div>
     </nav>
   );
 };

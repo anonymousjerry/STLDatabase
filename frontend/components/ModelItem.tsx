@@ -21,9 +21,11 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   const router = useRouter();
 
 
-  const { likedModels, likesCount, toggleLike } = useLikesStore();
-  const likedModel = likedModels[model.id] ?? model.likes?.some((like: Like) => like.userId === userId) ?? false;
-  const count = likesCount[model.id] ?? model.likes.length;
+  const { likedModels, likesCount, toggleLike, reset } = useLikesStore();
+  
+  // Only use server-side like data to determine if current user has liked this model
+  const likedModel = model.likes?.some((like: Like) => like.userId === userId) ?? false;
+  const count = model.likes.length;
 
   const { addView, isView, ViewCounts } = useViewsStore();
 
@@ -35,7 +37,6 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
       searchTag,
       searchInput,
       searchPrice,
-      favourited,
       liked,
       setSelectedPlatform,
       setSelectedCategory,
@@ -43,29 +44,13 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
       setSearchTag,
       setSearchInput,
       setSearchPrice,
-      setfavourited,
       setliked
     } = useSearch();
 
+  // Reset likes store when user changes (login/logout)
   useEffect(() => {
-    if (!model || !userId) return;
-
-    const alreadySet = likedModels.hasOwnProperty(model.id);
-    const hasLiked = model.likes?.some((like: Like) => like.userId === userId);
-
-    if (!alreadySet && hasLiked) {
-      useLikesStore.setState((prev) => ({
-        likedModels: {
-          ...prev.likedModels,
-          [model.id]: true,
-        },
-        likesCount: {
-          ...prev.likesCount,
-          [model.id]: model.likes.length,
-        },
-      }));
-    }
-  }, [userId, model, likedModels]);
+    reset();
+  }, [userId, reset]);
 
   const slugify = (text: string): string =>
     text
@@ -85,9 +70,8 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
     }
 
     try {
-      toggleLike(model.id);
       await likeModel(modelId, userId, session?.accessToken || "");
-      if(!likedModel) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+      if(!likedModel) {
           toast.success("Model liked successfully!");
         } else {
           toast.success("Model disliked successfully!");
@@ -131,7 +115,6 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
     if (selectedPlatform && selectedPlatform !== "All")
       queryParams.set("sourcesite", selectedPlatform);
     if (searchPrice) queryParams.set("price", searchPrice);
-    if (favourited) queryParams.set("favourited", 'true');
     if (liked) queryParams.set("liked", 'true');
     queryParams.set("currentPage", '1');
 

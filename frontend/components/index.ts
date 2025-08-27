@@ -7,7 +7,6 @@ export { default as ClientExplorePage} from "./ClientExplorePage"
 export { default as DailyDiscover } from "./DailyDiscover";
 export { default as DropdownButton } from "./DropdownButton";
 export { default as ExploreMainPageClient} from "./ExploreMainPageClient";
-export { default as FavoriteFilter} from "./FavoriteFilter";
 export { default as FeaturedSite } from "./FeaturedSite";
 export { default as Footer } from "./Footer";
 export { default as Header } from "./Header";

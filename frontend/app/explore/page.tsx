@@ -1,4 +1,5 @@
 import { ExploreMainPageClient } from '@/components';
+import Container from '@/components/Container';
 import { searchModels } from '@/lib/modelsApi';
 
 interface ExplorePageProps {
@@ -34,12 +35,14 @@ const ExploreMainPage = async ({ searchParams }: ExplorePageProps) => {
   });
 
   return (
-    <ExploreMainPageClient
-      initialModels={models}
-      totalPage={totalPage}
-      currentPage={page}
-      initialSearchParams={{ key, sourcesite, category, subCategory, price }}
-    />
+    <Container>
+      <ExploreMainPageClient
+        initialModels={models}
+        totalPage={totalPage}
+        currentPage={page}
+        initialSearchParams={{ key, sourcesite, category, subCategory, price }}
+      />
+    </Container>
   );
 };
 

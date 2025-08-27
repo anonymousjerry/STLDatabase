@@ -31,7 +31,6 @@ const SearchBar = () => {
     searchInput,
     searchTag,
     searchPrice,
-    favourited,
     liked,
     userId,
     setSelectedPlatform,
@@ -40,7 +39,6 @@ const SearchBar = () => {
     setSearchInput,
     setSearchTag,
     setSearchPrice,
-    setfavourited,
     setliked,
     setUserId
   } = useSearch();
@@ -78,6 +76,17 @@ const SearchBar = () => {
   useEffect(() => {
     if (selectedSubCategory?.id) {
       setCategoryLabel("SubCategory");
+      // If we have the ID but not the name, try to find the name from groupedCategories
+      if (selectedSubCategory.name === selectedSubCategory.id) {
+        // This means we only have the ID, try to find the name
+        for (const category of groupedCategories) {
+          const foundSub = category.items.find(sub => sub.id === selectedSubCategory.id);
+          if (foundSub) {
+            setCategoryValue(foundSub.name);
+            return;
+          }
+        }
+      }
       setCategoryValue(selectedSubCategory.name)
     } else if (selectedCategory && selectedCategory !== "All") {
       setCategoryLabel("Category");
@@ -86,7 +95,7 @@ const SearchBar = () => {
       setCategoryLabel("Category");
       setCategoryValue("All") // fallback
     }
-  }, [selectedCategory, selectedSubCategory]);
+  }, [selectedCategory, selectedSubCategory, groupedCategories]);
 
   const platformArray = platforms?.map(([platform]) => platform) || [];
 
@@ -103,7 +112,6 @@ const SearchBar = () => {
       queryParams.set("subCategory", selectedSubCategory.id);
     if (searchInput) queryParams.set("key", searchInput);
     if (searchPrice) queryParams.set("price", searchPrice);
-    if (favourited) queryParams.set("favourited", 'true');
     if (liked) queryParams.set("liked", 'true');
     if (userId) {
       queryParams.set("userId", userId)
@@ -135,10 +143,10 @@ const SearchBar = () => {
 
   return (
     <form
-      className="flex w-full gap-2.5 bg-custom-light-containercolor dark:bg-gray-900 rounded-lg px-[47px] py-[39px]"
+      className="flex w-full flex-col md:flex-row gap-3 md:gap-2.5 bg-custom-light-containercolor dark:bg-gray-900 rounded-lg px-3 sm:px-4 md:px-[47px] py-3 md:py-[39px]"
       onSubmit={handleSearch}
     >
-      <div className="basis-1/5">
+      <div className="w-full md:basis-1/5">
         <DropdownButton
           value={selectedPlatform}
           label="Platform"
@@ -147,7 +155,7 @@ const SearchBar = () => {
         />
       </div>
 
-      <div className="basis-1/5">
+      <div className="w-full md:basis-1/5">
         <CategoryTreeDropdown
           value={categoryValue}
           label={categoryLable}
@@ -157,14 +165,14 @@ const SearchBar = () => {
         />
       </div>
 
-      <div className="basis-3/5 flex gap-2">
-        <div className="basis-4/5">
+      <div className="w-full md:basis-3/5 flex flex-col md:flex-row gap-2">
+        <div className="w-full md:basis-4/5">
           <SearchInput value={searchInput} onChange={setSearchInput} />
         </div>
         <button
           type="submit"
           aria-label="Search models"
-          className="bg-[#4e4d80] dark:bg-[#3a3a60] rounded-xl basis-1/5 pr-2.5 pl-2.5 mt-7 flex flex-row gap-2 items-center justify-center shrink-0 h-12 relative hover:bg-[#3d3c66] dark:hover:bg-[#2e2e4a] transition"
+          className="bg-[#4e4d80] dark:bg-[#3a3a60] rounded-xl w-full md:w-auto md:basis-1/5 pr-2.5 pl-2.5 md:mt-7 flex flex-row gap-2 items-center justify-center h-12 relative hover:bg-[#3d3c66] dark:hover:bg-[#2e2e4a] transition"
         >
           <div className="text-white text-lg font-medium text-left relative select-none">
             Search

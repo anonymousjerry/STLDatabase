@@ -7,33 +7,36 @@ import DailyDiscover from "@/components/DailyDiscover";
 import { Header } from "@/components";
 import { Footer } from "@/components";
 import OptimizedAdPositionManager from "@/components/ads/OptimizedAdPositionManager";
+import Container from "@/components/Container";
 
 export default function Home() {
   
   return (
-    <>
+    <div className="bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
       <Header />
       <HeaderMain />
-      {/* Homepage header banner ad */}
-      <OptimizedAdPositionManager
-        page="homepage"
-        positions={[
-          'homepage-header-banner',
-        ]}
-        className="w-full flex justify-center items-center pt-10"
-      />
-      <Categories />
-      <FeaturedSite />
-      {/* Mid-content banner ad */}
-      <OptimizedAdPositionManager
-        page="homepage"
-        positions={[
-          'homepage-mid-content-banner',
-        ]}
-        className="w-full flex justify-center items-center pt-10"
-      />
-      <TrendingModels />
-      <DailyDiscover />
+      <Container>
+        {/* Homepage header banner ad */}
+        <OptimizedAdPositionManager
+          page="homepage"
+          positions={[
+            'homepage-header-banner',
+          ]}
+          className="w-full flex justify-center items-center pt-10"
+        />
+        <Categories />
+        <FeaturedSite />
+        {/* Mid-content banner ad */}
+        <OptimizedAdPositionManager
+          page="homepage"
+          positions={[
+            'homepage-mid-content-banner',
+          ]}
+          className="w-full flex justify-center items-center pt-10"
+        />
+        <TrendingModels />
+        <DailyDiscover />
+      </Container>
       {/* Footer banner ad (above footer) */}
       {/* <AdPositionManager
         page="homepage"
@@ -43,6 +46,6 @@ export default function Home() {
         className="container mx-auto px-4"
       /> */}
       <Footer />
-    </>
+    </div>
   );
 }

@@ -11,9 +11,7 @@ export default async function ContactLayout({
         <Header />
       </div>
 
-      <main 
-      // className="flex-1 px-52 sm:px-10 xl:px-52 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor overflow-auto"
-      >
+      <main>
         {children}
       </main>
 

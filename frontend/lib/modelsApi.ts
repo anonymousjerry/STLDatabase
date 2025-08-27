@@ -44,9 +44,9 @@ export const getDailyModels = async (page: number = 1, limit: number = 12) => {
     }
 }
 
-export const searchModels = async ({key, tag, sourcesite, category, subCategory, price, favourited, liked, userId, filters = [], page = 1, limit = 12}: SearchParams) => {
+export const searchModels = async ({key, tag, sourcesite, category, subCategory, price, liked, userId, filters = [], page = 1, limit = 12}: SearchParams) => {
     try {
-        console.log('Searching models with params:', { key, tag, sourcesite, category, subCategory, price, favourited, liked, userId, filters, page, limit });
+        console.log('Searching models with params:', { key, tag, sourcesite, category, subCategory, price, liked, userId, filters, page, limit });
         const params = new URLSearchParams();
 
         if (key) params.append('key', key);
@@ -57,14 +57,12 @@ export const searchModels = async ({key, tag, sourcesite, category, subCategory,
             params.append('sourcesite', '');
         if (category && category !== 'All') 
             params.append('category', category);
-        if (subCategory && subCategory !== 'All') 
+        if (subCategory) 
             params.append('subCategory', subCategory);
         else if (category && category === 'All')
             params.append('category', '');
         if (price) 
             params.append('price', price);
-        if (favourited) 
-            params.append('favourited', favourited);
         if (liked) 
             params.append('liked', liked);
         if (userId)

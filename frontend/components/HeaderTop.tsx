@@ -9,10 +9,8 @@ import { CiGlobe } from "react-icons/ci";
 const HeaderTop = () => {
 
   return (
-    <div
-      className="grid grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-52 h-auto min-h-[46px] py-2 lg:py-0 lg:h-[46px] items-center text-white bg-custom-light-titlecolor"
-      style={{ boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)" }}
-    >
+    <div className="w-full bg-custom-light-titlecolor" style={{ boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)" }}>
+      <div className="mx-auto w-full max-w-[1300px] grid grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 px-4 sm:px-6 md:px-8 h-auto min-h-[46px] py-2 lg:py-0 lg:h-[46px] items-center text-white">
       {/* Left Column */}
       <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 text-white text-left font-['Inter-Light',_sans-serif] text-sm sm:text-base font-light justify-center lg:justify-start">
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-center lg:items-start">
@@ -67,6 +65,7 @@ const HeaderTop = () => {
             Eng
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

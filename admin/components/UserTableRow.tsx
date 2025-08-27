@@ -168,9 +168,9 @@ export function UserTableRow({
 
       {/* Saved Models - Read-only */}
       <td className="px-6 py-4 whitespace-nowrap">
-        {Array.isArray(user.favourites) && user.favourites.length > 0 ? (
+        {Array.isArray(user.likes) && user.likes.length > 0 ? (
           <div className="flex flex-wrap gap-1">
-            {user.favourites.map((fav) => (
+            {user.likes.map((fav) => (
               <a
                 key={fav.id}
                 href={fav.model.websiteUrl || '#'}

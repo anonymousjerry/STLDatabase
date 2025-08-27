@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { getAllCategories } from '@/lib/categoryApi';
 import CategoriesPageClient from '@/components/CategoriesPageClient';
+import Container from '@/components/Container';
 
 export const metadata: Metadata = {
   title: 'Categories STL Files | Download 3D Printable Models by Category - 3DDatabase',
@@ -43,10 +44,12 @@ const CategoriesPage = async ({ searchParams }: CategoriesPageProps) => {
   }
 
   return (
-    <CategoriesPageClient 
-      categories={categories}
-      selectedCategory={category}
-    />
+    // <Container>
+      <CategoriesPageClient 
+        categories={categories}
+        selectedCategory={category}
+      />
+    // </Container>
   );
 };
 
