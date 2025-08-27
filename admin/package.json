@@ -15,7 +15,7 @@
     "sanity"
   ],
   "dependencies": {
-    "@sanity/vision": "^4.5.0",
+    "@sanity/vision": "^4.6.0",
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tanstack/react-table": "^8.21.3",
     "@vgaidadei/react-tags": "^0.1.4",
@@ -29,7 +29,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hot-toast": "^2.6.0",
-    "sanity": "^4.5.0",
+    "sanity": "^4.6.0",
     "socket.io-client": "^4.8.1",
     "styled-components": "^6.1.18",
     "tailwind": "^4.0.0"

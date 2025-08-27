@@ -9,8 +9,6 @@ import { signOut } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useModal } from "@/context/ModalContext";
 import { useSearch } from "@/context/SearchContext";
-import { FaAngleDown } from "react-icons/fa6";
-import CategoryMenu from "./CategoryMenu";
 import Image from "next/image";
 
 const Navbar = () => {
@@ -19,20 +17,20 @@ const Navbar = () => {
   const { data: session, status: sessionStatus } = useSession();
   const router = useRouter();
   const [accountMenuOpen, setAccountMenuOpen] = useState<boolean>(false);
-  const [categoryOpen, setCategoryOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const categoryRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
-  const isCategoryActive = categoryOpen;
+  const userId = (session?.user as { id?: string })?.id;
+
   const links = [
     { href: '/', label: 'Home' },
     { href: '/explore', label: 'Explore' },
+    { href: '/categories', label: 'Categories' },
     { href: '/blog', label: 'Blog' },
     { href: '/contact', label: 'Contact' },
   ];
   const isActive = (href: string) =>
-    !isCategoryActive && (href === '/' ? pathname === '/' : pathname.startsWith(href));
+    (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
 
   const handleLogOut = () => {
@@ -45,9 +43,6 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) {
-        setCategoryOpen(false);
-      }
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
         setMobileMenuOpen(false);
       }
@@ -57,14 +52,24 @@ const Navbar = () => {
   }, []);
 
   const {
+      searchInput,
+      selectedPlatform,
+      selectedCategory,
+      selectedSubCategory,
+      searchPrice,
+      favourited,
+      liked,
       setSelectedPlatform,
       setSelectedCategory,
+      setSelectedSubCategory,
+      setliked,
       setSearchInput
   } = useSearch();
 
   const resetSearch = (href: string) => {
       setSelectedPlatform('All');
       setSelectedCategory('All');
+      setSelectedSubCategory({id: "", name: ""});
       setSearchInput('');
       setMobileMenuOpen(false);
       router.push(href);
@@ -74,6 +79,28 @@ const Navbar = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
+  const handleLike = () => {
+    if (!userId) {
+      toast.error("Please log in to like this model.");
+      return;
+    }
+    setliked(true);
+    const queryParams = new URLSearchParams();
+    queryParams.set("liked", 'true');
+    queryParams.set("userId", userId)
+    if (searchInput) queryParams.set("key", searchInput);
+    if (selectedPlatform && selectedPlatform !== "All")
+      queryParams.set("sourcesite", selectedPlatform);
+    if (selectedCategory && selectedCategory !== "All")
+      queryParams.set("category", selectedCategory);
+    // if (selectedSubCategory?.id)
+    //   queryParams.set("subCategory", selectedSubCategory.id);
+    if (searchPrice && searchPrice !== "All")
+      queryParams.set("price", searchPrice);
+    if (favourited) queryParams.set("favourited", "true");
+    router.push(`/explore?${queryParams.toString()}`);
+  }
+
 
   return (
     <nav className="bg-custom-light-maincolor px-4 sm:px-8 md:px-16 lg:px-32 xl:px-52 py-4 relative">
@@ -81,17 +108,19 @@ const Navbar = () => {
       <div className="hidden lg:grid lg:grid-cols-3 items-center justify-between text-white">
         {/* Logo + Navigation */}
         <div className="flex items-center" onClick={() => resetSearch("/")}>
-          <Image
-            src="/Logo.png"
-            alt="Logo"
-            width={256}
-            height={36}
-            className="cursor-pointer h-auto"
-          />
+          <div className="relative w-64 h-9">
+            <Image
+              src="/Logo.png"
+              alt="Logo"
+              fill
+              className="cursor-pointer object-contain"
+              sizes="256px"
+            />
+          </div>
         </div>
 
         <div className="flex gap-6 justify-center">
-          {[...links.slice(0, 2)].map(link => (
+          {links.map(link => (
             <div
               key={link.href}
               onClick={() => resetSearch(link.href)}
@@ -105,44 +134,14 @@ const Navbar = () => {
               )}
             </div>
           ))}
-          <div ref={categoryRef} className="relative">
-            <button
-              onClick={() => setCategoryOpen(!categoryOpen)}
-              className={`relative flex flex-row items-center gap-1 transition ${
-                isCategoryActive ? 'font-medium' : 'hover:text-[#b6e402]'
-              }`}
-            >
-              <span>Categories</span>
-              <FaAngleDown />
-              {categoryOpen && (
-                <span className="absolute left-0 -bottom-1 w-full h-1 bg-[#b6e402] transition-all rounded" />
-              )}
-            </button>
-
-            {/* Dropdown box */}
-            { categoryOpen && (
-              <CategoryMenu setCategoryOpen = {setCategoryOpen}/>
-            )}
-          </div>
-          {[...links.slice(2)].map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`relative  hover:text-[#b6e402] transition ${
-                isActive(link.href) ? ' font-medium' : ''
-              }`}
-            >
-              {link.label}
-              {isActive(link.href) && (
-                <span className="absolute left-0 -bottom-1 w-full h-1 bg-[#b6e402] transition-all rounded"></span>
-              )}
-            </Link>
-          ))}
         </div>
 
         {/* Right Side Icons */}
         <div className="flex justify-end items-center space-x-4">
-          <button className="p-2 border border-white rounded-full hover:bg-white/10">
+          <button 
+            className="p-2 border border-white rounded-full hover:bg-white/10"
+            onClick={handleLike}
+          >
             <FaHeart />
           </button>
 
@@ -189,18 +188,23 @@ const Navbar = () => {
       <div className="lg:hidden flex items-center justify-between text-white">
         {/* Mobile Logo */}
         <div className="flex items-center" onClick={() => resetSearch("/")}>
-          <Image
-            src="/Logo.png"
-            alt="Logo"
-            width={180}
-            height={25}
-            className="cursor-pointer"
-          />
+          <div className="relative w-[180px] h-[25px]">
+            <Image
+              src="/Logo.png"
+              alt="Logo"
+              fill
+              className="cursor-pointer object-contain"
+              sizes="180px"
+            />
+          </div>
         </div>
 
         {/* Mobile Menu Button */}
         <div className="flex items-center space-x-3">
-          <button className="p-2 border border-white rounded-full hover:bg-white/10">
+          <button 
+            className="p-2 border border-white rounded-full hover:bg-white/10"
+            onClick={handleLike}
+          >
             <FaHeart size={16} />
           </button>
           
@@ -235,21 +239,6 @@ const Navbar = () => {
                   {link.label}
                 </div>
               ))}
-              
-              {/* Categories Mobile */}
-              <div 
-                onClick={() => setCategoryOpen(!categoryOpen)}
-                className="text-white py-2 px-3 rounded-lg cursor-pointer transition hover:bg-white/10 flex items-center justify-between"
-              >
-                <span>Categories</span>
-                <FaAngleDown className={`transition-transform ${categoryOpen ? 'rotate-180' : ''}`} />
-              </div>
-              
-              {/* {categoryOpen && (
-                <div className="ml-4 mt-2 space-y-2">
-                  <CategoryMenu setCategoryOpen={setCategoryOpen} />
-                </div>
-              )} */}
             </div>
 
             {/* Account Section */}

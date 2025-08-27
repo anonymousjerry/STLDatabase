@@ -266,7 +266,9 @@ export function ModelTable() {
                   className="px-6 py-4 w-96 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                   onClick={() => handleSort('title')}
                 >
-                  <div className="flex items-center gap-1">
+                  <div 
+                    className="flex items-center gap-1"
+                    >
                     Title
                     {getSortIcon('title')}
                   </div>
@@ -323,8 +325,11 @@ export function ModelTable() {
                       }}
                     />
                   </td>
-                  <td className="px-6 py-6 max-w-sm">
-                    <div className="font-semibold text-gray-900 dark:text-white">
+                  <td onClick={() => setEditingModel(model)} className="px-6 py-6 max-w-sm cursor-pointer">
+                    <div 
+                      
+                      className="font-semibold text-gray-900 dark:text-white"
+                    >
                       {model.title}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">

@@ -22,6 +22,7 @@ const CategoriesFilter = () => {
     searchInput,
     searchPrice,
     favourited,
+    liked,
     userId,
     setSelectedCategory,
     setSelectedSubCategory
@@ -60,6 +61,9 @@ const CategoriesFilter = () => {
     if (favourited) {
         queryParams.set("favourited", "true");    
     }
+    if (liked) {
+        queryParams.set("liked", "true");    
+    }
     if (userId) {
         queryParams.set("userId", userId)
     }
@@ -79,6 +83,9 @@ const CategoriesFilter = () => {
     if (searchPrice) queryParams.set("price", searchPrice);
     if (favourited) {
         queryParams.set("favourited", "true");    
+    }
+    if (liked) {
+        queryParams.set("liked", "true");    
     }
     if (userId) {
         queryParams.set("userId", userId)

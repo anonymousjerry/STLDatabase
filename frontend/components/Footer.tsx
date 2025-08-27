@@ -12,38 +12,47 @@ const Footer = () => {
   
   useEffect(() => {
     getPlatforms().then(setPlatforms).catch(console.error);
+    
   }, []);
-
+console.log(platforms)
   return (
     <footer className="bg-custom-light-maincolor flex flex-col" aria-labelledby="footer-heading">
       <div className="flex flex-col lg:flex-row justify-between px-4 sm:px-8 md:px-16 lg:px-32 xl:px-52 mb-8 lg:mb-[53px] gap-8 lg:gap-0">
         {/* Left Section */}
         <div className="flex flex-col mt-6 lg:mt-10 gap-4 lg:gap-2 items-start lg:justify-start shrink-0">
           <Link href="/" className="w-full ">
-            <Image
-              src="/Logo.png"
-              alt="Logo"
-              width={506}
-              height={64}
-              className="cursor-pointer mb-2 w-full max-w-[300px] lg:max-w-[506px] h-auto"
-            />
+            <div className="relative w-full max-w-[300px] lg:max-w-[506px] h-12">
+              <Image
+                src="/Logo.png"
+                alt="Logo"
+                width={300}
+                height={506}
+                // fill
+                className="cursor-pointer object-contain"
+                // sizes="(max-width: 1024px) 300px, 506px"
+              />
+            </div>
           </Link>
-          <div className="flex gap-3">
-            <Image
-              src={"/googleplay.png"}
-              alt="Google Play"
-              width={181}
-              height={52}
-              className="cursor-pointer w-[120px] lg:w-[181px] h-auto"
-            />
-            <Image
-              src={"/appstore.png"}
-              alt="App Store"
-              width={181}
-              height={52}
-              className="cursor-pointer w-[120px] lg:w-[181px] h-auto"
-            />
-          </div>
+          {/* <div className="flex gap-3">
+            <div className="relative w-[120px] lg:w-[181px] h-[52px]">
+              <Image
+                src={"/googleplay.png"}
+                alt="Google Play"
+                fill
+                className="cursor-pointer object-contain"
+                sizes="(max-width: 1024px) 120px, 181px"
+              />
+            </div>
+            <div className="relative w-[120px] lg:w-[181px] h-[52px]">
+              <Image
+                src={"/appstore.png"}
+                alt="App Store"
+                fill
+                className="cursor-pointer object-contain"
+                sizes="(max-width: 1024px) 120px, 181px"
+              />
+            </div>
+          </div> */}
           <div className="text-white text-left font-medium text-base lg:text-lg">
             Follow us
           </div>
@@ -79,15 +88,21 @@ const Footer = () => {
         <div className="flex flex-col gap-4 lg:gap-[2px] items-center lg:items-end justify-end lg:mt-32 shrink-0 relative">
           <div className="flex gap-2 justify-center items-center flex-wrap">
              {platforms.map((platform, index) => (
-                <Image
-                  key={index}
-                  src={platform[3]}
-                  alt={platform[0]}
-                  width={25}
-                  height={24}
-                  className="cursor-pointer w-[20px] lg:w-[25px] h-auto"
-                  unoptimized
-                />
+                <Link 
+                  href={platform[1]} 
+                  target="_blank" 
+                  key={index} 
+                  className="relative w-[20px] lg:w-[25px] h-[24px]"
+                >
+                  <Image
+                    src={platform[3]}
+                    alt={platform[0]}
+                    fill
+                    className="cursor-pointer object-contain"
+                    sizes="(max-width: 1024px) 20px, 25px"
+                    unoptimized
+                  />
+                </Link>
               ))}
             <span className="text-white text-left font-medium text-base lg:text-lg">
               ...more

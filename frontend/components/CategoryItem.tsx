@@ -41,7 +41,11 @@ const CategoryItem = ({ title, children, className = "" }: CategoryItemProps) =>
       `}
     >
       <div className="flex items-center justify-center">{children}</div>
-      <div className="text-[18px] leading-5 font-medium text-custom-light-textcolor dark:text-custom-dark-textcolor break-words">
+      <div
+        className="text-xs sm:text-xs font-medium leading-tight
+          text-custom-light-textcolor dark:text-custom-dark-textcolor
+          line-clamp-2"
+      >
         {title}
       </div>
     </div>

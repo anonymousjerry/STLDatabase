@@ -9,7 +9,7 @@ import { FiBox } from 'react-icons/fi';
 import SideFilter from './SideFilter';
 import { useSearch } from '@/context/SearchContext';
 import { useRouter } from 'next/navigation';
-import AdPositionManager from './ads/AdPositionManager';
+import OptimizedAdPositionManager from './ads/OptimizedAdPositionManager';
 import ScrollToTopButton from './ScrollToTopButton';
 
 type ExploreMainPageClientProps = {
@@ -49,9 +49,36 @@ const ExploreMainPageClient = ({
     searchTag,
     searchPrice,
     favourited,
+    liked,
     userId,
+    setSelectedPlatform,
+    setSelectedCategory,
+    setSelectedSubCategory,
+    setSearchInput,
     setSearchTag
   } = useSearch();
+
+  // Initialize search context with URL parameters
+  useEffect(() => {
+    if (initialSearchParams.key) {
+      setSearchInput(initialSearchParams.key);
+    }
+    if (initialSearchParams.sourcesite) {
+      setSelectedPlatform(initialSearchParams.sourcesite);
+    }
+    
+    // Handle category and subcategory initialization
+    if (initialSearchParams.subCategory) {
+      // If subcategory is provided, we need to find the parent category
+      // For now, we'll set category to "All" and let the SearchBar handle the display
+      setSelectedCategory("All");
+      setSelectedSubCategory({ id: initialSearchParams.subCategory, name: '' });
+    } else if (initialSearchParams.category) {
+      // If only category is provided (no subcategory)
+      setSelectedCategory(initialSearchParams.category);
+      setSelectedSubCategory({ id: "", name: "" });
+    }
+  }, [initialSearchParams, setSearchInput, setSelectedPlatform, setSelectedCategory, setSelectedSubCategory]);
 
   // Show/hide UP button on scroll
   // useEffect(() => {
@@ -80,6 +107,7 @@ const ExploreMainPageClient = ({
         subCategory: selectedSubCategory.id,
         price: searchPrice,
         favourited: favourited ? 'true' : undefined,
+        liked: liked ? 'true' : undefined,
         userId: userId,
         filters: selectedFilters,
         page: 1,
@@ -93,7 +121,7 @@ const ExploreMainPageClient = ({
     };
 
     fetchFilteredModels();
-  }, [selectedFilters, selectedPlatform, selectedCategory, selectedSubCategory, searchPrice, favourited, searchInput, searchTag]);
+  }, [selectedFilters, selectedPlatform, selectedCategory, selectedSubCategory, searchPrice, favourited, liked, searchInput, searchTag]);
 
   // 2️⃣ When page increases (lazy load), fetch and append
   useEffect(() => {
@@ -108,6 +136,7 @@ const ExploreMainPageClient = ({
         subCategory: selectedSubCategory.id,
         price: searchPrice,
         favourited: favourited ? 'true' : undefined,
+        liked: liked ? 'true' : undefined,
         userId: userId,
         page,
         limit: 12,
@@ -147,69 +176,76 @@ const ExploreMainPageClient = ({
   }, [hasMore, isLoading]);
 
   return (
-    <div className="flex flex-col pt-5 relative">
-      <SearchBar />
-      {/* Homepage header banner ad */}
-      <AdPositionManager
-        page="explore"
-        positions={[
-          'explore-header-banner',
-        ]}
-        className="w-full flex justify-center items-center pt-10"
-      />
-      <div className="flex gap-5 pt-10">
-        <div className="flex basis-1/5">
-          <div className="flex flex-col gap-4 w-full">
-            <SideFilter />
-          </div>
-        </div>
-        <div className="flex flex-col basis-4/5">
-          <div className="flex items-center w-full text-lg font-medium text-custom-light-textcolor dark:text-custom-dark-textcolor relative pt-1">
-            <FiBox className="mr-2" />
-            {searchTag ? (
-              <div className="flex items-center gap-2">
-                <span>{`Result (Tag: ${searchTag}) - ${totalModels} models`}</span>
-                <button
-                  onClick={() => {
-                    setSearchTag("");
-                    const params = new URLSearchParams();
-                    if (searchInput) params.set('key', searchInput);
-                    if (selectedPlatform && selectedPlatform !== 'All') params.set('sourcesite', selectedPlatform);
-                    if (selectedCategory && selectedCategory !== 'All') params.set('category', selectedCategory);
-                    if (selectedSubCategory?.id) params.set('subCategory', selectedSubCategory.id);
-                    if (searchPrice) params.set('price', searchPrice);
-                    if (favourited) params.set('favourited', 'true');
-                    params.set('currentPage', '1');
-                    router.push(`/explore?${params.toString()}`);
-                  }}
-                  className="ml-2 text-sm px-2 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-                  aria-label="Clear tag filter"
-                >
-                  Clear
-                </button>
-              </div>
-            ) : (
-              <span>{`Result - ${totalModels} models`}</span>
-            )}
-            <span className="absolute left-0 -bottom-2 w-full h-0.5 bg-custom-light-maincolor dark:bg-custom-light-containercolor rounded" />
-          </div>
-          <NavFilter selectedFilters={selectedFilters} onFilterChange={setSelectedFilters} />
-            {/* Explore mid-content banner ad */}
-          <AdPositionManager
+    <div className="flex flex-col min-h-screen">
+      <div className="flex-1">
+        <div className="pt-5">
+          <SearchBar />
+          {/* Homepage header banner ad */}
+          <OptimizedAdPositionManager
             page="explore"
             positions={[
-              'explore-mid-content-banner',
+              'explore-header-banner',
             ]}
             className="w-full flex justify-center items-center pt-10"
           />
-          <SearchResultPart models={models} />
-          <div ref={loaderRef} className="flex flex-col items-center justify-center py-10">
-            {isLoading && (
-              <div className="flex items-center space-x-2">
-                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500"></div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Loading more models...</span>
+          <div className="flex gap-5 pt-10">
+            <div className="flex basis-1/5">
+              <div className="flex flex-col gap-4 w-full">
+                <SideFilter />
               </div>
-            )}
+            </div>
+            <div className="flex flex-col basis-4/5">
+              <div className="flex items-center w-full text-lg font-medium text-custom-light-textcolor dark:text-custom-dark-textcolor relative pt-1">
+                <FiBox className="mr-2" />
+                {searchTag ? (
+                  <div className="flex items-center gap-2">
+                    <span>{`Result (Tag: ${searchTag}) - ${totalModels} models`}</span>
+                    <button
+                      onClick={() => {
+                        setSearchTag("");
+                        const params = new URLSearchParams();
+                        if (searchInput) params.set('key', searchInput);
+                        if (selectedPlatform && selectedPlatform !== 'All') params.set('sourcesite', selectedPlatform);
+                        if (selectedCategory && selectedCategory !== 'All') params.set('category', selectedCategory);
+                        if (selectedSubCategory?.id) params.set('subCategory', selectedSubCategory.id);
+                        if (searchPrice) params.set('price', searchPrice);
+                        if (favourited) params.set('favourited', 'true');
+                        if (liked) params.set('liked', 'true');
+                        params.set('currentPage', '1');
+                        router.push(`/explore?${params.toString()}`);
+                      }}
+                      className="ml-2 text-sm px-2 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                      aria-label="Clear tag filter"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                ) : (
+                  <span>{`Result - ${totalModels} models`}</span>
+                )}
+                <span className="absolute left-0 -bottom-2 w-full h-0.5 bg-custom-light-maincolor dark:bg-custom-light-containercolor rounded" />
+              </div>
+              <NavFilter selectedFilters={selectedFilters} onFilterChange={setSelectedFilters} />
+                {/* Explore mid-content banner ad */}
+              <OptimizedAdPositionManager
+                page="explore"
+                positions={[
+                  'explore-mid-content-banner',
+                ]}
+                className="w-full flex justify-center items-center pt-10"
+              />
+              <div className="flex-1 min-h-[calc(100vh-400px)]">
+                <SearchResultPart models={models} />
+              </div>
+              <div ref={loaderRef} className="flex flex-col items-center justify-center py-10">
+                {isLoading && (
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500"></div>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Loading more models...</span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

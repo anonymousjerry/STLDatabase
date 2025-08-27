@@ -6,7 +6,7 @@ import TrendingModels from "@/components/TrendingModels";
 import DailyDiscover from "@/components/DailyDiscover";
 import { Header } from "@/components";
 import { Footer } from "@/components";
-import AdPositionManager from "@/components/ads/AdPositionManager";
+import OptimizedAdPositionManager from "@/components/ads/OptimizedAdPositionManager";
 
 export default function Home() {
   
@@ -15,7 +15,7 @@ export default function Home() {
       <Header />
       <HeaderMain />
       {/* Homepage header banner ad */}
-      <AdPositionManager
+      <OptimizedAdPositionManager
         page="homepage"
         positions={[
           'homepage-header-banner',
@@ -25,7 +25,7 @@ export default function Home() {
       <Categories />
       <FeaturedSite />
       {/* Mid-content banner ad */}
-      <AdPositionManager
+      <OptimizedAdPositionManager
         page="homepage"
         positions={[
           'homepage-mid-content-banner',

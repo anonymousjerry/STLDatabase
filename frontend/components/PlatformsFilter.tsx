@@ -23,9 +23,11 @@ const PlatformsFilter = () => {
     const {
           selectedPlatform,
           selectedCategory,
+          selectedSubCategory,
           searchInput,
           searchPrice,
           favourited,
+          liked,
           userId,
           setSelectedPlatform,
       } = useSearch();
@@ -43,10 +45,13 @@ const PlatformsFilter = () => {
 
         queryParams.set("sourcesite", option);
         if (selectedCategory && selectedCategory !== "All")
-        queryParams.set("category", selectedCategory);
+          queryParams.set("category", selectedCategory);
+        // if (selectedSubCategory?.id)
+        //   queryParams.set("subCategory", selectedSubCategory.id);
         if (searchInput) queryParams.set("key", searchInput);
         if (searchPrice) queryParams.set("price", searchPrice);
         if (favourited) queryParams.set("favourited", 'true');
+        if (liked) queryParams.set("liked", 'true');
         if (userId) {
           queryParams.set("userId", userId)
         }

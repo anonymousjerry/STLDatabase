@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Breadcrumb from "./Breadcrumb";
 import SearchBar from "./SearchBar";
@@ -17,7 +17,7 @@ import { useFavoritesStore } from "@/app/_zustand/useFavoritesStore";
 import { useDownloadsStore } from "@/app/_zustand/useDonwloadStore";
 import { useSearch } from "@/context/SearchContext";
 import { useRouter } from "next/navigation";
-import AdPositionManager from "./ads/AdPositionManager";
+import OptimizedAdPositionManager from "./ads/OptimizedAdPositionManager";
 import Head from "next/head";
 
 interface ClientExplorePageProps {
@@ -44,7 +44,7 @@ export default function ClientExplorePage({
   const userId = (session?.user as { id?: string })?.id;
 
   const { likedModels, likesCount, toggleLike } = useLikesStore();
-  const liked = likedModels[id] ?? false;
+  const likedmodel = likedModels[id] ?? false;
   const count = likesCount[id] ?? result.likes.length;
 
   const { addFavorite, removeFavorite, isFavorite } = useFavoritesStore();
@@ -59,12 +59,15 @@ export default function ClientExplorePage({
     searchInput,
     searchPrice,
     favourited,
+    liked,
     setSelectedPlatform,
     setSelectedCategory,
+    setSelectedSubCategory,
     setSearchTag,
     setSearchInput,
     setSearchPrice,
     setfavourited,
+    setliked
   } = useSearch();
 
   const router = useRouter();
@@ -104,12 +107,15 @@ export default function ClientExplorePage({
   const sourceSiteName = result.sourceSite?.name ?? "";
 
   const handleModelOnClick = async (modelId: string) => {
-      if (!userId) return;
+      if (!userId) {
+        toast.error("Please log in to like this model.");
+        return;
+      }
 
       try {
         toggleLike(modelId);
         await likeModel(modelId, userId, session?.accessToken || "");
-        if(!liked) {
+        if(!likedmodel) {
           toast.success("Model liked successfully!");
         } else {
           toast.success("Model disliked successfully!");
@@ -121,6 +127,11 @@ export default function ClientExplorePage({
   };
 
   const handleToggleFavorite = async (modelId: string) => {
+      if (!userId) {
+        toast.error("Please log in to save this model.");
+        return;
+      }
+
       try {
         if (saved) {
             removeFavorite(id);
@@ -139,6 +150,11 @@ export default function ClientExplorePage({
   };
 
   const handleToggleDownload = async (modelId: string) => {
+    if (!userId) {
+      toast.error("Please log in to download this model.");
+      return;
+    }
+
     try {
       const data = await downloadModel(modelId, session?.accessToken || "");
       addDownload(modelId, data.downloads);
@@ -159,6 +175,17 @@ export default function ClientExplorePage({
       }
   };
 
+  const handleReport = () => {
+    if (!userId) {
+      toast.error("Please log in to report an issue.");
+      return;
+    }
+    const subject = encodeURIComponent(result.title);
+    const body = encodeURIComponent(`I would like to report an issue with the model: ${result.title}\n\nModel ID: ${id}\nModel URL: ${window.location.href}\n\nPlease provide details about the issue:`);
+    const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=hello@3ddatabase.com&su=${subject}&body=${body}`;
+    window.open(gmailLink, '_blank');
+  };
+
   const handleTagSearch = (tag: string) => {
     setSearchInput("");
     setSelectedCategory("All");
@@ -171,15 +198,23 @@ export default function ClientExplorePage({
       queryParams.set("sourcesite", selectedPlatform);
     if (searchPrice) queryParams.set("price", searchPrice);
     if (favourited) queryParams.set("favourited", 'true');
+    if (liked) queryParams.set("liked", 'true');
+
     queryParams.set("currentPage", '1');
 
     router.push(`/explore?${queryParams.toString()}`);
   };
 
-  const pageTitle = `${result.title} - Free 3D STL Model Download`;
-  const pageDescription =
-    result.description?.slice(0, 160) ||
-    "Download free 3D STL models for printing.";
+  const handlePlatformSearch = (platform: string) => {
+    setSelectedPlatform(platform);
+
+    const queryParams = new URLSearchParams();
+    queryParams.set("sourcesite", platform);
+    router.push(`/explore?${queryParams.toString()}`);
+  }
+
+  const pageTitle = `${result.title.replace(/\b\w/g, (char) => char.toUpperCase())} STL File | 3D Printable ${result.title.replace(/\b\w/g, (char) => char.toUpperCase())} Model - 3DDatabase`;
+  const pageDescription =`Download a 3D printable ${result.title.replace(/\b\w/g, (char) => char.toUpperCase())} STL file. Explore details, view related tags, and start printing your own ${result.title.replace(/\b\w/g, (char) => char.toUpperCase())} today.`
   const pageUrl = result.sourceUrl;
   const pageImage =
     result.thumbnailUrl || result.imagesUrl?.[0];
@@ -240,10 +275,10 @@ export default function ClientExplorePage({
       </Head>
 
       <div className="flex flex-col pb-10">
-        <Breadcrumb category={category} subCategory={subCategory} title={title} />
+        <Breadcrumb category={category} subCategory={result.subCategory} title={title} />
         <SearchBar />
         {/* Detail header banner ad */}
-        <AdPositionManager
+        <OptimizedAdPositionManager
           page="detail"
           positions={['detail-header-banner']}
           className="w-full flex justify-center items-center pt-10"
@@ -257,8 +292,8 @@ export default function ClientExplorePage({
                 alt={`Model preview ${selectedIndex}`}
                 className="rounded-md object-cover"
                 fill
-                unoptimized
                 priority
+                sizes="(max-width: 768px) 100vw, 60vw"
               />
             </div>
             <div className="flex relative items-center gap-2">
@@ -303,7 +338,7 @@ export default function ClientExplorePage({
                       alt={`Thumbnail ${index}`}
                       fill
                       className="object-cover"
-                      unoptimized
+                      sizes="90px"
                     />
                   </div>
                 ))}
@@ -332,7 +367,9 @@ export default function ClientExplorePage({
           {/* Right Side Details */}
           <div className="flex flex-col basis-2/5 w-full gap-4">
             <div className="font-bold text-custom-light-textcolor dark:text-custom-dark-titlecolor text-[40px]">
-              {title.replace(/-/g, " ")}
+              {title
+                .replace(/-/g, " ")
+                .replace(/\b\w/g, (char) => char.toUpperCase())}
             </div>
             <div className="flex gap-2 flex-wrap">
               {result.tags.map((tag: string, index: number) => (
@@ -355,10 +392,7 @@ export default function ClientExplorePage({
               ))}
             </div>
             <div className="flex gap-2 items-center">
-              <a
-                href={result.sourceSite?.url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <div
                 className="
                   flex items-center gap-2
                   cursor-pointer
@@ -366,24 +400,27 @@ export default function ClientExplorePage({
                   hover:scale-105 active:scale-95
                   hover:text-[#008bb0]
                 "
+                onClick={() => {handlePlatformSearch(sourceSiteName)}}
               >
-                <Image
-                  src={result.sourceSite?.iconBigUrl}
-                  alt={sourceSiteName}
-                  width={30}
-                  height={30}
-                  className="
-                    rounded-lg
-                    transition duration-200 ease-in-out
-                    hover:shadow-md
-                    h-auto
-                  "
-                  unoptimized
-                />
+                  <div className="relative w-[30px] h-[30px]">
+                   <Image
+                     src={result.sourceSite?.iconBigUrl}
+                     alt={sourceSiteName}
+                     fill
+                     className="
+                       rounded-lg
+                       transition duration-200 ease-in-out
+                       hover:shadow-md
+                       object-contain
+                     "
+                     sizes="30px"
+                     unoptimized
+                   />
+                 </div>
                 <span className="text-[#00ABD6] font-bold text-lg">
                   {slugify(sourceSiteName)}.com
                 </span>
-              </a>
+              </div>
             </div>
             <div className="flex gap-4 font-normal text-lg text-custom-light-textcolor dark:text-custom-dark-textcolor">
               <div className="flex items-center gap-1 ">
@@ -415,29 +452,17 @@ export default function ClientExplorePage({
             </div>
             <div className="grid grid-cols-2 justify-between gap-4">
               <button
-                  className="
-                  flex-1 flex items-center justify-center gap-2 rounded-xl py-2 font-normal text-lg
-                  bg-[#A1A1A1] text-white
-                  hover:bg-[#5c5c7d] hover:scale-[1.03]
-                  transition-transform duration-200
-                  dark:bg-gray-700 dark:text-gray-200
-                  dark:hover:bg-gray-600
-                  "
-                  onClick={handleShare}
-              >
-                  Share
-                  <CiShare2 />
-              </button>
-
-              <button
+                  disabled = {isDisabled}
                   onClick={() => {handleToggleFavorite(id)}}
                   className={`
                       flex-1 flex items-center justify-center gap-2 rounded-xl py-2 font-normal text-lg
                       transition-transform duration-200
-                      ${saved
-                      ? "bg-[#3a3663] text-white hover:bg-[#2c294f]"
-                      : "bg-[#A1A1A1] text-white hover:bg-[#5c5c7d]"}
-                      dark:${saved ? "bg-violet-700 hover:bg-violet-600" : "bg-gray-700 hover:bg-gray-600"}
+                      ${
+                        isDisabled
+                        ? "bg-[#E0E0E0] text-gray-400 cursor-not-allowed hover:scale-100 dark:bg-gray-800 dark:text-gray-500"
+                        : saved
+                          ? "bg-[#3a3663] text-white hover:bg-[#2c294f] dark:bg-violet-700 dark:hover:bg-violet-600 "
+                          : "bg-[#A1A1A1] text-white hover:bg-[#5c5c7d] dark:bg-gray-700 dark:hover:bg-gray-600"}
                       dark:text-gray-200
                       hover:scale-[1.03]
                   `}
@@ -454,7 +479,7 @@ export default function ClientExplorePage({
                   ${
                   isDisabled
                       ? "bg-[#E0E0E0] text-gray-400 cursor-not-allowed hover:scale-100 dark:bg-gray-800 dark:text-gray-500"
-                      : liked
+                      : likedmodel
                       ? "bg-red-500 border border-red-600 text-white hover:bg-red-600 hover:scale-105"
                       : "bg-[#A1A1A1] text-white hover:bg-[#5c5c7d] hover:scale-[1.03] dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                   }
@@ -466,27 +491,46 @@ export default function ClientExplorePage({
                       className={`${
                       isDisabled
                           ? "text-gray-300 dark:text-gray-600"
-                          : liked
+                          : likedmodel
                           ? "text-white"
                           : ""
                       }`}
                   />
               </button>
-
+            </div>
+            
+            {/* Small Share and Report Icons */}
+            <div className="flex items-center gap-4 mt-2">
               <button
-                  className="
-                  flex-1 flex items-center justify-center gap-2 rounded-xl py-2 font-normal text-lg
-                  bg-[#A1A1A1] text-white
-                  hover:bg-[#5c5c7d] hover:scale-[1.03]
-                  transition-transform duration-200
-                  dark:bg-gray-700 dark:text-gray-200
-                  dark:hover:bg-gray-600
-                  "
+                onClick={handleShare}
+                className="
+                  p-2 rounded-full
+                  bg-gray-200 text-gray-600
+                  hover:bg-gray-300 hover:text-gray-700
+                  transition-all duration-200
+                  dark:bg-gray-700 dark:text-gray-300
+                  dark:hover:bg-gray-600 dark:hover:text-gray-200
+                "
+                title="Share this model"
               >
-                  Report
-                  <CiFlag1 />
+                <CiShare2 size={20} />
               </button>
-          </div>
+              
+              <button
+                onClick={handleReport}
+                className="
+                  p-2 rounded-full
+                  bg-gray-200 text-gray-600
+                  hover:bg-gray-300 hover:text-gray-700
+                  transition-all duration-200
+                  dark:bg-gray-700 dark:text-gray-300
+                  dark:hover:bg-gray-600 dark:hover:text-gray-200
+                "
+                title="Report this model"
+              >
+                <CiFlag1 size={20} />
+              </button>
+            </div>
           <div className="text-lg text-custom-light-textcolor dark:text-custom-dark-textcolor font-normal">
               {showMore ? result.description : shortText}
               {sentences.length > 2 && (
@@ -501,7 +545,7 @@ export default function ClientExplorePage({
           </div>
         </div>
         {/* Detail mid-content banner ad */}
-        <AdPositionManager
+        <OptimizedAdPositionManager
           page="detail"
           positions={['detail-mid-content-banner']}
           className="w-full flex justify-center items-center pt-10"
@@ -517,8 +561,8 @@ export default function ClientExplorePage({
           positions={['detail-sponsored-similar']}
           className="container mx-auto px-4 mt-4"
         /> */}
-        <SuggestionSection modelId={id} />
-      </div>
-    </>
-  );
+                <SuggestionSection modelId={id} />
+        </div>
+      </>
+    );
 }
