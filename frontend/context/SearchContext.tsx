@@ -1,6 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, useMemo, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useMemo, ReactNode, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useLikesStore } from "@/app/_zustand/useLikesStore";
 
 type SearchContextType = {
   selectedPlatform: string;
@@ -36,6 +38,31 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
   const [searchTag, setSearchTag] = useState("");
   const [liked, setliked] = useState(false);
   const [userId, setUserId] = useState("");
+
+  // Watch for session changes and disable liked filter when logged out
+  const { data: session, status } = useSession();
+  
+  useEffect(() => {
+    if (status === "unauthenticated" && liked) {
+      // User logged out while liked filter was active, disable it
+      setliked(false);
+      setUserId("");
+      
+      // Clear likes store when user logs out
+      useLikesStore.getState().reset();
+    } else if (status === "authenticated" && session?.user) {
+      // User logged in, update userId
+      const currentUserId = (session.user as { id?: string })?.id;
+      if (currentUserId && currentUserId !== userId) {
+        setUserId(currentUserId);
+        console.log("User logged in, updated userId:", currentUserId);
+        
+        // Optionally auto-enable liked filter for new login
+        // Uncomment the next line if you want to automatically show liked models on login
+        // setliked(true);
+      }
+    }
+  }, [status, liked, session, userId]);
 
   // Memoized setters to prevent unnecessary re-renders
   const memoizedSetSelectedPlatform = useCallback((value: string) => {

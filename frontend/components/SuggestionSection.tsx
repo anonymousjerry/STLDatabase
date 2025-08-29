@@ -23,7 +23,7 @@ const SuggestionSection = ({ modelId }: SuggestionSectionProps) => {
 
   return (
     <div className="py-10 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor min-h-[200px]">
-      <div className="grid grid-cols-4 justify-between gap-x-12 gap-y-8 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1">
+      <div className="grid grid-cols-4 gap-x-4 gap-y-4 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1">
         {loading ? (
           <p className="col-span-full text-center text-gray-400">Loading suggestions...</p>
         ) : suggestionModels.length === 0 ? (
@@ -33,7 +33,7 @@ const SuggestionSection = ({ modelId }: SuggestionSectionProps) => {
               No Suggestions Yet
             </h3>
             <p className="text-center text-gray-500 dark:text-gray-400 ">
-              We couldn't find any suggestions for this model right now.<br /> Check back later or explore other models.
+              We couldn&apos;t find any suggestions for this model right now.<br /> Check back later or explore other models.
             </p>
           </div>
         ) : (

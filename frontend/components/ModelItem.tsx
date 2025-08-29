@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { HiDownload, HiOutlineFolderDownload } from "react-icons/hi";
 import { useSession } from "next-auth/react";
@@ -18,14 +18,33 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   const userId = (session?.user as { id?: string })?.id;
   const isDisabled = status !== "authenticated";
 
+  // Debug session state
+  console.log(`Session debug for model ${model.id}:`, {
+    status,
+    hasSession: !!session,
+    sessionUser: session?.user,
+    userId,
+    isDisabled
+  });
+
   const router = useRouter();
 
 
-  const { likedModels, likesCount, toggleLike, reset } = useLikesStore();
+  const { likedModels, likesCount, toggleLike } = useLikesStore();
   
-  // Only use server-side like data to determine if current user has liked this model
-  const likedModel = model.likes?.some((like: Like) => like.userId === userId) ?? false;
-  const count = model.likes.length;
+  // Use store state, fallback to server data
+  // If user is not authenticated, always show as unliked
+  const likedModel = userId ? (likedModels[model.id] ?? model.likes?.some((like: Like) => like.userId === userId) ?? false) : false;
+  const count = likesCount[model.id] ?? model.likes.length;
+
+  // Debug logging
+  console.log(`Model ${model.id}:`, {
+    storeLiked: likedModels[model.id],
+    serverLiked: model.likes?.some((like: Like) => like.userId === userId),
+    finalLiked: likedModel,
+    userId,
+    hasLikes: !!model.likes
+  });
 
   const { addView, isView, ViewCounts } = useViewsStore();
 
@@ -47,10 +66,7 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
       setliked
     } = useSearch();
 
-  // Reset likes store when user changes (login/logout)
-  useEffect(() => {
-    reset();
-  }, [userId, reset]);
+
 
   const slugify = (text: string): string =>
     text
@@ -63,21 +79,90 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   const generateSlug = (category: string, subCategory: string, title: string) =>
     `${slugify(category)}/${slugify(subCategory)}/${slugify(title)}`;
 
+  const [isLiking, setIsLiking] = useState(false);
+
+  // Initialize store with server data if not already set
+  useEffect(() => {
+    if (model.likes && userId && status === "authenticated") {
+      const serverLiked = model.likes.some((like: Like) => like.userId === userId);
+      const serverCount = model.likes.length;
+      
+      console.log(`Initializing store for model ${model.id}:`, {
+        serverLiked,
+        serverCount,
+        currentStoreValue: likedModels[model.id]
+      });
+      
+      // Always update if server data is different from store data
+      const currentStoreLiked = likedModels[model.id];
+      if (currentStoreLiked === undefined || currentStoreLiked !== serverLiked) {
+        useLikesStore.getState().setLikeStatus(model.id, serverLiked, serverCount);
+        console.log(`Set store for model ${model.id}:`, { serverLiked, serverCount });
+      }
+    }
+  }, [model.id, model.likes, userId, status, likedModels]);
+
+  // Global initialization when user logs in
+  useEffect(() => {
+    if (status === "authenticated" && userId && model.likes) {
+      const serverLiked = model.likes.some((like: Like) => like.userId === userId);
+      const serverCount = model.likes.length;
+      
+      // Force update store when user first logs in
+      useLikesStore.getState().setLikeStatus(model.id, serverLiked, serverCount);
+      console.log(`Global init for model ${model.id}:`, { serverLiked, serverCount });
+    }
+  }, [status, userId, model.id, model.likes]);
+
   const handleModelOnClick = async (modelId: string) => {
     if (!userId) {
       toast.error("Please log in to like this model.");
       return;
     }
 
+    if (isLiking) {
+      return; // Prevent rapid clicking
+    }
+
     try {
-      await likeModel(modelId, userId, session?.accessToken || "");
-      if(!likedModel) {
-          toast.success("Model liked successfully!");
-        } else {
-          toast.success("Model disliked successfully!");
+      setIsLiking(true);
+      
+      // Check current state before toggling
+      const wasLiked = likedModel;
+      
+      // Optimistically update UI
+      toggleLike(modelId);
+      
+      // Call API
+      const response = await likeModel(modelId, userId, session?.accessToken || "");
+      
+      // Update server data to reflect the new state
+      if (response.success) {
+        // Update the model's likes array to reflect the new state
+        const newLikes = wasLiked 
+          ? (model.likes || []).filter((like: Like) => like.userId !== userId)
+          : [...(model.likes || []), { userId, modelId }];
+        
+        // Update the model object (this will trigger re-render with correct server data)
+        Object.assign(model, { likes: newLikes });
+        
+        // Update store with the new server data
+        useLikesStore.getState().setLikeStatus(modelId, !wasLiked, newLikes.length);
+      }
+      
+      // Show appropriate message based on the action
+      if (!wasLiked) {
+        toast.success("Model liked successfully!");
+      } else {
+        toast.success("Model disliked successfully!");
       }
     } catch (err) {
+      // Revert on error
+      toggleLike(modelId); // Toggle back to original state
       console.error("Like failed:", err);
+      toast.error("Failed to update like status. Please try again.");
+    } finally {
+      setIsLiking(false);
     }
   };
 
@@ -143,6 +228,108 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   return `${currency}${num.toFixed(1)}`;
 }
 
+  const [width, setWidth] = useState<number>(
+    typeof window !== "undefined" ? window.innerWidth : 1000
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Function to render the meta section
+  const renderMeta = () => {
+    // Use the count variable that's already calculated with store data
+
+    // >=900px: single div with all three items
+    if (width >= 900) {
+      return (
+        <div className="flex items-center text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor justify-between">
+          {/* Downloads */}
+          <div className="flex items-center gap-1">
+            <HiOutlineFolderDownload className="text-base" size={20} />
+            <span>{model.downloads}</span>
+            <span className="hidden md:inline">downloads</span>
+          </div>
+
+          {/* Likes */}
+          <div className="flex items-center gap-1">
+            {likedModel ? (
+              <FaHeart className="text-base text-red-500" size={18} />
+            ) : (
+              <FaRegHeart className="text-base" size={18} />
+            )}
+            <span>{count}</span>
+            <span className="hidden md:inline">likes</span>
+          </div>
+
+          {/* Price */}
+          <div className="font-semibold text-lg sm:text-md text-custom-light-maincolor dark:text-custom-dark-maincolor ">
+            {model.price === "FREE" ? "Free" : formatPrice(model.price)}
+          </div>
+        </div>
+      );
+    }
+
+    // 480px <= width < 900px: two divs
+    if (width >= 480) {
+      return (
+        <div className="flex w-full items-center justify-between text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor">
+          {/* Downloads + Likes */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              <HiOutlineFolderDownload className="text-base" size={20} />
+              <span>{model.downloads}</span>
+              <span className="hidden md:inline"> downloads</span>
+            </div>
+            <div className="flex items-center gap-1">
+              {likedModel ? (
+                <FaHeart className="text-base text-red-500" size={18} />
+              ) : (
+                <FaRegHeart className="text-base" size={18} />
+              )}
+              <span>{count}</span>
+              <span className="hidden md:inline"> likes</span>
+            </div>
+          </div>
+
+          {/* Price */}
+          <div className="font-semibold text-lg sm:text-md text-custom-light-maincolor dark:text-custom-dark-maincolor">
+            {model.price === "FREE" ? "Free" : formatPrice(model.price)}
+          </div>
+        </div>
+      );
+    }
+
+    // <480px: single div, justify-between
+    return (
+      <div className="flex w-full items-center justify-between text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1">
+            <HiOutlineFolderDownload className="text-base" size={20} />
+            <span>{model.downloads}</span>
+            <span className="hidden md:inline"> downloads</span>
+
+          </div>
+          <div className="flex items-center gap-1">
+            {likedModel ? (
+              <FaHeart className="text-base text-red-500" size={18} />
+            ) : (
+              <FaRegHeart className="text-base" size={18} />
+            )}
+            <span>{count}</span>
+            <span className="hidden md:inline"> likes</span>
+          </div>
+        </div>
+
+        <div className="font-semibold text-lg sm:text-md text-custom-light-maincolor dark:text-custom-dark-maincolor">
+          {model.price === "FREE" ? "Free" : formatPrice(model.price)}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col w-full bg-custom-light-containercolor dark:bg-custom-dark-containercolor shadow-lg rounded-3xl border border-gray-200 overflow-hidden relative">
 
@@ -183,7 +370,7 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
         <Link
           href={{ pathname: `/explore/${modelSlug}`, query }}
           onClick={() => handleToggleView(model.id)}
-          className="font-semibold text-lg sm:text-xl md:text-2xl truncate max-w-full hover:underline transition-colors duration-200"
+          className="font-semibold text-base sm:text-lg md:text-xl truncate max-w-full hover:underline transition-colors duration-200"
         >
           {model.title}
         </Link>
@@ -202,19 +389,9 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
         </div>
 
         {/* Meta Info */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor">
-          <div className="flex items-center gap-1">
-            <HiOutlineFolderDownload className="text-base" size={20} />
-            <span>{model.downloads} files</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <FaRegHeart className="text-base" size={18} />
-            <span>{count} likes</span>
-          </div>
-          <div className="font-semibold text-lg sm:text-md text-custom-light-maincolor dark:text-custom-dark-maincolor">
-            {model.price === "FREE" ? "Free" : formatPrice(model.price)}
-          </div>
-        </div>
+        <div >{renderMeta()}</div>
+
+
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pb-2">

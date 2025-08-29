@@ -282,7 +282,7 @@ const Navbar = () => {
                     </button>
                     <div className="text-center">
                       <span className="text-white/60 text-sm">
-                        Welcome back! You're signed in.
+                        Welcome back! You&apos;re signed in.
                       </span>
                     </div>
                   </>

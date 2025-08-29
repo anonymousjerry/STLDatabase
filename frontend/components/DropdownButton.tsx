@@ -100,6 +100,7 @@ const DropdownButton = ({ value, label, list, onSelect}: DropdownButtonProps) =>
               onClick={() => handleSelect('All')}
               role="option"
               tabIndex={0}
+              aria-selected={value === 'All'}
               className="cursor-pointer px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               All
@@ -111,6 +112,7 @@ const DropdownButton = ({ value, label, list, onSelect}: DropdownButtonProps) =>
                   onClick={() => handleSelect(item)}
                   role="option"
                   tabIndex={0}
+                  aria-selected={value === item}
                   className="cursor-pointer px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   {item}
