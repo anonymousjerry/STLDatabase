@@ -99,8 +99,11 @@ const SearchBar = () => {
 
   const platformArray = platforms?.map(([platform]) => platform) || [];
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const performSearch = () => {
+    // Only search if input has minimum length or if clearing search
+    if (searchInput.trim().length < 2 && searchInput.trim().length > 0) {
+      return;
+    }
 
     const queryParams = new URLSearchParams();
 
@@ -110,7 +113,7 @@ const SearchBar = () => {
       queryParams.set("category", selectedCategory);
     if (selectedSubCategory && selectedSubCategory.id)
       queryParams.set("subCategory", selectedSubCategory.id);
-    if (searchInput) queryParams.set("key", searchInput);
+    if (searchInput.trim()) queryParams.set("key", searchInput.trim());
     if (searchPrice) queryParams.set("price", searchPrice);
     if (liked) queryParams.set("liked", 'true');
     if (userId) {
@@ -118,8 +121,12 @@ const SearchBar = () => {
     }
     queryParams.set("currentPage", '1');
     
-
     router.push(`/explore?${queryParams.toString()}`);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    performSearch();
   };
 
   const handleCategorySelect = (category: string) => {
@@ -165,21 +172,27 @@ const SearchBar = () => {
         />
       </div>
 
-      <div className="w-full md:basis-3/5 flex flex-col md:flex-row gap-2">
-        <div className="w-full md:basis-4/5">
-          <SearchInput value={searchInput} onChange={setSearchInput} />
-        </div>
-        <button
-          type="submit"
-          aria-label="Search models"
-          className="bg-[#4e4d80] dark:bg-[#3a3a60] rounded-xl w-full md:w-auto md:basis-1/5 pr-2.5 pl-2.5 md:mt-7 flex flex-row gap-2 items-center justify-center h-12 relative hover:bg-[#3d3c66] dark:hover:bg-[#2e2e4a] transition"
-        >
-          <div className="text-white text-lg font-medium text-left relative select-none">
-            Search
-          </div>
-          <IoIosSearch size={24} color="white"/>
-        </button>
-      </div>
+             <div className="w-full md:basis-3/5 flex flex-col md:flex-row gap-2">
+         <div className="w-full md:basis-4/5">
+                       <SearchInput 
+              value={searchInput} 
+              onChange={setSearchInput}
+              onSearch={performSearch}
+              placeholder="Search 3D models..."
+              showSearchButton={true}
+            />
+         </div>
+         <button
+           type="submit"
+           aria-label="Search models"
+           className="bg-[#4e4d80] dark:bg-[#3a3a60] rounded-xl w-full md:w-auto md:basis-1/5 pr-2.5 pl-2.5 md:mt-7 flex flex-row gap-2 items-center justify-center h-12 relative hover:bg-[#3d3c66] dark:hover:bg-[#2e2e4a] transition"
+         >
+           <div className="text-white text-lg font-medium text-left relative select-none">
+             Search
+           </div>
+           <IoIosSearch size={24} color="white"/>
+         </button>
+       </div>
     </form>
   );
 };
