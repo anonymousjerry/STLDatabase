@@ -4,17 +4,14 @@ import { persist, createJSONStorage } from "zustand/middleware";
 type LikeState = {
   likedModels: Record<string, boolean>;
   likesCount: Record<string, number>;
-  pendingLikes: Set<string>; // Track optimistic updates
   toggleLike: (modelId: string) => void;
   setLikeStatus: (modelId: string, liked: boolean, count: number) => void;
-  clearPendingLikes: () => void;
   reset: () => void;
 };
 
 const initialState = {
   likedModels: {},
   likesCount: {},
-  pendingLikes: new Set<string>(),
 };
 
 export const useLikesStore = create<LikeState>()(
@@ -24,10 +21,16 @@ export const useLikesStore = create<LikeState>()(
       
       toggleLike: (modelId: string) =>
         set((state) => {
-          const liked = !state.likedModels[modelId];
+          const currentLiked = state.likedModels[modelId] ?? false;
+          const liked = !currentLiked;
           const currentCount = state.likesCount[modelId] ?? 0;
-          const newPendingLikes = new Set(state.pendingLikes);
-          newPendingLikes.add(modelId);
+
+          console.log(`Toggle like for model ${modelId}:`, {
+            currentLiked,
+            newLiked: liked,
+            currentCount,
+            newCount: liked ? currentCount + 1 : Math.max(0, currentCount - 1)
+          });
 
           return {
             likedModels: { ...state.likedModels, [modelId]: liked },
@@ -35,26 +38,17 @@ export const useLikesStore = create<LikeState>()(
               ...state.likesCount,
               [modelId]: liked ? currentCount + 1 : Math.max(0, currentCount - 1),
             },
-            pendingLikes: newPendingLikes,
           };
         }),
 
       setLikeStatus: (modelId: string, liked: boolean, count: number) =>
         set((state) => {
-          const newPendingLikes = new Set(state.pendingLikes);
-          newPendingLikes.delete(modelId);
-
+          console.log(`Set like status for model ${modelId}:`, { liked, count });
           return {
             likedModels: { ...state.likedModels, [modelId]: liked },
             likesCount: { ...state.likesCount, [modelId]: count },
-            pendingLikes: newPendingLikes,
           };
         }),
-
-      clearPendingLikes: () =>
-        set((state) => ({
-          pendingLikes: new Set<string>(),
-        })),
 
       reset: () => set(initialState),
     }),

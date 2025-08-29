@@ -62,7 +62,7 @@ const TrendingModels = () => {
                     )}
                 </div>
 
-                <div className="grid grid-cols-4 max-xl:grid-cols-3 max-lg:grid-cols-2 max-md:grid-cols-1 max-sm:grid-cols-1 gap-6 pb-7">
+                <div className="grid grid-cols-4 max-xl:grid-cols-3 max-lg:grid-cols-2 max-md:grid-cols-2 max-sm:grid-cols-1 gap-4 pb-7">
                     {trendingModels.map((model: Model) => (
                         <ModelItem key={model.id} model={model} color="white" />
                     ))}

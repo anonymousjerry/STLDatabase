@@ -11,6 +11,8 @@ import { useSearch } from '@/context/SearchContext';
 import { useRouter } from 'next/navigation';
 import OptimizedAdPositionManager from './ads/OptimizedAdPositionManager';
 import ScrollToTopButton from './ScrollToTopButton';
+import { useLikesStore } from '@/app/_zustand/useLikesStore';
+import { useSession } from 'next-auth/react';
 
 type ExploreMainPageClientProps = {
   initialModels: Model[];
@@ -32,6 +34,7 @@ const ExploreMainPageClient = ({
   initialSearchParams,
 }: ExploreMainPageClientProps) => {
   const router = useRouter();
+  const { status } = useSession();
   const [models, setModels] = useState<Model[]>(initialModels);
   const [selectedFilters, setSelectedFilters] = useState<string[]>(['All']);
   const [totalModels, setTotalModels] = useState(0);
@@ -84,6 +87,23 @@ const ExploreMainPageClient = ({
     }
   }, [initialSearchParams, setSearchInput, setSelectedPlatform, setSelectedCategory, setSelectedSubCategory]);
 
+  // Clear liked filter if user is not authenticated but URL has liked=true
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLiked = urlParams.get('liked');
+    
+    if (urlLiked === 'true' && !userId) {
+      // User is not authenticated but URL has liked=true, clear it
+      setliked(false);
+      
+      // Remove liked parameter from URL
+      urlParams.delete('liked');
+      urlParams.delete('userId');
+      const newUrl = `${window.location.pathname}${urlParams.toString() ? '?' + urlParams.toString() : ''}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [userId, setliked]);
+
   // Show/hide UP button on scroll
   // useEffect(() => {
   //   const handleScroll = () => {
@@ -103,6 +123,13 @@ const ExploreMainPageClient = ({
       setIsLoading(true);
       setPage(1);
       setHasMore(true);
+      
+      console.log('Fetching models with params:', {
+        liked,
+        userId,
+        status: liked ? 'true' : 'false'
+      });
+      
       const { models: newModels, totalCount } = await searchModels({
         key: searchInput,
         tag: searchTag,
@@ -124,7 +151,43 @@ const ExploreMainPageClient = ({
     };
 
     fetchFilteredModels();
-  }, [selectedFilters, selectedPlatform, selectedCategory, selectedSubCategory, searchPrice, liked, searchInput, searchTag]);
+  }, [selectedFilters, selectedPlatform, selectedCategory, selectedSubCategory, searchPrice, liked, searchInput, searchTag, userId]);
+
+  // 1.5️⃣ Synchronize like states when models change
+  useEffect(() => {
+    if (models.length > 0 && userId && status === "authenticated") {
+      // Sync like states for all models in the current list
+      models.forEach(model => {
+        if (model.likes) {
+          const serverLiked = model.likes.some((like: Like) => like.userId === userId);
+          const serverCount = model.likes.length;
+          const currentStoreLiked = useLikesStore.getState().likedModels[model.id];
+          
+          // Update store if server data differs from store data
+          if (currentStoreLiked === undefined || currentStoreLiked !== serverLiked) {
+            useLikesStore.getState().setLikeStatus(model.id, serverLiked, serverCount);
+            console.log(`Synced like state for model ${model.id}:`, { serverLiked, serverCount });
+          }
+        }
+      });
+    }
+  }, [models, userId, status]);
+
+  // 1.6️⃣ Real-time filter update when like states change (for liked filter)
+  const { likedModels } = useLikesStore();
+  
+  useEffect(() => {
+    if (liked && userId) {
+      // When viewing liked models, remove models that are no longer liked
+      const updatedModels = models.filter(model => likedModels[model.id] === true);
+      
+      if (updatedModels.length !== models.length) {
+        setModels(updatedModels);
+        setTotalModels(prev => Math.max(0, prev - (models.length - updatedModels.length)));
+        console.log(`Removed ${models.length - updatedModels.length} unliked models from liked filter`);
+      }
+    }
+  }, [likedModels, liked, userId, models]);
 
   // 2️⃣ When page increases (lazy load), fetch and append
   useEffect(() => {
@@ -156,7 +219,7 @@ const ExploreMainPageClient = ({
     };
 
     fetchMore();
-  }, [page]);
+  }, [page, searchInput, searchTag, selectedPlatform, selectedCategory, selectedSubCategory.id, searchPrice, liked, userId]);
 
   // 3️⃣ Lazy loading on scroll (Intersection Observer)
   useEffect(() => {
@@ -190,14 +253,14 @@ const ExploreMainPageClient = ({
                 <div className="text-center text-custom-light-textcolor dark:text-custom-dark-textcolor">
                   <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
                     {selectedSubCategory?.id
-                      ? `${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} STL Files | 3D Printable ${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} Models`
-                      : `${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} STL Files | 3D Printable ${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} Models`}
+                      ? `${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} 3D Files`
+                      : `${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} 3D Files`}
                   </h1>
-                  <p className="text-lg sm:text-xl text-custom-light-textcolor dark:text-custom-dark-textcolor max-w-4xl mx-auto leading-relaxed">
+                  {/* <p className="text-lg sm:text-xl text-custom-light-textcolor dark:text-custom-dark-textcolor max-w-4xl mx-auto leading-relaxed">
                     {selectedSubCategory?.id
                       ? `Explore 3D printable ${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} STL files. Browse curated collections of ${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} models, discover popular designs, and download files to start printing today.`
                       : `Explore 3D printable ${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} STL files. Browse curated collections of ${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} models, discover popular designs, and download files to start printing today.`}
-                  </p>
+                  </p> */}
                 </div>
               </div>
             </div>
@@ -208,11 +271,11 @@ const ExploreMainPageClient = ({
               <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 md:px-8">
                 <div className="text-center text-custom-light-textcolor dark:text-custom-dark-textcolor">
                   <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-                    {`${searchTag.replace(/\b\w/g, (char) => char.toUpperCase())} STL Files | 3D Printable ${searchTag.replace(/\b\w/g, (char) => char.toUpperCase())} Models to Download - 3DDatabase`}
+                    {`${searchTag.replace(/\b\w/g, (char) => char.toUpperCase())} 3D Files`}
                   </h1>
-                  <p className="text-lg sm:text-xl text-custom-light-textcolor dark:text-custom-dark-textcolor max-w-4xl mx-auto leading-relaxed">
+                  {/* <p className="text-lg sm:text-xl text-custom-light-textcolor dark:text-custom-dark-textcolor max-w-4xl mx-auto leading-relaxed">
                     {`Discover free and premium 3D printable ${searchTag.replace(/\b\w/g, (char) => char.toUpperCase())} STL files. Download popular ${searchTag.replace(/\b\w/g, (char) => char.toUpperCase())} models, explore unique designs, and start printing today.`}
-                  </p>
+                  </p> */}
                 </div>
               </div>
             </div>

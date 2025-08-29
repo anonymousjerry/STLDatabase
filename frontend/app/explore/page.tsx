@@ -2,8 +2,12 @@ import { ExploreMainPageClient } from '@/components';
 import Container from '@/components/Container';
 import { searchModels } from '@/lib/modelsApi';
 
+export const metadata = {
+  title: 'Explore Models - 3D Database',
+};
+
 interface ExplorePageProps {
-  searchParams: {
+  searchParams: Promise<{
     key?: string;
     tag?: string;
     sourcesite?: string;
@@ -14,7 +18,7 @@ interface ExplorePageProps {
     liked?: string;
     userId?: string;
     currentPage?: number;
-  };
+  }>;
 }
 
 const ExploreMainPage = async ({ searchParams }: ExplorePageProps) => {

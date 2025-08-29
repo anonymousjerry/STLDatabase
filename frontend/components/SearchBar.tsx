@@ -95,7 +95,7 @@ const SearchBar = () => {
       setCategoryLabel("Category");
       setCategoryValue("All") // fallback
     }
-  }, [selectedCategory, selectedSubCategory, groupedCategories]);
+  }, [selectedCategory, selectedSubCategory?.id, selectedSubCategory?.name, groupedCategories]);
 
   const platformArray = platforms?.map(([platform]) => platform) || [];
 

@@ -9,6 +9,11 @@ import { Footer } from "@/components";
 import OptimizedAdPositionManager from "@/components/ads/OptimizedAdPositionManager";
 import Container from "@/components/Container";
 
+export const metadata = {
+  title: '3D Database - Explore 3D Models, Sites, and Resources',
+  description: 'Discover trending 3D models, featured sites, daily discoveries, and more on 3D Database.',
+};
+
 export default function Home() {
   
   return (

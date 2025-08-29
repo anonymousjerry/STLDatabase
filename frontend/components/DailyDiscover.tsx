@@ -71,7 +71,7 @@ const DailyDiscover = () => {
       </div>
 
       <div className="pt-10 bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
-        <div className="grid grid-cols-4 justify-between gap-x-12 gap-y-8 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1">
+        <div className="grid grid-cols-4 justify-between gap-x-4 gap-y-4 max-xl:grid-cols-3 max-lg:grid-cols-2 max-md:grid-cols-2 max-sm:grid-cols-1">
           {models.map((model: Model) => (
             <ModelItem key={model.id} model={model} color="white" />
           ))}

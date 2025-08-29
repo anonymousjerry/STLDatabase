@@ -21,7 +21,7 @@ const CategoryTreeDropdown = ({
 }: CategoryTreeDropdownProps) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const { selectedCategory, setSelectedCategory } = useSearch();
+  const { selectedCategory, selectedSubCategory, setSelectedCategory } = useSearch();
   const [displayValue, setDisplayValue] = useState(value);
   const [submenuPosition, setSubmenuPosition] = useState<{ top: number; left: number; width: number } | null>(null);
   const [activeSubmenu, setActiveSubmenu] = useState<GroupedCategory | null>(null);
@@ -135,6 +135,7 @@ const CategoryTreeDropdown = ({
               onClick={handleAllSelect}
               role="option"
               tabIndex={0}
+              aria-selected={selectedCategory === "All"}
               className="cursor-pointer px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-medium"
             >
               All
@@ -151,6 +152,7 @@ const CategoryTreeDropdown = ({
                   <div
                     role="option"
                     tabIndex={0}
+                    aria-selected={selectedCategory === category.group}
                     className="cursor-pointer px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-medium flex justify-between items-center"
                     onClick={() => handleCategoryOnlySelect(category)}
                   >
@@ -188,6 +190,7 @@ const CategoryTreeDropdown = ({
                 onClick={() => handleSubCategorySelect(sub)}
                 role="option"
                 tabIndex={0}
+                aria-selected={selectedSubCategory?.id === sub.id}
                 className=" cursor-pointer px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-md relative border-b border-gray-100 dark:border-gray-700 dark:text-gray-200 last:border-b-0"
               >
                 {sub.name}

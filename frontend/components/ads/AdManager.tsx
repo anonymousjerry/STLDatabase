@@ -101,7 +101,7 @@ const AdManager: React.FC<AdManagerProps> = ({ page, className = '' }) => {
     // Set ads for current page
     const pageAds = adConfigs[page] || [];
     setAds(pageAds.filter(ad => ad.enabled).sort((a, b) => a.priority - b.priority));
-  }, [page]);
+  }, [page, adConfigs]);
 
   const renderAd = (ad: AdConfig) => {
     if (isAdBlocked) {

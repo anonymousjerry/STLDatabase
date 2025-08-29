@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaClock, FaPaperPlane, FaUser, FaComment, FaBuilding, FaGlobe } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { isValidEmailAddressFormat } from "@/lib/utils";
+import { updateContactApi } from "@/lib/contactApi";
 
 interface ContactFormData {
   name: string;
@@ -79,6 +80,10 @@ const ContactPageComponent = () => {
         toast.error("Please select an advertisement type");
         return false;
       }
+      if (!formData.budget?.trim()) {
+        toast.error("Please select an budget range");
+        return false;
+      }
     }
 
     return true;
@@ -90,10 +95,12 @@ const ContactPageComponent = () => {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+    console.log("Contact Form", formData);
     
     try {
       // Simulate API call - replace with actual contact form submission
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // await new Promise(resolve => setTimeout(resolve, 2000));
+      await updateContactApi(formData);
       
       const successMessage = showAdFields 
         ? "Thank you for your advertisement inquiry! Our team will review your request and get back to you within 24 hours."
@@ -174,7 +181,7 @@ const ContactPageComponent = () => {
               Get in Touch
             </h1>
             <p className="text-xl text-gray-200 max-w-2xl mx-auto">
-              Have questions about our 3D models? Need support? Want to advertise? We're here to help you find the perfect 3D printing models and grow your business.
+              Have questions about our 3D models? Need support? Want to advertise? We&apos;re here to help you find the perfect 3D printing models and grow your business.
             </p>
           </div>
         </div>
@@ -186,11 +193,11 @@ const ContactPageComponent = () => {
           <div className="space-y-8">
             <div>
               <h2 className="text-3xl font-bold text-custom-light-titlecolor dark:text-custom-dark-titlecolor mb-6">
-                Let's Connect
+                Let&apos;s Connect
               </h2>
               <p className="text-lg text-custom-light-textcolor dark:text-custom-dark-textcolor mb-8">
-                We're passionate about 3D printing and always excited to hear from our community. 
-                Whether you have a question, suggestion, want to advertise, or just want to say hello, we'd love to hear from you.
+                We&apos;re passionate about 3D printing and always excited to hear from our community. 
+                Whether you have a question, suggestion, want to advertise, or just want to say hello, we&apos;d love to hear from you.
               </p>
             </div>
 

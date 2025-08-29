@@ -94,7 +94,7 @@ const LoginPage = () => {
                 </form>
 
                 <div className="flex ml-2 items-center mt-5">
-                    <span className="text-xs text-gray-400">Don't have an account?</span>
+                    <span className="text-xs text-gray-400">Don&apos;t have an account?</span>
                     <button
                         onClick={() => router.replace('/register')}
                         className="ml-2 text-sm text-[#0099ff] hover:underline"
