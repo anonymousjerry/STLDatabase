@@ -23,13 +23,13 @@ interface ScrapeSummaryPayload {
 type NotifyFn = (status: string, msg: string) => void;
 type StatusUpdateFn = (id: string, status: string, platform: string) => void;
 
-const SOCKET_URL = "http://15.204.213.3:8080"; // replace with your backend socket server
+// const SOCKET_URL = "http://15.204.213.3:8080"; // replace with your backend socket server
 
 let socket: Socket | null = null;
 
 export const setupSocketListeners = (notify: NotifyFn, statusUpdate?: StatusUpdateFn) => {
   if (!socket) {
-    socket = io(SOCKET_URL, { transports: ["websocket"] });
+    socket = io(process.env.NEXT_PUBLIC_WS_URL, { transports: ["websocket"] });
   }
 
   socket.on("connect", () => {

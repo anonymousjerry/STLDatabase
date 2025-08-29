@@ -13,6 +13,7 @@ import OptimizedAdPositionManager from './ads/OptimizedAdPositionManager';
 import ScrollToTopButton from './ScrollToTopButton';
 import { useLikesStore } from '@/app/_zustand/useLikesStore';
 import { useSession } from 'next-auth/react';
+import { useDebounce } from '@/hooks/useDebounce';
 
 type ExploreMainPageClientProps = {
   initialModels: Model[];
@@ -61,6 +62,9 @@ const ExploreMainPageClient = ({
     setliked,
     setSearchTag
   } = useSearch();
+  
+  // Debounce search input to prevent excessive API calls
+  const debouncedSearchInput = useDebounce(searchInput, 500);
 
   // Initialize search context with URL parameters
   useEffect(() => {
@@ -120,6 +124,11 @@ const ExploreMainPageClient = ({
   // 1️⃣ When filters change, reset page & fetch new models
   useEffect(() => {
     const fetchFilteredModels = async () => {
+      // Only search if debounced input has minimum length or if it's empty (to show all results)
+      if (debouncedSearchInput.trim().length > 0 && debouncedSearchInput.trim().length < 2) {
+        return;
+      }
+
       setIsLoading(true);
       setPage(1);
       setHasMore(true);
@@ -131,7 +140,7 @@ const ExploreMainPageClient = ({
       });
       
       const { models: newModels, totalCount } = await searchModels({
-        key: searchInput,
+        key: debouncedSearchInput.trim(),
         tag: searchTag,
         sourcesite: selectedPlatform,
         category: selectedCategory,
@@ -151,7 +160,7 @@ const ExploreMainPageClient = ({
     };
 
     fetchFilteredModels();
-  }, [selectedFilters, selectedPlatform, selectedCategory, selectedSubCategory, searchPrice, liked, searchInput, searchTag, userId]);
+  }, [selectedFilters, selectedPlatform, selectedCategory, selectedSubCategory, searchPrice, liked, debouncedSearchInput, searchTag, userId]);
 
   // 1.5️⃣ Synchronize like states when models change
   useEffect(() => {
@@ -195,7 +204,7 @@ const ExploreMainPageClient = ({
       setIsLoading(true);
 
       const { models: moreModels, totalCount } = await searchModels({
-        key: searchInput,
+        key: debouncedSearchInput.trim(),
         tag: searchTag,
         sourcesite: selectedPlatform,
         category: selectedCategory,
@@ -219,7 +228,7 @@ const ExploreMainPageClient = ({
     };
 
     fetchMore();
-  }, [page, searchInput, searchTag, selectedPlatform, selectedCategory, selectedSubCategory.id, searchPrice, liked, userId]);
+  }, [page, debouncedSearchInput, searchTag, selectedPlatform, selectedCategory, selectedSubCategory.id, searchPrice, liked, userId]);
 
   // 3️⃣ Lazy loading on scroll (Intersection Observer)
   useEffect(() => {
