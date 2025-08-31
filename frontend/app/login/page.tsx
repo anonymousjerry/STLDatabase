@@ -4,7 +4,7 @@ import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { FaGoogle, FaApple, FaGithub } from "react-icons/fa6";
+import { FaGoogle, FaApple } from "react-icons/fa6";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -14,7 +14,6 @@ const LoginPage = () => {
   const providers = [
       { name: "google", Icon: FaGoogle },
       { name: "apple", Icon: FaApple },
-      { name: "github", Icon: FaGithub },
     ];
 
   useEffect(() => {

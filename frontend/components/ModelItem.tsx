@@ -185,7 +185,8 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
       setSelectedCategory("All");
       setSelectedSubCategory({name: "", id: ""});
     } catch (error) {
-      toast.error("Failed to view model.");
+      // toast.error("Failed to view model.");
+      console.log(error)
     }
   };
 
@@ -239,96 +240,121 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   }, []);
 
   // Function to render the meta section
-  const renderMeta = () => {
-    // Use the count variable that's already calculated with store data
+  // const renderMeta = () => {
+  //   // Use the count variable that's already calculated with store data
 
-    // >=900px: single div with all three items
-    if (width >= 900) {
-      return (
-        <div className="flex items-center text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor justify-between">
-          {/* Downloads */}
-          <div className="flex items-center gap-1">
-            <HiOutlineFolderDownload className="text-base" size={20} />
-            <span>{model.downloads}</span>
-            <span className="hidden md:inline">downloads</span>
-          </div>
+  //   // >=900px: single div with all three items
+  //   if (width >= 620) {
+  //     return (
+  //       <div className="flex items-center text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor justify-between">
+  //         {/* Downloads */}
+  //         <div className="flex items-center gap-1">
+  //           <HiOutlineFolderDownload className="text-base" size={20} />
+  //           <span>{model.downloads} downloads</span>
+  //         </div>
 
-          {/* Likes */}
-          <div className="flex items-center gap-1">
-            {likedModel ? (
-              <FaHeart className="text-base text-red-500" size={18} />
-            ) : (
-              <FaRegHeart className="text-base" size={18} />
-            )}
-            <span>{count}</span>
-            <span className="hidden md:inline">likes</span>
-          </div>
+  //         {/* Likes */}
+  //         <div className="flex items-center gap-1">
+  //           {likedModel ? (
+  //             <FaHeart className="text-base text-red-500" size={18} />
+  //           ) : (
+  //             <FaRegHeart className="text-base" size={18} />
+  //           )}
+  //           <span>{count} likes</span>
+  //         </div>
 
-          {/* Price */}
-          <div className="font-semibold text-lg sm:text-md text-custom-light-maincolor dark:text-custom-dark-maincolor ">
-            {model.price === "FREE" ? "Free" : formatPrice(model.price)}
-          </div>
-        </div>
-      );
-    }
+  //         {/* Price */}
+  //         <div className="font-semibold text-lg sm:text-md text-custom-light-maincolor dark:text-custom-dark-maincolor ">
+  //           {model.price === "FREE" ? "Free" : formatPrice(model.price)}
+  //         </div>
+  //       </div>
+  //     );
+  //   }
 
-    // 480px <= width < 900px: two divs
-    if (width >= 480) {
-      return (
-        <div className="flex w-full items-center justify-between text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor">
-          {/* Downloads + Likes */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
-              <HiOutlineFolderDownload className="text-base" size={20} />
-              <span>{model.downloads}</span>
-              <span className="hidden md:inline"> downloads</span>
-            </div>
-            <div className="flex items-center gap-1">
-              {likedModel ? (
-                <FaHeart className="text-base text-red-500" size={18} />
-              ) : (
-                <FaRegHeart className="text-base" size={18} />
-              )}
-              <span>{count}</span>
-              <span className="hidden md:inline"> likes</span>
-            </div>
-          </div>
+  //   // 480px <= width < 620px: two divs
+  //   if (width >= 480) {
+  //     return (
+  //       <div className="flex w-full items-center justify-between text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor">
+  //         {/* Downloads + Likes */}
+  //         <div className="flex items-center gap-3">
+  //           <div className="flex items-center gap-1">
+  //             <HiOutlineFolderDownload className="text-base" size={20} />
+  //             <span>{model.downloads}</span>
+  //             <span className="hidden md:inline"> downloads</span>
+  //           </div>
+  //           <div className="flex items-center gap-1">
+  //             {likedModel ? (
+  //               <FaHeart className="text-base text-red-500" size={18} />
+  //             ) : (
+  //               <FaRegHeart className="text-base" size={18} />
+  //             )}
+  //             <span>{count}</span>
+  //             <span className="hidden md:inline"> likes</span>
+  //           </div>
+  //         </div>
 
-          {/* Price */}
-          <div className="font-semibold text-lg sm:text-md text-custom-light-maincolor dark:text-custom-dark-maincolor">
-            {model.price === "FREE" ? "Free" : formatPrice(model.price)}
-          </div>
-        </div>
-      );
-    }
+  //         {/* Price */}
+  //         <div className="font-semibold text-lg sm:text-md text-custom-light-maincolor dark:text-custom-dark-maincolor">
+  //           {model.price === "FREE" ? "Free" : formatPrice(model.price)}
+  //         </div>
+  //       </div>
+  //     );
+  //   }
 
-    // <480px: single div, justify-between
-    return (
-      <div className="flex w-full items-center justify-between text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1">
-            <HiOutlineFolderDownload className="text-base" size={20} />
-            <span>{model.downloads}</span>
-            <span className="hidden md:inline"> downloads</span>
+  //   if (width >= 350) {
+  //     return (
+  //       <div className="flex items-center text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor justify-between">
+  //         {/* Downloads */}
+  //         <div className="flex items-center gap-1">
+  //           <HiOutlineFolderDownload className="text-base" size={20} />
+  //           <span>{model.downloads} downloads</span>
+  //         </div>
 
-          </div>
-          <div className="flex items-center gap-1">
-            {likedModel ? (
-              <FaHeart className="text-base text-red-500" size={18} />
-            ) : (
-              <FaRegHeart className="text-base" size={18} />
-            )}
-            <span>{count}</span>
-            <span className="hidden md:inline"> likes</span>
-          </div>
-        </div>
+  //         {/* Likes */}
+  //         <div className="flex items-center gap-1">
+  //           {likedModel ? (
+  //             <FaHeart className="text-base text-red-500" size={18} />
+  //           ) : (
+  //             <FaRegHeart className="text-base" size={18} />
+  //           )}
+  //           <span>{count} likes</span>
+  //         </div>
 
-        <div className="font-semibold text-lg sm:text-md text-custom-light-maincolor dark:text-custom-dark-maincolor">
-          {model.price === "FREE" ? "Free" : formatPrice(model.price)}
-        </div>
-      </div>
-    );
-  };
+  //         {/* Price */}
+  //         <div className="font-semibold text-lg sm:text-md text-custom-light-maincolor dark:text-custom-dark-maincolor ">
+  //           {model.price === "FREE" ? "Free" : formatPrice(model.price)}
+  //         </div>
+  //       </div>
+  //     );
+  //   }
+
+  //   // <350px: single div, justify-between
+  //   return (
+  //     <div className="flex w-full items-center justify-between text-xs sm:text-sm font-medium text-gray-700 dark:text-custom-dark-titlecolor">
+  //       <div className="flex items-center gap-3">
+  //         <div className="flex items-center gap-1">
+  //           <HiOutlineFolderDownload className="text-base" size={20} />
+  //           <span>{model.downloads}</span>
+  //           <span className="hidden md:inline"> downloads</span>
+
+  //         </div>
+  //         <div className="flex items-center gap-1">
+  //           {likedModel ? (
+  //             <FaHeart className="text-base text-red-500" size={18} />
+  //           ) : (
+  //             <FaRegHeart className="text-base" size={18} />
+  //           )}
+  //           <span>{count}</span>
+  //           <span className="hidden md:inline"> likes</span>
+  //         </div>
+  //       </div>
+
+  //       <div className="font-semibold text-lg sm:text-md text-custom-light-maincolor dark:text-custom-dark-maincolor">
+  //         {model.price === "FREE" ? "Free" : formatPrice(model.price)}
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   return (
     <div className="flex flex-col w-full bg-custom-light-containercolor dark:bg-custom-dark-containercolor shadow-lg rounded-3xl border border-gray-200 overflow-hidden relative">
@@ -389,7 +415,30 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
         </div>
 
         {/* Meta Info */}
-        <div >{renderMeta()}</div>
+        <div className="flex w-full items-center justify-between text-lg sm:text-md font-medium text-gray-700 dark:text-custom-dark-titlecolor">
+          {/* Downloads + Likes */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              <HiDownload className="text-base" size={22} />
+              <span>{model.downloads}</span>
+              {/* <span className="hidden md:inline"> downloads</span> */}
+            </div>
+            <div className="flex items-center gap-1">
+              {likedModel ? (
+                <FaHeart className="text-base text-red-500" size={18} />
+              ) : (
+                <FaRegHeart className="text-base" size={18} />
+              )}
+              <span>{count}</span>
+              {/* <span className="hidden md:inline"> likes</span> */}
+            </div>
+          </div>
+
+          {/* Price */}
+          <div className="font-semibold text-2xl sm:text-xl text-custom-light-maincolor dark:text-custom-dark-maincolor">
+            {model.price === "FREE" ? "Free" : formatPrice(model.price)}
+          </div>
+        </div>
 
 
 

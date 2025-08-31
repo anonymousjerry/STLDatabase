@@ -26,20 +26,24 @@ export async function generateMetadata({
     return { title: "Model Not Found - 3D Database" };
   }
 
+  // Get category name for description
+  const categoryName = model.category || '3D models';
+
   return {
-    title: `${model.title} | 3D Printable Model - 3D Database`,
-    description: model.description || `Download and explore ${model.title}, a high-quality 3D printable model.`,
+    title: `${model.title} STL File | Download 3D Printable Model - 3DDatabase`,
+    description: `Discover free and premium 3D printable ${categoryName} STL files. Download popular ${categoryName} models, explore unique designs, and start printing today.`,
+    keywords: `${model.title}, ${categoryName}, STL files, 3D printing, download, printable models`,
     openGraph: {
-      title: `${model.title} | 3D Printable Model - 3D Database`,
-      description: model.description || `Download and explore ${model.title}, a high-quality 3D printable model.`,
+      title: `${model.title} STL File | Download 3D Printable Model - 3DDatabase`,
+      description: `Discover free and premium 3D printable ${categoryName} STL files. Download popular ${categoryName} models, explore unique designs, and start printing today.`,
       type: "website",
       url: `https://3ddatabase.com/model/${id}`,
       images: model.image ? [{ url: model.image, alt: model.title }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: `${model.title} | 3D Printable Model - 3D Database`,
-      description: model.description || `Download and explore ${model.title}, a high-quality 3D printable model.`,
+      title: `${model.title} STL File | Download 3D Printable Model - 3DDatabase`,
+      description: `Discover free and premium 3D printable ${categoryName} STL files. Download popular ${categoryName} models, explore unique designs, and start printing today.`,
       images: model.image ? [model.image] : undefined,
     },
   };

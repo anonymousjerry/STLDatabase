@@ -265,11 +265,11 @@ const ExploreMainPageClient = ({
                       ? `${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} 3D Files`
                       : `${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} 3D Files`}
                   </h1>
-                  {/* <p className="text-lg sm:text-xl text-custom-light-textcolor dark:text-custom-dark-textcolor max-w-4xl mx-auto leading-relaxed">
+                  <h2 className="text-lg sm:text-xl text-custom-light-textcolor dark:text-custom-dark-textcolor max-w-4xl mx-auto leading-relaxed">
                     {selectedSubCategory?.id
-                      ? `Explore 3D printable ${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} STL files. Browse curated collections of ${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} models, discover popular designs, and download files to start printing today.`
-                      : `Explore 3D printable ${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} STL files. Browse curated collections of ${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} models, discover popular designs, and download files to start printing today.`}
-                  </p> */}
+                      ? `Discover free and premium 3D printable ${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} STL files. Download popular ${selectedSubCategory.name.replace(/\b\w/g, (char) => char.toUpperCase())} models, explore unique designs, and start printing today.`
+                      : `Discover free and premium 3D printable ${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} STL files. Download popular ${selectedCategory.replace(/\b\w/g, (char) => char.toUpperCase())} models, explore unique designs, and start printing today.`}
+                  </h2>
                 </div>
               </div>
             </div>
@@ -282,9 +282,9 @@ const ExploreMainPageClient = ({
                   <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
                     {`${searchTag.replace(/\b\w/g, (char) => char.toUpperCase())} 3D Files`}
                   </h1>
-                  {/* <p className="text-lg sm:text-xl text-custom-light-textcolor dark:text-custom-dark-textcolor max-w-4xl mx-auto leading-relaxed">
+                  <h2 className="text-lg sm:text-xl text-custom-light-textcolor dark:text-custom-dark-textcolor max-w-4xl mx-auto leading-relaxed">
                     {`Discover free and premium 3D printable ${searchTag.replace(/\b\w/g, (char) => char.toUpperCase())} STL files. Download popular ${searchTag.replace(/\b\w/g, (char) => char.toUpperCase())} models, explore unique designs, and start printing today.`}
-                  </p> */}
+                  </h2>
                 </div>
               </div>
             </div>
