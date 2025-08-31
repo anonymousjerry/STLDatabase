@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { FaGoogle, FaApple, FaGithub } from "react-icons/fa6";
+import { FaGoogle, FaApple } from "react-icons/fa6";
 import { signIn } from "next-auth/react";
 
 const RegisterPage = () => {
@@ -15,7 +15,6 @@ const RegisterPage = () => {
   const providers = [
     { name: "google", Icon: FaGoogle },
     { name: "apple", Icon: FaApple },
-    { name: "github", Icon: FaGithub },
   ];
 
   useEffect(() => {

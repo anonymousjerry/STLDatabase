@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import {User as AuthUser } from "next-auth";
-import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple";
@@ -46,11 +45,6 @@ export const authOptions = {
     AppleProvider({
       clientId: process.env.APPLE_CLIENT_ID!,
       clientSecret: process.env.APPLE_CLIENT_SECRET!,
-    }),
-
-    GithubProvider({
-      clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!
     }),
   ],
   session: {

@@ -132,12 +132,6 @@ const ContactPageComponent = () => {
       title: "Email Us",
       details: "hello@3ddatabase.com",
       description: "Send us an email anytime"
-    },
-    {
-      icon: FaClock,
-      title: "Business Hours",
-      details: "Monday - Friday",
-      description: "8:00 AM - 6:00 PM EST"
     }
   ];
 

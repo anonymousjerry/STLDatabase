@@ -578,7 +578,7 @@ export default function ClientExplorePage({
             />
             <div className="flex flex-col bg-custom-light-containercolor dark:bg-custom-dark-containercolor rounded-t-[24px] border-b-4 border-custom-light-maincolor px-11 mt-10 max-md:px-6">
               <div className="flex text-custom-light-titlecolor dark:text-custom-dark-titlecolor py-3 font-bold text-2xl">
-                SIMILAR DESIGN YOU MAY LIKE
+                Similar Models You May Like
               </div>
             </div>
             {/* Sponsored models within similar section */}
