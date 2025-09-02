@@ -5,12 +5,13 @@ const { hashPassword, comparePassword } = require('../utils/hash');
 const prisma = new PrismaClient();
 
 const register = async (req, res) => {
-    const {email, password, role} = req.body;
+    const {username, email, password, role} = req.body;
 
     try {
         const hashed = await hashPassword(password);
         const user = await prisma.user.create({
             data: {
+                username,
                 email,
                 password: hashed,
                 role,
@@ -122,4 +123,38 @@ const googleAuth = async (req, res) => {
     }
 };
 
-module.exports = { register, login, googleAuth };
+const getUserFavourites = async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId){
+        return res.status(404).json({ error: "User ID is required"});
+    };
+
+    try {
+        const favourites = await prisma.favourite.findMany({
+            where: {
+                userId: userId
+            },
+            include: {
+                model: {
+                    include: {
+                        sourceSite: true,
+                        category: true,
+                        subCategory: true,
+                        likes: true,
+                        favourites: true
+                    }
+                }
+            }
+        });
+
+        const favouriteModels = favourites.map(fav => fav.model);
+
+        res.status(200).json(favouriteModels);
+    } catch(err){
+        console.error('Error fetching favourite models: ', err);
+        res.status(500).json({ error: 'Internal server error'});
+    }
+}
+
+module.exports = { register, login, getUserFavourites, googleAuth };
