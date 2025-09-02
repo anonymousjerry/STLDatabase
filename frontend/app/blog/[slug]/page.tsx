@@ -30,13 +30,18 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       };
     }
 
+    // Fallback description from first text span
+    const description = Array.isArray(blogPost.content)
+      ? (blogPost.content.find((b: any) => b._type === 'block')?.children?.map((c: any) => c.text).join(' ') || '')
+      : String(blogPost.content || '');
+
     return {
       title: `${blogPost.title} - 3DDatabase Blog`,
-      description: blogPost.content.substring(0, 160) + '...',
+      description: description.substring(0, 160) + '...',
       keywords: ['3D printing', 'STL files', 'blog', blogPost.title],
       openGraph: {
         title: blogPost.title,
-        description: blogPost.content.substring(0, 160) + '...',
+        description: description.substring(0, 160) + '...',
         type: 'article',
         url: `https://3ddatabase.com/blog/${slug}`,
         images: blogPost.image ? [getImageUrl(blogPost)] : [],
@@ -44,7 +49,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       twitter: {
         card: 'summary_large_image',
         title: blogPost.title,
-        description: blogPost.content.substring(0, 160) + '...',
+        description: description.substring(0, 160) + '...',
         images: blogPost.image ? [getImageUrl(blogPost)] : [],
       },
     };
