@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { useSearch } from "@/context/SearchContext";
 import { useSession } from "next-auth/react";
 import { getAllCategories } from "@/lib/categoryApi";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 import LoadingOverlay from "./LoadingOverlay";
 
 
 const CategoriesFilter = () => {
   const router = useRouter();
+  const { executeRecaptcha, isReady: recaptchaReady } = useRecaptcha();
 
   const [groupedCategories, setGroupedCategories] = useState<GroupedCategory[]>([]);
   const [openGroup, setOpenGroup] = useState<string | null>(null); // <-- only one open
@@ -46,25 +48,41 @@ const CategoriesFilter = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleCategorySelect = (category: string) => {
-    setOpenGroup((prev) => (prev === category ? null : category));
-    setSelectedCategory(category);
-    setSelectedSubCategory({id: "", name: ""});
+  const handleCategorySelect = async (category: string) => {
+    try {
+      // Execute reCAPTCHA for filter action
+      if (recaptchaReady) {
+        await executeRecaptcha('filter');
+      }
 
-    const queryParams = new URLSearchParams();
-    queryParams.set("category", category);
-    if (selectedPlatform && selectedPlatform !== "All")
-      queryParams.set("sourcesite", selectedPlatform);
-    if (searchInput) queryParams.set("key", searchInput);
-    if (searchPrice) queryParams.set("price", searchPrice);
-    if (liked) {
-        queryParams.set("liked", "true");    
-    }
-    if (userId) {
-        queryParams.set("userId", userId)
-    }
+      setOpenGroup((prev) => (prev === category ? null : category));
+      setSelectedCategory(category);
+      setSelectedSubCategory({id: "", name: ""});
 
-    router.push(`/explore?${queryParams.toString()}`);
+      const queryParams = new URLSearchParams();
+      queryParams.set("category", category);
+      if (selectedPlatform && selectedPlatform !== "All")
+        queryParams.set("sourcesite", selectedPlatform);
+      if (searchInput) queryParams.set("key", searchInput);
+      if (searchPrice) queryParams.set("price", searchPrice);
+      if (liked) {
+          queryParams.set("liked", "true");    
+      }
+      if (userId) {
+          queryParams.set("userId", userId)
+      }
+
+      router.push(`/explore?${queryParams.toString()}`);
+    } catch (error) {
+      console.error('Category filter reCAPTCHA error:', error);
+      // Continue with filter even if reCAPTCHA fails
+      setOpenGroup((prev) => (prev === category ? null : category));
+      setSelectedCategory(category);
+      setSelectedSubCategory({id: "", name: ""});
+      const queryParams = new URLSearchParams();
+      // ... same logic as above
+      router.push(`/explore?${queryParams.toString()}`);
+    }
   };
 
   const handleSubcategorySelect = (subcategory: {id: string, name: string}) => {

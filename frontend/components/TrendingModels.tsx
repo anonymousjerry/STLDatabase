@@ -20,7 +20,7 @@ const TrendingModels = () => {
         // setLoading(true);
         const fetchFilteredModels = async () => {
             setLoading(true);
-            const { models: newModels, totalCount } = await searchModels({filters: ['trending'], page: 1, limit: 4 },);
+            const { models: newModels, totalCount } = await searchModels({filters: ['Trending'], page: 1, limit: 4 },);
             setTrendingModels(newModels);
             setLoading(false);
         };

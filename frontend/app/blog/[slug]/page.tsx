@@ -1,50 +1,79 @@
-"use client";
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
+import Link from 'next/link';
+import Image from 'next/image';
 import Container from '@/components/Container';
 import HeaderMain from '@/components/HeaderMain';
 import Footer from '@/components/Footer';
-import { FaCalendar, FaArrowLeft, FaShare } from 'react-icons/fa';
+import { FaCalendar, FaArrowLeft } from 'react-icons/fa';
+import ShareButton from '@/components/ShareButton';
 import { getBlogPostBySlug, getImageUrl, renderContent, BlogPost } from '@/lib/blogApi';
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
-const BlogPostPage = ({ params }: BlogPostPageProps) => {
-  const [blogPost, setBlogPost] = useState<BlogPost | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// Generate metadata for the page
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  
+  try {
+    const blogPost = await getBlogPostBySlug(slug);
+    
+    if (!blogPost) {
+      return {
+        title: 'Blog Post Not Found - 3DDatabase',
+        description: 'The requested blog post could not be found.',
+      };
+    }
 
-  useEffect(() => {
-    const fetchBlogPost = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        console.log('Fetching blog post with slug:', params.slug);
-        
-        const post = await getBlogPostBySlug(params.slug);
-        console.log('Blog post fetched:', post);
-        
-        if (!post) {
-          setError('Blog post not found');
-          return;
-        }
-        
-        setBlogPost(post);
-      } catch (error) {
-        console.error('Error fetching blog post:', error);
-        setError('Failed to load blog post. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
+    return {
+      title: `${blogPost.title} - 3DDatabase Blog`,
+      description: blogPost.content.substring(0, 160) + '...',
+      keywords: ['3D printing', 'STL files', 'blog', blogPost.title],
+      openGraph: {
+        title: blogPost.title,
+        description: blogPost.content.substring(0, 160) + '...',
+        type: 'article',
+        url: `https://3ddatabase.com/blog/${slug}`,
+        images: blogPost.image ? [getImageUrl(blogPost)] : [],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: blogPost.title,
+        description: blogPost.content.substring(0, 160) + '...',
+        images: blogPost.image ? [getImageUrl(blogPost)] : [],
+      },
     };
+  } catch (error) {
+    return {
+      title: 'Blog Post - 3DDatabase',
+      description: 'Blog post from 3DDatabase',
+    };
+  }
+}
 
-    fetchBlogPost();
-  }, [params.slug]);
+const BlogPostPage = async ({ params }: BlogPostPageProps) => {
+  const { slug } = await params;
+  
+  let blogPost: BlogPost | null = null;
+  let error: string | null = null;
+
+  try {
+    console.log('Fetching blog post with slug:', slug);
+    blogPost = await getBlogPostBySlug(slug);
+    console.log('Blog post fetched:', blogPost);
+    
+    if (!blogPost) {
+      notFound();
+    }
+  } catch (err) {
+    console.error('Error fetching blog post:', err);
+    error = 'Failed to load blog post. Please try again later.';
+  }
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -54,34 +83,15 @@ const BlogPostPage = ({ params }: BlogPostPageProps) => {
     });
   };
 
-  const sharePost = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: blogPost?.title,
-        text: blogPost?.content.substring(0, 100) + '...',
-        url: window.location.href,
-      });
-    } else {
-      // Fallback: copy URL to clipboard
-      navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
-    }
-  };
-
-  if (loading) {
+  if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
         <HeaderMain />
         <Container>
           <div className="py-12">
-            <div className="animate-pulse space-y-8">
-              <div className="h-12 bg-gray-200 rounded w-1/3"></div>
-              <div className="h-64 bg-gray-200 rounded"></div>
-              <div className="space-y-4">
-                <div className="h-8 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              </div>
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">Error Loading Blog Post</h1>
+              <p className="text-gray-600">{error}</p>
             </div>
           </div>
         </Container>
@@ -90,32 +100,8 @@ const BlogPostPage = ({ params }: BlogPostPageProps) => {
     );
   }
 
-  if (error || !blogPost) {
-    if (error === 'Blog post not found') {
-      notFound();
-    }
-    
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <HeaderMain />
-        <Container>
-          <div className="py-12 text-center">
-            <div className="text-red-500 mb-4">
-              <FaCalendar size={48} className="mx-auto" />
-            </div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">Error Loading Blog Post</h3>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Try Again
-            </button>
-          </div>
-        </Container>
-        <Footer />
-      </div>
-    );
+  if (!blogPost) {
+    notFound();
   }
 
   return (
@@ -126,13 +112,13 @@ const BlogPostPage = ({ params }: BlogPostPageProps) => {
         <div className="py-12">
           {/* Back Button */}
           <div className="mb-8">
-            <a 
+            <Link 
               href="/blog"
               className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
             >
               <FaArrowLeft className="mr-2" size={14} />
               Back to Blog
-            </a>
+            </Link>
           </div>
 
           {/* Blog Post Content */}
@@ -140,9 +126,11 @@ const BlogPostPage = ({ params }: BlogPostPageProps) => {
             {/* Featured Image */}
             <div className="w-full h-64 md:h-96 bg-gray-200 overflow-hidden">
               {getImageUrl(blogPost) ? (
-                <img 
+                <Image 
                   src={getImageUrl(blogPost)} 
                   alt={blogPost.title}
+                  width={800}
+                  height={384}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -159,13 +147,7 @@ const BlogPostPage = ({ params }: BlogPostPageProps) => {
                   <FaCalendar className="mr-2" size={12} />
                   <span>{formatDate(blogPost.publishedAt || blogPost._createdAt)}</span>
                 </div>
-                <button
-                  onClick={sharePost}
-                  className="flex items-center text-gray-500 hover:text-gray-700 transition-colors"
-                >
-                  <FaShare className="mr-2" size={12} />
-                  Share
-                </button>
+                <ShareButton title={blogPost.title} content={blogPost.content} />
               </div>
               
               {/* Title */}
@@ -189,13 +171,13 @@ const BlogPostPage = ({ params }: BlogPostPageProps) => {
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">More Articles</h2>
             <div className="text-center py-8">
-              <a 
+              <Link 
                 href="/blog"
                 className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
                 View All Blog Posts
                 <FaArrowLeft className="ml-2 rotate-180" size={14} />
-              </a>
+              </Link>
             </div>
           </div>
         </div>

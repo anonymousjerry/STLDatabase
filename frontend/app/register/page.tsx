@@ -2,27 +2,36 @@
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
-import { FaGoogle, FaApple } from "react-icons/fa6";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
+import { FaGoogle } from "react-icons/fa6";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 
 const RegisterPage = () => {
   const [error, setError] = useState("");
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
+  const { executeRecaptcha, isLoading: recaptchaLoading, error: recaptchaError, isReady: recaptchaReady } = useRecaptcha();
 
   const providers = [
     { name: "google", Icon: FaGoogle },
-    { name: "apple", Icon: FaApple },
   ];
 
   useEffect(() => {
     // chechking if user has already registered redirect to home page
     if (sessionStatus === "authenticated") {
+      // Show success toast for Google login
+      if (session?.user) {
+        console.log('Register page - Session user data:', session.user);
+        const username = (session.user as any).username || (session.user as any).name || session.user.email;
+        console.log('Register page - Username for toast:', username);
+        toast.success(`Successfully logged in as ${username}!`);
+      }
       router.replace("/");
     }
-  }, [sessionStatus, router]);
+  }, [sessionStatus, router, session]);
 
   const isValidEmail = (email: string) => {
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -54,31 +63,54 @@ const RegisterPage = () => {
     }
 
     try {
-        // sending API request for registering user
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/register`, {
+      // Execute reCAPTCHA v3 (if available)
+      let recaptchaToken = null;
+      if (recaptchaReady) {
+        recaptchaToken = await executeRecaptcha('register');
+      }
+
+      // sending API request for registering user
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/register`, {
+          method: "POST",
+          headers: {
+          "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+              username,
+              email,
+              password,
+              recaptchaToken,
+          }),
+      });
+
+      if (res.status === 400) {
+          toast.error("This email is already registered");
+          setError("The email already in use");
+      }
+      if (res.status === 201) {
+          setError("");
+          toast.success("Registration successful");
+          recaptchaToken = await executeRecaptcha('contact');
+          await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/contact/welcome`, {
             method: "POST",
             headers: {
             "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                username,
+                name: username,
                 email,
-                password,
+                recaptchaToken,
             }),
-        });
-
-        if (res.status === 400) {
-            toast.error("This email is already registered");
-            setError("The email already in use");
-        }
-        if (res.status === 201) {
-            setError("");
-            toast.success("Registration successful");
-            router.push("/login");
-        }
+          });
+          router.push("/login");
+      }
     } catch (error) {
-        toast.error("Error, try again");
-        setError("Error, try again");
+        if (error instanceof Error && error.message.includes('reCAPTCHA')) {
+          toast.error("Security verification failed. Please try again.");
+        } else {
+          toast.error("Error, try again");
+          setError("Error, try again");
+        }
         console.log(error);
     }
   };
@@ -130,8 +162,15 @@ const RegisterPage = () => {
                     <input
                         defaultValue="Sign Up"
                         type="submit"
-                        className="block w-full font-bold bg-gradient-to-r from-[#1089d3] to-[#12b1d1] text-white py-4 mt-5 rounded-[20px] shadow-[0_20px_10px_-15px_rgba(133,189,215,0.88)] border-none transition-transform duration-200 ease-in-out hover:scale-[1.03] hover:shadow-[0_23px_10px_-20px_rgba(133,189,215,0.88)] active:scale-95 active:shadow-[0_15px_10px_-10px_rgba(133,189,215,0.88)]"
+                        disabled={recaptchaLoading || !recaptchaReady}
+                        className="block w-full font-bold bg-gradient-to-r from-[#1089d3] to-[#12b1d1] disabled:bg-gray-400 text-white py-4 mt-5 rounded-[20px] shadow-[0_20px_10px_-15px_rgba(133,189,215,0.88)] border-none transition-transform duration-200 ease-in-out hover:scale-[1.03] hover:shadow-[0_23px_10px_-20px_rgba(133,189,215,0.88)] active:scale-95 active:shadow-[0_15px_10px_-10px_rgba(133,189,215,0.88)]"
                     />
+                    
+                    {recaptchaError && (
+                        <div className="text-red-500 text-xs text-center mt-2">
+                            Security verification error. Please refresh the page and try again.
+                        </div>
+                    )}
                 </form>
 
                 <div className="flex ml-2 items-center mt-5">
@@ -142,6 +181,22 @@ const RegisterPage = () => {
                     >
                         Sign In
                     </button>
+                </div>
+                
+                {/* Privacy Policy and Terms Links */}
+                <div className="text-center mt-4 space-y-1">
+                    <div>
+                        <Link href="/privacy" className="text-xs text-gray-400 hover:text-[#0099ff] transition-colors duration-200">
+                            Privacy Policy
+                        </Link>
+                        <span className="text-xs text-gray-400 mx-2">•</span>
+                        <Link href="/terms" className="text-xs text-gray-400 hover:text-[#0099ff] transition-colors duration-200">
+                            Terms of Service
+                        </Link>
+                    </div>
+                    <p className="text-xs text-gray-400">
+                        By signing up, you agree to our Terms of Service and Privacy Policy
+                    </p>
                 </div>
 
                 <div className="mt-6">

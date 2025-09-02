@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useLikesStore } from "@/app/_zustand/useLikesStore";
 import { useViewsStore } from "@/app/_zustand/useViewStore";
 import { useSearch } from "@/context/SearchContext";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
@@ -17,6 +18,7 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   const { data: session, status } = useSession();
   const userId = (session?.user as { id?: string })?.id;
   const isDisabled = status !== "authenticated";
+  const { executeRecaptcha, isReady: recaptchaReady } = useRecaptcha();
 
   // Debug session state
   console.log(`Session debug for model ${model.id}:`, {
@@ -127,6 +129,11 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
     try {
       setIsLiking(true);
       
+      // Execute reCAPTCHA for like action
+      if (recaptchaReady) {
+        await executeRecaptcha('like');
+      }
+      
       // Check current state before toggling
       const wasLiked = likedModel;
       
@@ -160,7 +167,11 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
       // Revert on error
       toggleLike(modelId); // Toggle back to original state
       console.error("Like failed:", err);
-      toast.error("Failed to update like status. Please try again.");
+      if (err instanceof Error && err.message.includes('reCAPTCHA')) {
+        toast.error("Security verification failed. Please try again.");
+      } else {
+        toast.error("Failed to update like status. Please try again.");
+      }
     } finally {
       setIsLiking(false);
     }
@@ -177,15 +188,18 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   };
 
   const handleToggleView = async (modelId: string) => {
-    
     try {
+      // Execute reCAPTCHA for view action
+      if (recaptchaReady) {
+        await executeRecaptcha('view');
+      }
+      
       const data = await viewModel(modelId, session?.accessToken || "");
       addView(modelId, data.count);
       setSearchInput("");
       setSelectedCategory("All");
       setSelectedSubCategory({name: "", id: ""});
     } catch (error) {
-      // toast.error("Failed to view model.");
       console.log(error)
     }
   };

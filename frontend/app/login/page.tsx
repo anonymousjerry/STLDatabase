@@ -2,26 +2,35 @@
 import { isValidEmailAddressFormat } from "@/lib/utils";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
-import { FaGoogle, FaApple } from "react-icons/fa6";
+import { FaGoogle } from "react-icons/fa6";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
+import Link from "next/link";
 
 const LoginPage = () => {
   const router = useRouter();
   const [error, setError] = useState("");
   const { data: session, status: sessionStatus } = useSession();
+  const { executeRecaptcha, isLoading: recaptchaLoading, error: recaptchaError, isReady: recaptchaReady } = useRecaptcha();
 
   const providers = [
       { name: "google", Icon: FaGoogle },
-      { name: "apple", Icon: FaApple },
     ];
 
   useEffect(() => {
     // if user has already logged in redirect to home page
     if (sessionStatus === "authenticated") {
+      // Show success toast for Google login
+      if (session?.user) {
+        console.log('Login page - Session user data:', session.user);
+        const username = (session.user as any).username || (session.user as any).name || session.user.email;
+        console.log('Login page - Username for toast:', username);
+        toast.success(`Successfully logged in as ${username}!`);
+      }
       router.replace("/");
     }
-  }, [sessionStatus, router]);
+  }, [sessionStatus, router, session]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -40,19 +49,35 @@ const LoginPage = () => {
       return;
     }
 
-    const res = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
+    try {
+      // Execute reCAPTCHA v3 (if available)
+      let recaptchaToken = null;
+      if (recaptchaReady) {
+        recaptchaToken = await executeRecaptcha('login');
+      }
 
-    if (res?.error) {
-      setError("Invalid email or password");
-      toast.error("Invalid email or password");
-      if (res?.url) router.replace("/");
-    } else {
-      setError("");
-      toast.success("Successful login");
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+        recaptchaToken,
+      });
+
+      if (res?.error) {
+        setError("Invalid email or password");
+        toast.error("Invalid email or password");
+        if (res?.url) router.replace("/");
+      } else {
+        setError("");
+        toast.success("Successful login");
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('reCAPTCHA')) {
+        toast.error("Security verification failed. Please try again.");
+      } else {
+        setError("Login failed");
+        toast.error("Login failed");
+      }
     }
   };
 
@@ -88,8 +113,15 @@ const LoginPage = () => {
                     <input
                         defaultValue="Sign In"
                         type="submit"
-                        className="block w-full font-bold bg-gradient-to-r from-[#1089d3] to-[#12b1d1] text-white py-4 mt-5 rounded-[20px] shadow-[0_20px_10px_-15px_rgba(133,189,215,0.88)] border-none transition-transform duration-200 ease-in-out hover:scale-[1.03] hover:shadow-[0_23px_10px_-20px_rgba(133,189,215,0.88)] active:scale-95 active:shadow-[0_15px_10px_-10px_rgba(133,189,215,0.88)]"
+                        disabled={recaptchaLoading || !recaptchaReady}
+                        className="block w-full font-bold bg-gradient-to-r from-[#1089d3] to-[#12b1d1] disabled:bg-gray-400 text-white py-4 mt-5 rounded-[20px] shadow-[0_20px_10px_-15px_rgba(133,189,215,0.88)] border-none transition-transform duration-200 ease-in-out hover:scale-[1.03] hover:shadow-[0_23px_10px_-20px_rgba(133,189,215,0.88)] active:scale-95 active:shadow-[0_15px_10px_-10px_rgba(133,189,215,0.88)]"
                     />
+                    
+                    {recaptchaError && (
+                        <div className="text-red-500 text-xs text-center mt-2">
+                            Security verification error. Please refresh the page and try again.
+                        </div>
+                    )}
                 </form>
 
                 <div className="flex ml-2 items-center mt-5">
@@ -100,6 +132,22 @@ const LoginPage = () => {
                     >
                         Sign Up
                     </button>
+                </div>
+                
+                {/* Privacy Policy and Terms Links */}
+                <div className="text-center mt-4 space-y-1">
+                    <div>
+                        <Link href="/privacy" className="text-xs text-gray-400 hover:text-[#0099ff] transition-colors duration-200">
+                            Privacy Policy
+                        </Link>
+                        <span className="text-xs text-gray-400 mx-2">•</span>
+                        <Link href="/terms" className="text-xs text-gray-400 hover:text-[#0099ff] transition-colors duration-200">
+                            Terms of Service
+                        </Link>
+                    </div>
+                    <p className="text-xs text-gray-400">
+                        By signing in, you agree to our Terms of Service and Privacy Policy
+                    </p>
                 </div>
 
                 <div className="mt-6">
