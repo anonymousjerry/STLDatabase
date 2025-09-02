@@ -73,7 +73,7 @@ const SearchBar = () => {
       setCategoryValue("All") // fallback
     }
       
-  }, []);
+  }, [selectedCategory, selectedSubCategory?.id, selectedSubCategory?.name]);
 
   useEffect(() => {
     if (selectedSubCategory?.id) {
