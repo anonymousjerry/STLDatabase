@@ -3,11 +3,11 @@ import imageUrlBuilder from '@sanity/image-url'
 
 // Create Sanity client for frontend with token for read access
 const sanityClient = createClient({
-  projectId: 'vngrr2a1',
+  projectId: 'dktl6wwa',
   dataset: 'production',
   apiVersion: '2024-01-01',
   useCdn: false, // Same as admin configuration
-  token: 'skRhPahQGGeCyHmEM21s5ksiJqlh387AR8aqNekPW5unAjIm8rT5XPfp6ZAIknuwglkKjVU1nAtrtHTDFodlcmfGZuXmcDLFjd26D8oAVbKJEySUxj87r8Y3kHW54W1gzVkz3ut7TuC1yKGcGug7XuBKNQCJR3i17iypHOrHhuOu5qBF3tKW', // Token required for read access
+  token: 'skwHjOoPUm3HcN5jj2NduwbNbEehSKtA134W6WJGydAdnv60M6crVwlRFWx0ROV34KhhZekQxAiryQtQ1V5pMKcmrDWA3YH9iQr8phWcRuO4Pwo5cnuFbcsC573MU9YbNGS40cDsAbSPMqKwbjIqJjWyCEkn4wgabl5LfyGG67U5GaJQk6rB', // Token required for read access
 })
 
 // Create image URL builder

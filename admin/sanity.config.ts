@@ -8,9 +8,9 @@ import './global.css';
 
 export default defineConfig({
   name: 'default',
-  title: 'STLDatabase',
+  title: '3DDatabase',
 
-  projectId: 'vngrr2a1',
+  projectId: 'dktl6wwa',
   dataset: 'production',
 
   plugins: [

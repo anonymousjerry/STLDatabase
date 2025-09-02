@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import BannerAd from './BannerAd';
 import SidebarAd from './SidebarAd';
 import SponsoredModelAd from './SponsoredModelAd';
@@ -23,8 +23,8 @@ const AdManager: React.FC<AdManagerProps> = ({ page, className = '' }) => {
   const [ads, setAds] = useState<AdConfig[]>([]);
   const [isAdBlocked, setIsAdBlocked] = useState(false);
 
-  // Ad configurations for different pages
-  const adConfigs: Record<string, AdConfig[]> = {
+  // Ad configurations for different pages - memoized to prevent recreation
+  const adConfigs = useMemo<Record<string, AdConfig[]>>(() => ({
     home: [
       {
         id: 'home-header-banner',
@@ -80,7 +80,7 @@ const AdManager: React.FC<AdManagerProps> = ({ page, className = '' }) => {
         priority: 2
       }
     ]
-  };
+  }), []);
 
   useEffect(() => {
     // Check if ads are blocked

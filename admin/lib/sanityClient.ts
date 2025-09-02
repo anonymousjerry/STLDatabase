@@ -1,7 +1,7 @@
 import { createClient } from '@sanity/client'
 
 // Get environment variables with fallbacks
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'vngrr2a1'
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'dktl6wwa'
 const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
 const token = process.env.SANITY_STUDIO_TOKEN
 
