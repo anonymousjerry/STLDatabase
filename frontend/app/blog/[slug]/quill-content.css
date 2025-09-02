@@ -1,0 +1,82 @@
+/* Quill Content Styles */
+.quill-content {
+  @apply prose prose-lg max-w-none;
+}
+
+.quill-content h1 {
+  @apply text-4xl font-bold text-gray-900 mb-6 mt-8 border-b-2 border-blue-200 pb-2;
+}
+
+.quill-content h2 {
+  @apply text-3xl font-bold text-gray-900 mb-5 mt-7 border-b border-gray-200 pb-2;
+}
+
+.quill-content h3 {
+  @apply text-2xl font-semibold text-gray-800 mb-4 mt-6;
+}
+
+.quill-content p {
+  @apply mb-6 text-lg leading-relaxed text-gray-700;
+}
+
+.quill-content ul, .quill-content ol {
+  @apply mb-6 ml-6;
+}
+
+.quill-content li {
+  @apply mb-2 text-lg text-gray-700;
+}
+
+.quill-content blockquote {
+  @apply border-l-4 border-blue-500 bg-blue-50 pl-6 py-4 my-6 italic text-gray-700;
+}
+
+.quill-content strong {
+  @apply font-bold text-gray-900;
+}
+
+.quill-content em {
+  @apply italic text-gray-800;
+}
+
+.quill-content u {
+  @apply underline;
+}
+
+.quill-content a {
+  @apply text-blue-600 hover:text-blue-800 underline transition-colors duration-200;
+}
+
+.quill-content code {
+  @apply px-2 py-1 rounded bg-gray-100 text-gray-800 font-mono text-sm;
+}
+
+.quill-content pre {
+  @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-6;
+}
+
+.quill-content img {
+  @apply max-w-full h-auto rounded-lg shadow-md my-6 mx-auto;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .quill-content h1,
+  .quill-content h2,
+  .quill-content h3 {
+    @apply text-gray-100;
+  }
+  
+  .quill-content p,
+  .quill-content li {
+    @apply text-gray-300;
+  }
+  
+  .quill-content blockquote {
+    @apply bg-gray-800 text-gray-300 border-blue-400;
+  }
+  
+  .quill-content code {
+    @apply bg-gray-700 text-gray-200;
+  }
+}

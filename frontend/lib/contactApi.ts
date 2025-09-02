@@ -15,7 +15,7 @@ interface ContactFormData {
 export const updateContactApi = async (formData: ContactFormData) => {
     try {
         console.log(formData)
-        const response = await axiosInstance.post('/contact/welcome', formData, {
+        const response = await axiosInstance.post('/contact/contact', formData, {
             headers: { "Content-Type": "application/json" }
         });
         console.log(response)

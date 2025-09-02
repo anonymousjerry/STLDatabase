@@ -29,7 +29,7 @@ let socket: Socket | null = null;
 
 export const setupSocketListeners = (notify: NotifyFn, statusUpdate?: StatusUpdateFn) => {
   if (!socket) {
-    socket = io(process.env.NEXT_PUBLIC_WS_URL, { transports: ["websocket"] });
+    socket = io(process.env.SANITY_STUDIO_WS_URL, { transports: ["websocket"] });
   }
 
   socket.on("connect", () => {
