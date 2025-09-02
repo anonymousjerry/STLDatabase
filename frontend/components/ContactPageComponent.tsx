@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaClock, FaPaperPlane, FaUser, FaComment, FaBuilding, FaGlobe } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { isValidEmailAddressFormat } from "@/lib/utils";
 import { updateContactApi } from "@/lib/contactApi";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 interface ContactFormData {
   name: string;
@@ -30,6 +31,7 @@ const ContactPageComponent = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAdFields, setShowAdFields] = useState(false);
+  const { executeRecaptcha, isLoading: recaptchaLoading, error: recaptchaError, isReady: recaptchaReady } = useRecaptcha();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -94,13 +96,26 @@ const ContactPageComponent = () => {
     
     if (!validateForm()) return;
 
+    // Check if reCAPTCHA is ready
+    if (!recaptchaReady) {
+      toast.error("Security verification is loading. Please wait a moment and try again.");
+      return;
+    }
+
     setIsSubmitting(true);
     console.log("Contact Form", formData);
     
     try {
-      // Simulate API call - replace with actual contact form submission
-      // await new Promise(resolve => setTimeout(resolve, 2000));
-      await updateContactApi(formData);
+      // Execute reCAPTCHA v3
+      const recaptchaToken = await executeRecaptcha('contact');
+      
+      // Add reCAPTCHA token to form data
+      const formDataWithRecaptcha = {
+        ...formData,
+        recaptchaToken
+      };
+      
+      await updateContactApi(formDataWithRecaptcha);
       
       const successMessage = showAdFields 
         ? "Thank you for your advertisement inquiry! Our team will review your request and get back to you within 24 hours."
@@ -120,7 +135,11 @@ const ContactPageComponent = () => {
       setShowAdFields(false);
     } catch (error) {
       console.error('Contact form submission error:', error);
-      toast.error(error instanceof Error ? error.message : "Something went wrong. Please try again.");
+      if (error instanceof Error && error.message.includes('reCAPTCHA')) {
+        toast.error("Security verification failed. Please try again.");
+      } else {
+        toast.error(error instanceof Error ? error.message : "Something went wrong. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -425,13 +444,13 @@ const ContactPageComponent = () => {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || recaptchaLoading || !recaptchaReady}
                 className="w-full bg-custom-light-maincolor hover:bg-purple-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center space-x-2"
               >
-                {isSubmitting ? (
+                {isSubmitting || recaptchaLoading ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    <span>Sending...</span>
+                    <span>{recaptchaLoading ? "Loading security..." : "Sending..."}</span>
                   </>
                 ) : (
                   <>
@@ -440,6 +459,12 @@ const ContactPageComponent = () => {
                   </>
                 )}
               </button>
+              
+              {recaptchaError && (
+                <div className="text-red-500 text-sm text-center mt-2">
+                    Security verification error. Please refresh the page and try again.
+                </div>
+              )}
             </form>
 
             <div className="mt-6 text-center">

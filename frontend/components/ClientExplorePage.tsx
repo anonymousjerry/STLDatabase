@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import { useDownloadsStore } from "@/app/_zustand/useDonwloadStore";
 import { useSearch } from "@/context/SearchContext";
 import { useRouter } from "next/navigation";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 import OptimizedAdPositionManager from "./ads/OptimizedAdPositionManager";
 import Head from "next/head";
 import Container from "./Container";
@@ -43,6 +44,7 @@ export default function ClientExplorePage({
   const [showMore, setShowMore] = useState(false);
   const { data: session, status } = useSession();
   const userId = (session?.user as { id?: string })?.id;
+  const { executeRecaptcha, isReady: recaptchaReady } = useRecaptcha();
 
   const { likedModels, likesCount, toggleLike } = useLikesStore();
   // Use store state, fallback to server data
@@ -140,24 +142,41 @@ export default function ClientExplorePage({
   const sourceSiteName = result.sourceSite?.name ?? "";
 
   const handleToggleDownload = async (modelId: string) => {
-
     try {
+      // Execute reCAPTCHA for download action
+      if (recaptchaReady) {
+        await executeRecaptcha('download');
+      }
+
       const data = await downloadModel(modelId, session?.accessToken || "");
       addDownload(modelId, data.downloads);
       toast.success("Model downloaded successfully!")
     } catch (error) {
       console.error("Download failed:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to download model.");
+      if (error instanceof Error && error.message.includes('reCAPTCHA')) {
+        toast.error("Security verification failed. Please try again.");
+      } else {
+        toast.error(error instanceof Error ? error.message : "Failed to download model.");
+      }
     }
   };
 
   const handleShare = async () => {
       try {
+          // Execute reCAPTCHA for share action
+          if (recaptchaReady) {
+              await executeRecaptcha('share');
+          }
+          
           await navigator.clipboard.writeText(window.location.href);
           toast.success("Page URL copied to clipboard!");
       } catch (err) {
           console.error("Failed to copy:", err);
-          toast.error("Failed to copy URL.");
+          if (err instanceof Error && err.message.includes('reCAPTCHA')) {
+              toast.error("Security verification failed. Please try again.");
+          } else {
+              toast.error("Failed to copy URL.");
+          }
       }
   };
 
@@ -168,6 +187,11 @@ export default function ClientExplorePage({
     }
 
     try {
+      // Execute reCAPTCHA for like action
+      if (recaptchaReady) {
+        await executeRecaptcha('like');
+      }
+
       // Check current state before toggling
       const wasLiked = likedmodel;
       
@@ -201,7 +225,11 @@ export default function ClientExplorePage({
       // Revert on error
       toggleLike(id); // Toggle back to original state
       console.error("Like failed:", err);
-      toast.error("Failed to update like status. Please try again.");
+      if (err instanceof Error && err.message.includes('reCAPTCHA')) {
+        toast.error("Security verification failed. Please try again.");
+      } else {
+        toast.error("Failed to update like status. Please try again.");
+      }
     }
   };
 

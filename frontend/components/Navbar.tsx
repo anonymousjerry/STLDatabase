@@ -33,11 +33,20 @@ const Navbar = () => {
     (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
 
-  const handleLogOut = () => {
-    toast.success("Logout Successful!");
-    setTimeout(() => {
-      signOut({callbackUrl: '/'})
-    }, 1000);
+  const handleLogOut = async () => {
+    try {
+      // Close dropdown first
+      setAccountMenuOpen(false);
+      
+      // Show success message
+      toast.success("Logout Successful!");
+      
+      // Sign out with redirect to home page
+      await signOut({ callbackUrl: '/' });
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error("Logout failed. Please try again.");
+    }
   }
   
 
@@ -46,10 +55,14 @@ const Navbar = () => {
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
         setMobileMenuOpen(false);
       }
+      // Close account dropdown when clicking outside
+      if (accountMenuOpen && !(e.target as Element).closest('.account-dropdown')) {
+        setAccountMenuOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [accountMenuOpen]);
 
   const {
       searchInput,
@@ -152,7 +165,7 @@ const Navbar = () => {
             <FaHeart />
           </button>
 
-          <div className="relative">
+          <div className="relative account-dropdown">
             <button
               onClick={() => setAccountMenuOpen(!accountMenuOpen)}
               className="flex items-center bg-lime-400 text-black font-semibold px-4 py-2 rounded-full hover:bg-lime-500"
@@ -167,24 +180,34 @@ const Navbar = () => {
 
             {accountMenuOpen && (
               <div className="absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-xl shadow-xl z-50 ring-1 ring-gray-200 animate-fade-in overflow-hidden">
-                <a
-                  href="/login"
-                  className="block px-5 py-2 text-lg hover:bg-gray-100 hover:text-blue-600 transition-colors duration-150"
-                >
-                  🔐 Login
-                </a>
-                <a
-                  href="/register"
-                  className="block px-5 py-2 text-lg hover:bg-gray-100 hover:text-green-600 transition-colors duration-150"
-                >
-                  📝 Register
-                </a>
-                <button
-                  onClick={handleLogOut}
-                  className="w-full text-left px-5 py-2 text-lg hover:bg-gray-100 hover:text-red-600 transition-colors duration-150"
-                >
-                  🚪 Logout
-                </button>
+                {sessionStatus === "authenticated" ? (
+                  <>
+                    <div className="px-5 py-2 text-sm text-gray-500 border-b border-gray-100">
+                      Welcome, {session?.user?.username || 'User'}
+                    </div>
+                    <button
+                      onClick={handleLogOut}
+                      className="w-full text-left px-5 py-2 text-lg hover:bg-gray-100 hover:text-red-600 transition-colors duration-150"
+                    >
+                      🚪 Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <a
+                      href="/login"
+                      className="block px-5 py-2 text-lg hover:bg-gray-100 hover:text-blue-600 transition-colors duration-150"
+                    >
+                      🔐 Login
+                    </a>
+                    <a
+                      href="/register"
+                      className="block px-5 py-2 text-lg hover:bg-gray-100 hover:text-green-600 transition-colors duration-150"
+                    >
+                      📝 Register
+                    </a>
+                  </>
+                )}
               </div>
             )}
           </div>

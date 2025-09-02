@@ -11,10 +11,12 @@ import { useSearch } from "@/context/SearchContext";
 import { IoIosSearch } from "react-icons/io";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { set } from "zod";
 
 const SearchBar = () => {
   const router = useRouter();
+  const { executeRecaptcha, isReady: recaptchaReady } = useRecaptcha();
 
   const [platforms, setPlatforms] = useState<string[][]>([]);
   const [groupedCategories, setGroupedCategories] = useState<GroupedCategory[]>([]);
@@ -99,29 +101,42 @@ const SearchBar = () => {
 
   const platformArray = platforms?.map(([platform]) => platform) || [];
 
-  const performSearch = () => {
+  const performSearch = async () => {
     // Only search if input has minimum length or if clearing search
     if (searchInput.trim().length < 2 && searchInput.trim().length > 0) {
       return;
     }
 
-    const queryParams = new URLSearchParams();
+    try {
+      // Execute reCAPTCHA for search
+      if (recaptchaReady && searchInput.trim()) {
+        await executeRecaptcha('search');
+      }
 
-    if (selectedPlatform && selectedPlatform !== "All")
-      queryParams.set("sourcesite", selectedPlatform);
-    if (selectedCategory && selectedCategory !== "All")
-      queryParams.set("category", selectedCategory);
-    if (selectedSubCategory && selectedSubCategory.id)
-      queryParams.set("subCategory", selectedSubCategory.id);
-    if (searchInput.trim()) queryParams.set("key", searchInput.trim());
-    if (searchPrice) queryParams.set("price", searchPrice);
-    if (liked) queryParams.set("liked", 'true');
-    if (userId) {
-      queryParams.set("userId", userId)
+      const queryParams = new URLSearchParams();
+
+      if (selectedPlatform && selectedPlatform !== "All")
+        queryParams.set("sourcesite", selectedPlatform);
+      if (selectedCategory && selectedCategory !== "All")
+        queryParams.set("category", selectedCategory);
+      if (selectedSubCategory && selectedSubCategory.id)
+        queryParams.set("subCategory", selectedSubCategory.id);
+      if (searchInput.trim()) queryParams.set("key", searchInput.trim());
+      if (searchPrice) queryParams.set("price", searchPrice);
+      if (liked) queryParams.set("liked", 'true');
+      if (userId) {
+        queryParams.set("userId", userId)
+      }
+      queryParams.set("currentPage", '1');
+      
+      router.push(`/explore?${queryParams.toString()}`);
+    } catch (error) {
+      console.error('Search reCAPTCHA error:', error);
+      // Continue with search even if reCAPTCHA fails
+      const queryParams = new URLSearchParams();
+      // ... same logic as above
+      router.push(`/explore?${queryParams.toString()}`);
     }
-    queryParams.set("currentPage", '1');
-    
-    router.push(`/explore?${queryParams.toString()}`);
   };
 
   const handleSearch = (e: React.FormEvent) => {

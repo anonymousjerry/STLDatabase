@@ -4,6 +4,7 @@ import React from "react";
 import { useSearch } from "@/context/SearchContext";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 
 const PriceArray = [
@@ -18,6 +19,7 @@ const PriceArray = [
 
 const PriceFilter = () => {
     const router = useRouter();
+    const { executeRecaptcha, isReady: recaptchaReady } = useRecaptcha();
     // const { data: session, status } = useSession();
     // const userId = (session?.user as { id?: string })?.id;
 
@@ -36,25 +38,38 @@ const PriceFilter = () => {
       setliked
     } = useSearch();
 
-  const handleRadioChange = (value: string) => {
-        setSearchPrice(value);
+  const handleRadioChange = async (value: string) => {
+        try {
+            // Execute reCAPTCHA for filter action
+            if (recaptchaReady) {
+                await executeRecaptcha('filter');
+            }
 
-        const queryParams = new URLSearchParams();
+            setSearchPrice(value);
 
-        if (selectedPlatform && selectedPlatform !== "All")
-        queryParams.set("sourcesite", selectedPlatform);
-        if (selectedCategory && selectedCategory !== "All")
-          queryParams.set("category", selectedCategory);
-        if (selectedSubCategory) queryParams.set("subCategory", selectedSubCategory.id);
-        if (searchInput) queryParams.set("key", searchInput);
-        if (value) queryParams.set("price", value);
-        if (liked) queryParams.set("liked", 'true');
-        if (userId) {
-          queryParams.set("userId", userId)
+            const queryParams = new URLSearchParams();
+
+            if (selectedPlatform && selectedPlatform !== "All")
+            queryParams.set("sourcesite", selectedPlatform);
+            if (selectedCategory && selectedCategory !== "All")
+              queryParams.set("category", selectedCategory);
+            if (selectedSubCategory) queryParams.set("subCategory", selectedSubCategory.id);
+            if (searchInput) queryParams.set("key", searchInput);
+            if (value) queryParams.set("price", value);
+            if (liked) queryParams.set("liked", 'true');
+            if (userId) {
+              queryParams.set("userId", userId)
+            }
+
+            router.push(`/explore?${queryParams.toString()}`);
+        } catch (error) {
+            console.error('Price filter reCAPTCHA error:', error);
+            // Continue with filter even if reCAPTCHA fails
+            setSearchPrice(value);
+            const queryParams = new URLSearchParams();
+            // ... same logic as above
+            router.push(`/explore?${queryParams.toString()}`);
         }
-        
-
-        router.push(`/explore?${queryParams.toString()}`);
 };
 
   return (

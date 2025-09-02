@@ -11,7 +11,7 @@ model User {
   id         String   @id @default(cuid())
   username   String
   email      String   @unique
-  password   String
+  password   String?  // Optional for Google users
   role       String   @default("user")
   likes      Like[]
   favourites Favourite[]

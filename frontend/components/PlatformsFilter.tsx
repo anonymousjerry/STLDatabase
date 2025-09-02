@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { getPlatforms } from "@/lib/platformApi";
 import { useSearch } from "@/context/SearchContext";
 import { useSession } from "next-auth/react";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 import LoadingOverlay from "./LoadingOverlay";
 
 
 const PlatformsFilter = () => {
     const router = useRouter();
+    const { executeRecaptcha, isReady: recaptchaReady } = useRecaptcha();
     const [platforms, setPlatforms] = useState<string[][]>([]);
     const [loading, setLoading] = useState(true); // <-- loading state
     // const { data: session, status } = useSession();
@@ -34,29 +36,50 @@ const PlatformsFilter = () => {
 
     const platformArray = platforms?.map(([platform]) => platform) || [];
 
-    const handleRadioChange = (option: string) => {
+    const handleRadioChange = async (option: string) => {
+        try {
+            // Execute reCAPTCHA for filter action
+            if (recaptchaReady) {
+                await executeRecaptcha('filter');
+            }
 
+            setSelectedPlatform(option);
 
-        setSelectedPlatform(option);
+            const queryParams = new URLSearchParams();
 
-        const queryParams = new URLSearchParams();
+            queryParams.set("sourcesite", option);
+            if (selectedCategory && selectedCategory !== "All")
+              queryParams.set("category", selectedCategory);
+            if (selectedSubCategory?.id)
+              queryParams.set("subCategory", selectedSubCategory.id);
+            if (searchInput) queryParams.set("key", searchInput);
+            if (searchPrice) queryParams.set("price", searchPrice);
+            if (liked) queryParams.set("liked", 'true');
+            if (userId) {
+              queryParams.set("userId", userId)
+            }
+            queryParams.set("currentPage", "1")
 
-
-        queryParams.set("sourcesite", option);
-        if (selectedCategory && selectedCategory !== "All")
-          queryParams.set("category", selectedCategory);
-        if (selectedSubCategory?.id)
-          queryParams.set("subCategory", selectedSubCategory.id);
-        if (searchInput) queryParams.set("key", searchInput);
-        if (searchPrice) queryParams.set("price", searchPrice);
-        if (liked) queryParams.set("liked", 'true');
-        if (userId) {
-          queryParams.set("userId", userId)
+            router.push(`/explore?${queryParams.toString()}`);
+        } catch (error) {
+            console.error('Filter reCAPTCHA error:', error);
+            // Continue with filter even if reCAPTCHA fails
+            setSelectedPlatform(option);
+            const queryParams = new URLSearchParams();
+            queryParams.set("sourcesite", option);
+            if (selectedCategory && selectedCategory !== "All")
+              queryParams.set("category", selectedCategory);
+            if (selectedSubCategory?.id)
+              queryParams.set("subCategory", selectedSubCategory.id);
+            if (searchInput) queryParams.set("key", searchInput);
+            if (searchPrice) queryParams.set("price", searchPrice);
+            if (liked) queryParams.set("liked", 'true');
+            if (userId) {
+              queryParams.set("userId", userId)
+            }
+            queryParams.set("currentPage", "1")
+            router.push(`/explore?${queryParams.toString()}`);
         }
-        queryParams.set("currentPage", "1")
-
-
-        router.push(`/explore?${queryParams.toString()}`);
     };
 
   return (

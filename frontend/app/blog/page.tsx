@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import Container from '@/components/Container';
-import HeaderMain from '@/components/HeaderMain';
+// import HeaderMain from '@/components/HeaderMain';
 import Footer from '@/components/Footer';
 import { FaCalendar, FaUser, FaArrowRight, FaSearch } from 'react-icons/fa';
 import { getBlogPosts, searchBlogPosts, getImageUrl, renderContent, BlogPost } from '@/lib/blogApi';
@@ -70,7 +71,7 @@ const BlogPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <HeaderMain />
+        {/* <HeaderMain /> */}
         <Container>
           <div className="py-12">
             <div className="animate-pulse space-y-8">
@@ -98,7 +99,7 @@ const BlogPage = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <HeaderMain />
+        {/* <HeaderMain /> */}
         <Container>
           <div className="py-12 text-center">
             <div className="text-red-500 mb-4">
@@ -121,7 +122,7 @@ const BlogPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <HeaderMain />
+      {/* <HeaderMain /> */}
       
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
@@ -167,9 +168,11 @@ const BlogPage = () => {
                 <article key={post._id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
                                       <div className="relative">
                       {getImageUrl(post) ? (
-                        <img 
+                        <Image 
                           src={getImageUrl(post)} 
                           alt={post.title}
+                          width={400}
+                          height={192}
                           className="w-full h-48 object-cover"
                         />
                       ) : (
