@@ -16,6 +16,7 @@ export interface UpdateUserPayload {
 
 export const getAllUser = async () => {
     try {
+        console.log("Asdfasdfasdfasdfadf")
         const response = await axiosInstance.get('/users');
         return response.data;
     } catch (error: any) {

@@ -3,11 +3,11 @@ import imageUrlBuilder from '@sanity/image-url'
 
 // Create Sanity client for frontend with token for read access
 const sanityClient = createClient({
-  projectId: 'dktl6wwa',
-  dataset: 'production',
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
   apiVersion: '2024-01-01',
   useCdn: false, // Same as admin configuration
-  token: 'skwHjOoPUm3HcN5jj2NduwbNbEehSKtA134W6WJGydAdnv60M6crVwlRFWx0ROV34KhhZekQxAiryQtQ1V5pMKcmrDWA3YH9iQr8phWcRuO4Pwo5cnuFbcsC573MU9YbNGS40cDsAbSPMqKwbjIqJjWyCEkn4wgabl5LfyGG67U5GaJQk6rB', // Token required for read access
+  token: process.env.SANITY_API_TOKEN!
 })
 
 // Create image URL builder
@@ -23,7 +23,7 @@ export interface BlogPost {
   slug: {
     current: string;
   };
-  content: string;
+  content: any; // Portable Text array
   image?: {
     asset: {
       url?: string;
@@ -153,36 +153,85 @@ export const getImageUrl = (post: BlogPost) => {
 }
 
 // Helper function to render rich content
-export const renderContent = (content: string) => {
-  if (!content) return '';
-  
-  // Convert markdown and HTML to rendered content
-  let rendered = content;
-  
-  // Convert markdown bold
-  rendered = rendered.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  
-  // Convert markdown italic
-  rendered = rendered.replace(/\*(.*?)\*/g, '<em>$1</em>');
-  
-  // Convert markdown headings
-  rendered = rendered.replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mb-4">$1</h1>');
-  rendered = rendered.replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold mb-3">$1</h2>');
-  
-  // Convert markdown links
-  rendered = rendered.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 hover:text-blue-800 underline" target="_blank" rel="noopener noreferrer">$1</a>');
-  
-  // Convert line breaks to paragraphs
-  rendered = rendered.replace(/\n\n/g, '</p><p class="mb-4">');
-  rendered = rendered.replace(/\n/g, '<br>');
-  
-  // Wrap in paragraph tags
-  if (!rendered.startsWith('<')) {
-    rendered = `<p class="mb-4">${rendered}</p>`;
-  }
-  
-  return rendered;
-}
+// Render Portable Text (lightweight without extra deps)
+export const renderContent = (content: any): string => {
+  if (!content || !Array.isArray(content)) return '';
+
+  const esc = (s: string) => s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const renderMarks = (text: string, marks: string[] = []) => {
+    return marks.reduce((acc, m) => {
+      switch (m) {
+        case 'strong': return `<strong>${acc}</strong>`;
+        case 'em': return `<em>${acc}</em>`;
+        case 'underline': return `<u>${acc}</u>`;
+        case 'code': return `<code class="px-1 py-0.5 rounded bg-gray-100">${acc}</code>`;
+        default: return acc;
+      }
+    }, esc(text));
+  };
+
+  const renderBlock = (block: any) => {
+    if (block._type === 'block') {
+      const tag =
+        block.style === 'h1' ? 'h1' :
+        block.style === 'h2' ? 'h2' :
+        block.style === 'h3' ? 'h3' :
+        block.style === 'blockquote' ? 'blockquote' : 'p';
+
+      const className =
+        tag === 'h1' ? 'text-3xl font-bold mb-4' :
+        tag === 'h2' ? 'text-2xl font-bold mb-3' :
+        tag === 'h3' ? 'text-xl font-semibold mb-2' :
+        tag === 'blockquote' ? 'border-l-4 pl-4 italic text-gray-600' : 'mb-4';
+
+      if (!block.children) return '';
+
+      const html = block.children.map((span: any) => {
+        if (span._type !== 'span') return '';
+
+        // handle link mark defs
+        if (span.marks && span.marks.length) {
+          let out = esc(span.text || '');
+          for (const m of span.marks) {
+            const def = block.markDefs?.find((d: any) => d._key === m && d._type === 'link');
+            if (def) {
+              out = `<a href="${def.href}" target="${def.blank ? '_blank' : '_self'}" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline">${out}</a>`;
+            } else {
+              out = renderMarks(out, [m]);
+            }
+          }
+          return out;
+        }
+        return esc(span.text || '');
+      }).join('');
+
+      return `<${tag} class="${className}">${html}</${tag}>`;
+    }
+
+    if (block._type === 'image' && block.asset?._ref) {
+      try {
+        const src = urlFor(block).width(1200).url();
+        return `<img src="${src}" alt="" class="my-6 rounded"/>`;
+      } catch (_) {
+        return '';
+      }
+    }
+
+    if (block._type === 'code') {
+      const lang = esc(block.language || '');
+      const code = esc(block.code || '');
+      return `<pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto my-4"><code class="language-${lang}">${code}</code></pre>`;
+    }
+
+    return '';
+  };
+
+  return content.map(renderBlock).join('\n');
+};
 
 // Simple search function that works client-side
 export const searchBlogPosts = async (query: string, posts: BlogPost[]): Promise<BlogPost[]> => {

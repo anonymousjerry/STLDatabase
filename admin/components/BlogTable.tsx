@@ -26,11 +26,11 @@ interface BlogPost {
 
 // Create Sanity client for admin with token for write permissions
 const sanityClient = createClient({
-  projectId: 'vngrr2a1',
-  dataset: 'production',
+  projectId: process.env.SANITY_STUDIO_PROJECT_ID!,
+  dataset: process.env.SANITY_STUDIO_DATASET!,
   apiVersion: '2024-01-01',
   useCdn: false,
-  token: 'skRhPahQGGeCyHmEM21s5ksiJqlh387AR8aqNekPW5unAjIm8rT5XPfp6ZAIknuwglkKjVU1nAtrtHTDFodlcmfGZuXmcDLFjd26D8oAVbKJEySUxj87r8Y3kHW54W1gzVkz3ut7TuC1yKGcGug7XuBKNQCJR3i17iypHOrHhuOu5qBF3tKW',
+  token: process.env.SANITY_STUDIO_TOKEN!,
 });
 
 // Create image URL builder
