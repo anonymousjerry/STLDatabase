@@ -10,7 +10,6 @@ export default function SocketNotifier() {
 
   useEffect(() => {
     setupSocketListeners(async (status, message) => {
-      console.log("📡 Socket Event:", status, message);
 
       // Show toast
       toast.push({

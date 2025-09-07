@@ -127,25 +127,16 @@ export function AdPositionForm({
         size: undefined
       }));
       
-      console.log('Updated form data after position change:', {
-        position: value,
-        page: newPage,
-        adType: newAdType,
-        size: newSize
-      });
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Form data:', formData);
     const validationErrors = validateAdPosition(formData);
-    console.log('Validation errors:', validationErrors);
     setErrors(validationErrors);
     
     if (hasValidationErrors(validationErrors)) {
-      console.log('Form has validation errors, cannot submit');
       return;
     }
     

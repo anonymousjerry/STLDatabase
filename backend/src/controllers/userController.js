@@ -65,6 +65,8 @@ const googleAuth = async (req, res) => {
         let user = await prisma.user.findUnique({ 
             where: { email }
         });
+        
+        let isNewUser = false;
 
         if (!user) {
             // Create new user (without password for Google users)
@@ -76,6 +78,7 @@ const googleAuth = async (req, res) => {
                     password: '', // Empty password for Google users
                 }
             });
+            isNewUser = true;
             console.log('New Google user created:', user.email);
         } else {
             // Update existing user's username if it's different
@@ -111,6 +114,7 @@ const googleAuth = async (req, res) => {
                 role: user.role,
                 picture: picture
             },
+            isNewUser: isNewUser,
             token: token
         });
 

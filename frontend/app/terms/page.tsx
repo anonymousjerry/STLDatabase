@@ -12,12 +12,12 @@ const TermsOfServicePage = () => {
   const { data: session, status: sessionStatus } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
-    // If user is not authenticated, redirect to login
-    if (sessionStatus === "unauthenticated") {
-      router.replace("/login");
-    }
-  }, [sessionStatus, router]);
+  // useEffect(() => {
+  //   // If user is not authenticated, redirect to login
+  //   if (sessionStatus === "unauthenticated") {
+  //     router.replace("/login");
+  //   }
+  // }, [sessionStatus, router]);
 
   if (sessionStatus === "loading") {
     return (
@@ -27,9 +27,9 @@ const TermsOfServicePage = () => {
     );
   }
 
-  if (sessionStatus === "unauthenticated") {
-    return null; // Will redirect
-  }
+  // if (sessionStatus === "unauthenticated") {
+  //   return null; // Will redirect
+  // }
 
   return (
     <>

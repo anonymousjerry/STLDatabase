@@ -90,7 +90,7 @@ const CategoriesPageClient = ({ categories, selectedCategory }: CategoriesPageCl
     <>
       
       {/* Hero Section */}
-      <div className="w-full bg-gradient-to-br from-custom-light-maincolor to-purple-800 text-white py-16">
+      <div className="w-full bg-gradient-to-br from-[#4e4d8b] to-[#6b6aac] dark:from-[#2e2d5c] dark:to-[#49487a] text-white py-16">
         <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 md:px-8 text-center">
           <div className="flex justify-center mb-6">
             <div className="bg-white/20 rounded-full p-4">

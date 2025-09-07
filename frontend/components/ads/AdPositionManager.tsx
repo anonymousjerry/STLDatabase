@@ -53,9 +53,7 @@ const AdPositionManager: React.FC<AdPositionManagerProps> = ({
       try {
         // Convert AdPositionType to string array for the API call
         const positionStrings = positions.map(pos => pos.toString());
-        console.log("positionStrings:", positionStrings);
         const ads = await getAdPositionsByPositions(positionStrings);
-        console.log(ads)
         setActiveAds(ads);
       } catch (error) {
         console.error('Failed to fetch ad positions:', error);

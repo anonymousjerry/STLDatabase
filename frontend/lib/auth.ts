@@ -1,7 +1,6 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -74,20 +73,21 @@ export const authOptions: NextAuthOptions = {
           
           if (response.ok) {
             const userData = await response.json();
-            console.log('Google auth backend response:', userData);
             
             (user as any).id = userData.user.id;
             (user as any).role = userData.user.role;
             (user as any).username = userData.user.username || user.name; // Set username from backend, fallback to Google name
             
-            console.log('User object after Google auth:', {
-              id: (user as any).id,
-              email: user.email,
-              name: user.name,
-              username: (user as any).username,
-              role: (user as any).role
-            });
-            
+            // Check if this is a new user (no password means Google user, and we can check if it was just created)
+            if (userData.isNewUser) {
+              // Store isNewUser flag in user object for client-side handling
+              (user as any).isNewUser = true;
+              (user as any).googleUserData = {
+                name: userData.user.username || user.name,
+                email: user.email,
+                isNewUser: true
+              };
+            }
             return true;
           }
         } catch (error) {
@@ -116,10 +116,16 @@ export const authOptions: NextAuthOptions = {
         if (!token.user.username && user.name) {
           token.user.username = user.name;
         }
-        console.log('JWT token for Google user:', {
-          provider: token.provider,
-          user: token.user
-        });
+        // Always preserve Google user data for Google OAuth users
+        token.googleUserData = {
+          name: (user as any).username || user.name,
+          email: user.email,
+          isNewUser: (user as any).isNewUser || false
+        };
+        // Preserve isNewUser flag
+        if ((user as any).isNewUser) {
+          token.isNewUser = true;
+        }
       }
       
       return token;
@@ -130,14 +136,8 @@ export const authOptions: NextAuthOptions = {
         session.user = token.user;
         session.accessToken = token.accessToken;
         session.provider = token.provider;
-        
-        // Debug logging for Google users
-        if (token.provider === "google") {
-          console.log('Session created for Google user:', {
-            user: session.user,
-            provider: session.provider
-          });
-        }
+        session.isNewUser = token.isNewUser;
+        session.googleUserData = token.googleUserData;
       }
       return session;
     },

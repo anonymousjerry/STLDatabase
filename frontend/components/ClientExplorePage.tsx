@@ -78,6 +78,16 @@ export default function ClientExplorePage({
 
   const { addDownload, isDownload, DownloadCounts } = useDownloadsStore();
 
+  // Initialize download store with server data
+  useEffect(() => {
+    if (result.downloads !== undefined) {
+      // Initialize the download count in the store if not already set
+      if (DownloadCounts[id] === undefined) {
+        useDownloadsStore.getState().addDownload(id, result.downloads);
+      }
+    }
+  }, [id, result.downloads, DownloadCounts]);
+
   const {
     selectedPlatform,
     selectedCategory,
@@ -149,7 +159,19 @@ export default function ClientExplorePage({
       }
 
       const data = await downloadModel(modelId, session?.accessToken || "");
-      addDownload(modelId, data.downloads);
+      
+      // Get current count and increment by 1
+      const currentCount = DownloadCounts[id] ?? result.downloads ?? 0;
+      const newCount = currentCount + 1;
+      
+      // Update the store with incremented count
+      addDownload(modelId, newCount);
+      
+      // Update the server data to reflect the new download count
+      if (result.downloads !== undefined) {
+        result.downloads = newCount;
+      }
+      
       toast.success("Model downloaded successfully!")
     } catch (error) {
       console.error("Download failed:", error);
@@ -234,10 +256,6 @@ export default function ClientExplorePage({
   };
 
   const handleReport = () => {
-  if (!userId) {
-    toast.error("Please log in to report an issue.");
-    return;
-  }
 
   const subject = encodeURIComponent(`Report: ${result.title}`);
   const body = encodeURIComponent(
@@ -247,7 +265,7 @@ export default function ClientExplorePage({
     `Please provide details about the issue:`
   );
 
-  const mailtoLink = `mailto:hello@3ddb?subject=${subject}&body=${body}`;
+  const mailtoLink = `mailto:hello@3ddatabase.com?subject=${subject}&body=${body}`;
 
   // Try forcing it
   window.open(mailtoLink, "_self");

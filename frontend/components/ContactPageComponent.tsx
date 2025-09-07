@@ -103,7 +103,6 @@ const ContactPageComponent = () => {
     }
 
     setIsSubmitting(true);
-    console.log("Contact Form", formData);
     
     try {
       // Execute reCAPTCHA v3
@@ -187,7 +186,7 @@ const ContactPageComponent = () => {
   return (
     <div className="min-h-screen bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
       {/* Hero Section */}
-      <div className="bg-custom-light-maincolor text-white py-16">
+      <div className="bg-gradient-to-r from-[#4e4d8b] to-[#6b6aac] dark:from-[#2e2d5c] dark:to-[#49487a] text-white py-16">
         <div className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">

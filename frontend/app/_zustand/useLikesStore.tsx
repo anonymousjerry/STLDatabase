@@ -25,13 +25,6 @@ export const useLikesStore = create<LikeState>()(
           const liked = !currentLiked;
           const currentCount = state.likesCount[modelId] ?? 0;
 
-          console.log(`Toggle like for model ${modelId}:`, {
-            currentLiked,
-            newLiked: liked,
-            currentCount,
-            newCount: liked ? currentCount + 1 : Math.max(0, currentCount - 1)
-          });
-
           return {
             likedModels: { ...state.likedModels, [modelId]: liked },
             likesCount: {
@@ -43,7 +36,6 @@ export const useLikesStore = create<LikeState>()(
 
       setLikeStatus: (modelId: string, liked: boolean, count: number) =>
         set((state) => {
-          console.log(`Set like status for model ${modelId}:`, { liked, count });
           return {
             likedModels: { ...state.likedModels, [modelId]: liked },
             likesCount: { ...state.likesCount, [modelId]: count },

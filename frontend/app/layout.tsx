@@ -11,6 +11,7 @@ import 'svgmap/dist/svgMap.min.css';
 import { LoadingProvider } from "@/context/LoadingContext";
 import { AdProvider } from "@/context/AdContext";
 import Script from "next/script";
+import GoogleAuthHandler from "@/components/GoogleAuthHandler";
 // import LoadingSpinner from "@/components/LoadingSpinner";
 // import RouteChangeLoader from "@/components/RouteChangeLoader";
 
@@ -77,7 +78,8 @@ export default async function RootLayout({
               <SearchProvider>
                 <AdProvider>
                   <Providers>
-                  {children}
+                    {children}
+                    <GoogleAuthHandler />
                   </Providers>
                 </AdProvider>
               </SearchProvider>

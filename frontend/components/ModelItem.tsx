@@ -20,15 +20,6 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   const isDisabled = status !== "authenticated";
   const { executeRecaptcha, isReady: recaptchaReady } = useRecaptcha();
 
-  // Debug session state
-  console.log(`Session debug for model ${model.id}:`, {
-    status,
-    hasSession: !!session,
-    sessionUser: session?.user,
-    userId,
-    isDisabled
-  });
-
   const router = useRouter();
 
 
@@ -38,15 +29,6 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
   // If user is not authenticated, always show as unliked
   const likedModel = userId ? (likedModels[model.id] ?? model.likes?.some((like: Like) => like.userId === userId) ?? false) : false;
   const count = likesCount[model.id] ?? model.likes.length;
-
-  // Debug logging
-  console.log(`Model ${model.id}:`, {
-    storeLiked: likedModels[model.id],
-    serverLiked: model.likes?.some((like: Like) => like.userId === userId),
-    finalLiked: likedModel,
-    userId,
-    hasLikes: !!model.likes
-  });
 
   const { addView, isView, ViewCounts } = useViewsStore();
 
@@ -89,17 +71,10 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
       const serverLiked = model.likes.some((like: Like) => like.userId === userId);
       const serverCount = model.likes.length;
       
-      console.log(`Initializing store for model ${model.id}:`, {
-        serverLiked,
-        serverCount,
-        currentStoreValue: likedModels[model.id]
-      });
-      
       // Always update if server data is different from store data
       const currentStoreLiked = likedModels[model.id];
       if (currentStoreLiked === undefined || currentStoreLiked !== serverLiked) {
         useLikesStore.getState().setLikeStatus(model.id, serverLiked, serverCount);
-        console.log(`Set store for model ${model.id}:`, { serverLiked, serverCount });
       }
     }
   }, [model.id, model.likes, userId, status, likedModels]);
@@ -112,7 +87,6 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
       
       // Force update store when user first logs in
       useLikesStore.getState().setLikeStatus(model.id, serverLiked, serverCount);
-      console.log(`Global init for model ${model.id}:`, { serverLiked, serverCount });
     }
   }, [status, userId, model.id, model.likes]);
 
@@ -200,7 +174,7 @@ const ModelItem = ({ model, color }: { model: Model; color: string }) => {
       setSelectedCategory("All");
       setSelectedSubCategory({name: "", id: ""});
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   };
 

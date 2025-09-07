@@ -55,11 +55,6 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
       const currentUserId = (session.user as { id?: string })?.id;
       if (currentUserId && currentUserId !== userId) {
         setUserId(currentUserId);
-        console.log("User logged in, updated userId:", currentUserId);
-        
-        // Optionally auto-enable liked filter for new login
-        // Uncomment the next line if you want to automatically show liked models on login
-        // setliked(true);
       }
     }
   }, [status, liked, session, userId]);

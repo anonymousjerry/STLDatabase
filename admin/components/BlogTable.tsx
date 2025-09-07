@@ -33,6 +33,8 @@ const urlFor = (source: any) => builder.image(source).url();
 const BlogTable = () => {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -117,6 +119,7 @@ const BlogTable = () => {
     }
 
     try {
+      setSaving(true);
       let imageAsset = null;
       if (formData.imageFile) {
         imageAsset = await sanityClient.assets.upload('image', formData.imageFile);
@@ -148,18 +151,23 @@ const BlogTable = () => {
     } catch (err) {
       console.error(err);
       alert('Failed to save blog post.');
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDelete = async (post: BlogPost) => {
     if (confirm(`Are you sure you want to delete "${post.title}"?`)) {
       try {
+        setDeletingId(post._id);
         await sanityClient.delete(post._id);
         fetchBlogPosts();
         alert('Blog post deleted!');
       } catch (err) {
         console.error(err);
         alert('Failed to delete blog post.');
+      } finally {
+        setDeletingId(null);
       }
     }
   };
@@ -172,13 +180,30 @@ const BlogTable = () => {
     return '';
   };
 
-  if (loading) return <div className="p-6">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="p-6 bg-white rounded-lg shadow-sm">
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600 text-lg">Loading blog posts...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Blog Posts</h2>
-        <button onClick={handleCreate} className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2">
+        <button 
+          onClick={handleCreate} 
+          disabled={saving || deletingId !== null}
+          className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+            saving || deletingId !== null
+              ? 'bg-blue-400 cursor-not-allowed' 
+              : 'bg-blue-600 hover:bg-blue-700'
+          } text-white`}
+        >
           <FaPlus /> Create New Post
         </button>
       </div>
@@ -228,10 +253,36 @@ const BlogTable = () => {
           </div>
 
           <div className="mt-6 flex gap-3">
-            <button onClick={handleSave} className="px-4 py-2 bg-green-600 text-white rounded-lg flex items-center gap-2">
-              <FaSave /> {isCreating ? 'Create Post' : 'Update Post'}
+            <button 
+              onClick={handleSave} 
+              disabled={saving}
+              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+                saving 
+                  ? 'bg-green-400 cursor-not-allowed' 
+                  : 'bg-green-600 hover:bg-green-700'
+              } text-white`}
+            >
+              {saving ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  {isCreating ? 'Creating...' : 'Updating...'}
+                </>
+              ) : (
+                <>
+                  <FaSave /> 
+                  {isCreating ? 'Create Post' : 'Update Post'}
+                </>
+              )}
             </button>
-            <button onClick={handleCancel} className="px-4 py-2 bg-gray-600 text-white rounded-lg flex items-center gap-2">
+            <button 
+              onClick={handleCancel} 
+              disabled={saving}
+              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+                saving 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-gray-600 hover:bg-gray-700'
+              } text-white`}
+            >
               <FaTimes /> Cancel
             </button>
           </div>
@@ -266,8 +317,27 @@ const BlogTable = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(post.publishedAt || post._createdAt)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex gap-2 justify-end">
-                    <button onClick={() => handleEdit(post)} className="text-blue-600 hover:text-blue-900"><FaEdit /></button>
-                    <button onClick={() => handleDelete(post)} className="text-red-600 hover:text-red-900"><FaTrash /></button>
+                    <button 
+                      onClick={() => handleEdit(post)} 
+                      disabled={saving || deletingId === post._id}
+                      className="text-blue-600 hover:text-blue-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(post)} 
+                      disabled={saving || deletingId === post._id}
+                      className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                    >
+                      {deletingId === post._id ? (
+                        <>
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-red-600"></div>
+                          <span className="text-xs">Deleting...</span>
+                        </>
+                      ) : (
+                        <FaTrash />
+                      )}
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -277,7 +347,15 @@ const BlogTable = () => {
       ) : (
         <div className="text-center py-12">
           <h3 className="text-xl font-medium text-gray-900 mb-2">No blog posts found</h3>
-          <button onClick={handleCreate} className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 mx-auto">
+          <button 
+            onClick={handleCreate} 
+            disabled={saving || deletingId !== null}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 mx-auto transition-colors ${
+              saving || deletingId !== null
+                ? 'bg-blue-400 cursor-not-allowed' 
+                : 'bg-blue-600 hover:bg-blue-700'
+            } text-white`}
+          >
             <FaPlus /> Create First Post
           </button>
         </div>

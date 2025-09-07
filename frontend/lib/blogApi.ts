@@ -55,8 +55,6 @@ export interface UpdateBlogPostRequest {
 // Get all published blog posts with better error handling
 export const getBlogPosts = async (): Promise<BlogPost[]> => {
   try {
-    console.log('🔍 Frontend: Fetching blog posts from Sanity...');
-    
     // Use same query as admin
     const posts = await sanityClient.fetch(`
       *[_type == "blogPost" && status == "published"] | order(publishedAt desc) {
@@ -71,9 +69,6 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
         _createdAt
       }
     `)
-    
-    console.log('🔍 Frontend: Blog posts fetched successfully:', posts);
-    console.log('🔍 Frontend: Number of posts found:', posts?.length || 0);
     
     return posts || []
   } catch (error) {

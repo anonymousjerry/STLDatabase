@@ -29,7 +29,6 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
       S.listItem()
         .title('Scraping Job Management')
         .child(S.component(ScrapeJobTable).title('Scraping Jobs')),
-      S.divider(),
       S.listItem()
         .title('Blog Management')
         .child(S.component(BlogTable).title('Blog Posts')),

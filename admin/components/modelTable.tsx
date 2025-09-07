@@ -73,6 +73,8 @@ export function ModelTable() {
     users: Array<{ id: string; username: string; email: string }>;
   }>({ isOpen: false, title: "", users: [] });
   const [categories, setCategories] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
 
   const pageSize = 20;
 
@@ -138,6 +140,24 @@ export function ModelTable() {
   const closeUserModal = () =>
     setUserModal({ isOpen: false, title: "", users: [] });
 
+  const resetFilters = () => {
+    setSelectedCategory("");
+    setSelectedSubCategory("");
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
+  const handleCategoryChange = (categoryName: string) => {
+    setSelectedCategory(categoryName);
+    setSelectedSubCategory(""); // Reset subcategory when category changes
+    setCurrentPage(1);
+  };
+
+  const handleSubCategoryChange = (subCategoryName: string) => {
+    setSelectedSubCategory(subCategoryName);
+    setCurrentPage(1);
+  };
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -159,13 +179,18 @@ export function ModelTable() {
 
   const filteredModels = models.filter((model) => {
     const search = searchTerm.toLowerCase();
+    const matchesCategory = selectedCategory ? model.category === selectedCategory : true;
+    const matchesSubCategory = selectedSubCategory ? model.subCategory === selectedSubCategory : true;
+
     return (
-      !searchTerm ||
-      model.title.toLowerCase().includes(search) ||
-      model.description.toLowerCase().includes(search) ||
-      (model.category || "").toLowerCase().includes(search) ||
-      (model.subCategory || "").toLowerCase().includes(search) ||
-      (model.tags || []).some((tag) => tag.toLowerCase().includes(search))
+      (!searchTerm ||
+        model.title.toLowerCase().includes(search) ||
+        model.description.toLowerCase().includes(search) ||
+        (model.category || "").toLowerCase().includes(search) ||
+        (model.subCategory || "").toLowerCase().includes(search) ||
+        (model.tags || []).some((tag) => tag.toLowerCase().includes(search))) &&
+      matchesCategory &&
+      matchesSubCategory
     );
   });
 
@@ -223,6 +248,52 @@ export function ModelTable() {
           Model Management
         </h1>
         <div className="flex gap-4 w-full md:w-auto">
+          {/* Category and Subcategory Filters */}
+          <div className="flex gap-2 flex-1 md:flex-none">
+            <select
+              value={selectedCategory}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              className="px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm appearance-none bg-no-repeat"
+              style={{
+                // simple caret using currentColor so it matches light/dark
+                backgroundImage:
+                  'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 20 20\' fill=\'currentColor\'%3E%3Cpath d=\'M5.8 7.5a1 1 0 0 1 1.4 0L10 10.3l2.8-2.8a1 1 0 1 1 1.4 1.4l-3.5 3.5a1 1 0 0 1-1.4 0L5.8 8.9a1 1 0 0 1 0-1.4z\'/%3E%3C/svg%3E")',
+                backgroundSize: '1rem 1rem',
+                backgroundPosition: 'right 0.5rem center', // ≈ pr-2 for the arrow
+              }}
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.name}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            
+            <select
+              value={selectedSubCategory}
+              onChange={(e) => handleSubCategoryChange(e.target.value)}
+              disabled={!selectedCategory}
+              className="px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm appearance-none bg-no-repeat"
+              style={{
+                // simple caret using currentColor so it matches light/dark
+                backgroundImage:
+                  'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 20 20\' fill=\'currentColor\'%3E%3Cpath d=\'M5.8 7.5a1 1 0 0 1 1.4 0L10 10.3l2.8-2.8a1 1 0 1 1 1.4 1.4l-3.5 3.5a1 1 0 0 1-1.4 0L5.8 8.9a1 1 0 0 1 0-1.4z\'/%3E%3C/svg%3E")',
+                backgroundSize: '1rem 1rem',
+                backgroundPosition: 'right 0.5rem center', // ≈ pr-2 for the arrow
+              }}
+            >
+              <option value="">All Subcategories</option>
+              {selectedCategory && categories
+                .find((cat) => cat.name === selectedCategory)
+                ?.subcategories.map((sub: { id: string; name: string }) => (
+                  <option key={sub.id} value={sub.name}>
+                    {sub.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+          
           <div className="relative flex-1">
             <Search
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -236,14 +307,51 @@ export function ModelTable() {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             />
           </div>
-          <button
-            onClick={refresh}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            Refresh
-          </button>
+          
+          <div className="flex gap-2">
+            <button
+              onClick={resetFilters}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+              title="Reset all filters"
+            >
+              Reset
+            </button>
+            <button
+              onClick={refresh}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Refresh
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Filter Summary */}
+      {(selectedCategory || selectedSubCategory || searchTerm) && (
+        <div className="px-6 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <span className="font-medium">Active filters:</span>
+            {selectedCategory && (
+              <span className="px-2 py-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 rounded-full">
+                Category: {selectedCategory}
+              </span>
+            )}
+            {selectedSubCategory && (
+              <span className="px-2 py-1 bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 rounded-full">
+                Subcategory: {selectedSubCategory}
+              </span>
+            )}
+            {searchTerm && (
+              <span className="px-2 py-1 bg-purple-100 dark:bg-purple-800 text-purple-800 dark:text-purple-200 rounded-full">
+                Search: "{searchTerm}"
+              </span>
+            )}
+            <span className="text-gray-500 dark:text-gray-400">
+              ({filteredModels.length} models found)
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Table */}
       <div className="overflow-x-auto">
