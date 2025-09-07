@@ -58,7 +58,6 @@ export const AdProvider: React.FC<AdProviderProps> = ({ children }) => {
       setError(null);
       const allAds = await getAllActiveAdPositions();
       setAds(allAds);
-      console.log('[AdContext] Loaded', allAds.length, 'active ads');
     } catch (err) {
       console.error('[AdContext] Failed to load ads:', err);
       setError('Failed to load advertisements');

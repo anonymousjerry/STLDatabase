@@ -133,12 +133,6 @@ const ExploreMainPageClient = ({
       setPage(1);
       setHasMore(true);
       
-      console.log('Fetching models with params:', {
-        liked,
-        userId,
-        status: liked ? 'true' : 'false'
-      });
-      
       const { models: newModels, totalCount } = await searchModels({
         key: debouncedSearchInput.trim(),
         tag: searchTag,
@@ -175,7 +169,6 @@ const ExploreMainPageClient = ({
           // Update store if server data differs from store data
           if (currentStoreLiked === undefined || currentStoreLiked !== serverLiked) {
             useLikesStore.getState().setLikeStatus(model.id, serverLiked, serverCount);
-            console.log(`Synced like state for model ${model.id}:`, { serverLiked, serverCount });
           }
         }
       });
@@ -193,7 +186,6 @@ const ExploreMainPageClient = ({
       if (updatedModels.length !== models.length) {
         setModels(updatedModels);
         setTotalModels(prev => Math.max(0, prev - (models.length - updatedModels.length)));
-        console.log(`Removed ${models.length - updatedModels.length} unliked models from liked filter`);
       }
     }
   }, [likedModels, liked, userId, models]);
@@ -248,6 +240,14 @@ const ExploreMainPageClient = ({
       if (current) observer.unobserve(current);
     };
   }, [hasMore, isLoading]);
+
+  function abbreviateNumber(num: number) {
+    if (num >= 1_000_000_000_000) return (num / 1_000_000_000_000).toFixed(1).replace(/\.0$/, '') + 'T';
+    if (num >= 1_000_000_000)     return (num / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B';
+    if (num >= 1_000_000)         return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (num >= 1_000)             return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+    return num.toString();
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -309,7 +309,7 @@ const ExploreMainPageClient = ({
                 <FiBox className="mr-2" />
                 {searchTag ? (
                   <div className="flex items-center gap-2">
-                    <span>{`Result (Tag: ${searchTag}) - ${totalModels} models`}</span>
+                    <span>{`Result (Tag: ${searchTag}) - ${abbreviateNumber(totalModels)} models`}</span>
                     <button
                       onClick={() => {
                         setSearchTag("");
@@ -332,10 +332,10 @@ const ExploreMainPageClient = ({
                 ) : (
                   <span>
                     {selectedSubCategory?.id
-                      ? `Result (Subcategory: ${selectedSubCategory.name || selectedSubCategory.id}) - ${totalModels} models`
+                      ? `Result (Subcategory: ${selectedSubCategory.name || selectedSubCategory.id}) - ${abbreviateNumber(totalModels)} models`
                       : selectedCategory && selectedCategory !== 'All'
-                        ? `Result (Category: ${selectedCategory}) - ${totalModels} models`
-                        : `Result - ${totalModels} models`}
+                        ? `Result (Category: ${selectedCategory}) - ${abbreviateNumber(totalModels)} models`
+                        : `Result - ${abbreviateNumber(totalModels)} models`}
                   </span>
                 )}
                 <span className="absolute left-0 -bottom-2 w-full h-0.5 bg-custom-light-maincolor dark:bg-custom-light-containercolor rounded" />

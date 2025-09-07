@@ -4,7 +4,7 @@ import FeaturedSite from "@/components/FeaturedSite";
 import HeaderMain from "@/components/HeaderMain";
 import TrendingModels from "@/components/TrendingModels";
 import DailyDiscover from "@/components/DailyDiscover";
-import { Header } from "@/components";
+import { Navbar } from "@/components";
 import { Footer } from "@/components";
 import OptimizedAdPositionManager from "@/components/ads/OptimizedAdPositionManager";
 import Container from "@/components/Container";
@@ -18,7 +18,8 @@ export default function Home() {
   
   return (
     <div className="bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
-      <Header />
+      {/* <Header /> */}
+      <Navbar />
       <HeaderMain />
       <Container>
         {/* Homepage header banner ad */}

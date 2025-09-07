@@ -7,7 +7,6 @@ const normalizePosition = (pos?: string): string => (pos || '').toString().trim(
 export const getAllActiveAdPositions = async (): Promise<AdPosition[]> => {
   try {
     const response = await axiosInstance.get('/categories/advertisements')
-    console.log("all", response.data)
     const all: AdPosition[] = response.data || []
     const now = new Date()
     const active = all

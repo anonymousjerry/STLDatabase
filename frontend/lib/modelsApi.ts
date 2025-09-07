@@ -16,18 +16,6 @@ type SearchParams = {
   limit?: number;
 };
 
-
-// export const getModels = async (page: number = 1, limit: number = 12) => {
-//   const response = await axiosInstance.get(`/models?page=${page}&limit=${limit}`);
-//   return response.data.models;
-// };
-
-// export const getTrendingModels = async () => {
-//     const response = await axiosInstance.get('/models/trending');
-//     console.log(response.data.models)
-//     return response.data.models;
-// }
-
 export const getDailyModels = async (page: number = 1, limit: number = 12) => {
     try {
         const response = await axiosInstance.get(`/models/dailyDiscover?page=${page}&limit=${limit}`);
@@ -46,7 +34,6 @@ export const getDailyModels = async (page: number = 1, limit: number = 12) => {
 
 export const searchModels = async ({key, tag, sourcesite, category, subCategory, price, liked, userId, filters = [], page = 1, limit = 12}: SearchParams) => {
     try {
-        console.log('Searching models with params:', { key, tag, sourcesite, category, subCategory, price, liked, userId, filters, page, limit });
         const params = new URLSearchParams();
 
         if (key) params.append('key', key);
@@ -76,10 +63,8 @@ export const searchModels = async ({key, tag, sourcesite, category, subCategory,
             params.append('sortby', filter);
             }
         });
-        console.log('Search params:', params.toString());
 
         const response = await axiosInstance.get(`/models?${params.toString()}`);
-        console.log('Models search completed successfully:', response.data.models?.length || 0);
         return response.data;
     } catch (error: any) {
         console.error('Error searching models:', error);

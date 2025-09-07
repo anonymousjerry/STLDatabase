@@ -1,4 +1,4 @@
-import { Footer, Header } from "@/components";
+import { Footer, Navbar } from "@/components";
 
 export default async function CategoriesLayout({
   children,
@@ -8,7 +8,7 @@ export default async function CategoriesLayout({
 
   return (
     <>
-      <Header />
+      <Navbar />
         <div className="flex flex-col bg-custom-light-secondcolor dark:bg-custom-dark-secondcolor">
           {children}
         </div>

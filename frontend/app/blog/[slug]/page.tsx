@@ -6,7 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Container from '@/components/Container';
 import HeaderMain from '@/components/HeaderMain';
-import Footer from '@/components/Footer';
 import { FaCalendar, FaArrowLeft } from 'react-icons/fa';
 import ShareButton from '@/components/ShareButton';
 import { getBlogPostBySlug, getImageUrl, renderContent, BlogPost } from '@/lib/blogApi';
@@ -38,7 +37,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       : '';
 
     return {
-      title: `${blogPost.title} - 3DDatabase Blog`,
+      title: `${blogPost.title} - 3D Printing Blog - 3DDatabase.com`,
       description: description.substring(0, 160) + '...',
       keywords: ['3D printing', 'STL files', 'blog', blogPost.title],
       openGraph: {
@@ -70,11 +69,7 @@ const BlogPostPage = async ({ params }: BlogPostPageProps) => {
   let error: string | null = null;
 
   try {
-    console.log('Fetching blog post with slug:', slug);
     blogPost = await getBlogPostBySlug(slug);
-    console.log('Blog post fetched:', blogPost);
-    console.log('Blog post content:', blogPost?.content);
-    console.log('Blog post content type:', typeof blogPost?.content);
     
     if (!blogPost) {
       notFound();
@@ -94,17 +89,16 @@ const BlogPostPage = async ({ params }: BlogPostPageProps) => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <HeaderMain />
         <Container>
           <div className="py-12">
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">Error Loading Blog Post</h1>
-              <p className="text-gray-600">{error}</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Error Loading Blog Post</h1>
+              <p className="text-gray-600 dark:text-gray-400">{error}</p>
             </div>
           </div>
         </Container>
-        <Footer />
       </div>
     );
   }
@@ -114,7 +108,7 @@ const BlogPostPage = async ({ params }: BlogPostPageProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <HeaderMain />
       
       <Container>
@@ -123,7 +117,7 @@ const BlogPostPage = async ({ params }: BlogPostPageProps) => {
           <div className="mb-8">
             <Link 
               href="/blog"
-              className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              className="inline-flex items-center text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
             >
               <FaArrowLeft className="mr-2" size={14} />
               Back to Blog
@@ -131,9 +125,9 @@ const BlogPostPage = async ({ params }: BlogPostPageProps) => {
           </div>
 
           {/* Blog Post Content */}
-          <article className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+          <article className="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
             {/* Featured Image */}
-            <div className="w-full h-80 md:h-96 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden relative">
+            <div className="w-full h-80 md:h-96 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 overflow-hidden relative">
               {getImageUrl(blogPost) ? (
                 <Image 
                   src={getImageUrl(blogPost)} 
@@ -144,12 +138,12 @@ const BlogPostPage = async ({ params }: BlogPostPageProps) => {
                   priority
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
                   <div className="text-center">
-                    <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-gray-500 text-2xl">📝</span>
+                    <div className="w-16 h-16 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-gray-500 dark:text-gray-400 text-2xl">📝</span>
                     </div>
-                    <span className="text-gray-500 text-lg">No Featured Image</span>
+                    <span className="text-gray-500 dark:text-gray-400 text-lg">No Featured Image</span>
                   </div>
                 </div>
               )}
@@ -160,10 +154,10 @@ const BlogPostPage = async ({ params }: BlogPostPageProps) => {
             
             <div className="p-8 md:p-12">
               {/* Meta Information */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-gray-500 mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-gray-500 dark:text-gray-400 mb-8">
                 <div className="flex items-center mb-4 sm:mb-0">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                    <FaCalendar className="text-blue-600" size={12} />
+                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-3">
+                    <FaCalendar className="text-blue-600 dark:text-blue-400" size={12} />
                   </div>
                   <span className="font-medium">{formatDate(blogPost.publishedAt || blogPost._createdAt)}</span>
                 </div>
@@ -171,14 +165,14 @@ const BlogPostPage = async ({ params }: BlogPostPageProps) => {
               </div>
               
               {/* Title */}
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8 leading-tight">
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-8 leading-tight">
                 {blogPost.title}
               </h1>
               
 
               
               {/* Content */}
-              <div className="prose prose-lg max-w-none">
+              <div className="prose prose-lg max-w-none dark:prose-invert">
                 {blogPost.content ? (
                   <div 
                     className="quill-content"
@@ -189,11 +183,11 @@ const BlogPostPage = async ({ params }: BlogPostPageProps) => {
                   />
                 ) : (
                   <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-gray-400 text-2xl">📝</span>
+                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-gray-400 dark:text-gray-500 text-2xl">📝</span>
                     </div>
-                    <p className="text-gray-500 text-lg">No content available for this blog post.</p>
-                    <p className="text-gray-400 text-sm mt-2">Please add content using the Quill editor in the admin panel.</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-lg">No content available for this blog post.</p>
+                    <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">Please add content using the Quill editor in the admin panel.</p>
                   </div>
                 )}
               </div>
@@ -203,13 +197,9 @@ const BlogPostPage = async ({ params }: BlogPostPageProps) => {
           {/* Related Posts Section */}
           <div className="mt-16">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Explore More Articles</h2>
-              <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-                Discover more insights, tutorials, and updates from our 3D printing community
-              </p>
               <Link 
                 href="/blog"
-                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 dark:hover:from-blue-600 dark:hover:to-blue-700 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 <span>View All Blog Posts</span>
                 <FaArrowLeft className="ml-3 rotate-180" size={16} />
@@ -218,8 +208,6 @@ const BlogPostPage = async ({ params }: BlogPostPageProps) => {
           </div>
         </div>
       </Container>
-      
-      <Footer />
     </div>
   );
 };

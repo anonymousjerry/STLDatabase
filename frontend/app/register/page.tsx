@@ -24,9 +24,7 @@ const RegisterPage = () => {
     if (sessionStatus === "authenticated") {
       // Show success toast for Google login
       if (session?.user) {
-        console.log('Register page - Session user data:', session.user);
         const username = (session.user as any).username || (session.user as any).name || session.user.email;
-        console.log('Register page - Username for toast:', username);
         toast.success(`Successfully logged in as ${username}!`);
       }
       router.replace("/");
@@ -111,7 +109,7 @@ const RegisterPage = () => {
           toast.error("Error, try again");
           setError("Error, try again");
         }
-        console.log(error);
+        console.error(error);
     }
   };
 
@@ -119,10 +117,10 @@ const RegisterPage = () => {
     return <h1>Loading...</h1>;
   }
   return (
-    <div className="bg-white h-screen">
-      <div className="inset-0 h-full bg-custom-light-secondcolor flex items-center justify-center py-20">
-        <div className="basis-1/4 bg-gradient-to-b from-white to-[#f4f7fb] rounded-[40px] p-6 border-[5px] border-white shadow-[0_30px_30px_-20px_rgba(133,189,215,0.88)] m-5">
-             <div className="text-center font-black text-[30px] text-[#1089d3]">Sign Up</div>
+    <div className="bg-white min-h-screen">
+      <div className="inset-0 min-h-screen bg-custom-light-secondcolor flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div className="w-full max-w-md bg-gradient-to-b from-white to-[#f4f7fb] rounded-2xl sm:rounded-3xl lg:rounded-[40px] p-4 sm:p-6 lg:p-8 border-2 sm:border-4 lg:border-[5px] border-white shadow-[0_30px_30px_-20px_rgba(133,189,215,0.88)]">
+             <div className="text-center font-black text-2xl sm:text-3xl lg:text-[30px] text-[#1089d3]">Sign Up</div>
                  <form className="mt-5" onSubmit={handleSubmit}>
                      <input
                         placeholder="Name"
@@ -130,7 +128,7 @@ const RegisterPage = () => {
                         name="name"
                         type="text"
                         required
-                        className="w-full bg-white border-none px-5 py-4 rounded-[20px] shadow-[0_10px_10px_-5px_#cff0ff] placeholder:text-gray-400 focus:outline-none focus:border-x-2 focus:border-[#12b1d1]"
+                        className="w-full bg-white border-none px-3 sm:px-4 lg:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl lg:rounded-[20px] shadow-[0_10px_10px_-5px_#cff0ff] placeholder:text-gray-400 focus:outline-none focus:border-x-2 focus:border-[#12b1d1] text-sm sm:text-base"
                     />
                     <input
                         placeholder="E-mail"
@@ -138,7 +136,7 @@ const RegisterPage = () => {
                         name="email"
                         type="email"
                         required
-                        className="w-full bg-white border-none px-5 py-4 rounded-[20px] mt-4 shadow-[0_10px_10px_-5px_#cff0ff] placeholder:text-gray-400 focus:outline-none focus:border-x-2 focus:border-[#12b1d1]"
+                        className="w-full bg-white border-none px-3 sm:px-4 lg:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl lg:rounded-[20px] mt-4 shadow-[0_10px_10px_-5px_#cff0ff] placeholder:text-gray-400 focus:outline-none focus:border-x-2 focus:border-[#12b1d1] text-sm sm:text-base"
                     />
                     <input
                         placeholder="Password"
@@ -146,7 +144,7 @@ const RegisterPage = () => {
                         name="password"
                         type="password"
                         required
-                        className="w-full bg-white border-none px-5 py-4 rounded-[20px] mt-4 shadow-[0_10px_10px_-5px_#cff0ff] placeholder:text-gray-400 focus:outline-none focus:border-x-2 focus:border-[#12b1d1]"
+                        className="w-full bg-white border-none px-3 sm:px-4 lg:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl lg:rounded-[20px] mt-4 shadow-[0_10px_10px_-5px_#cff0ff] placeholder:text-gray-400 focus:outline-none focus:border-x-2 focus:border-[#12b1d1] text-sm sm:text-base"
                     />
                     <input
                         placeholder="Confirm Password"
@@ -154,7 +152,7 @@ const RegisterPage = () => {
                         name="confirmPassword"
                         type="password"
                         required
-                        className="w-full bg-white border-none px-5 py-4 rounded-[20px] mt-4 shadow-[0_10px_10px_-5px_#cff0ff] placeholder:text-gray-400 focus:outline-none focus:border-x-2 focus:border-[#12b1d1]"
+                        className="w-full bg-white border-none px-3 sm:px-4 lg:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl lg:rounded-[20px] mt-4 shadow-[0_10px_10px_-5px_#cff0ff] placeholder:text-gray-400 focus:outline-none focus:border-x-2 focus:border-[#12b1d1] text-sm sm:text-base"
                     />
                     <span className="block mt-2 ml-2 text-xs text-[#0099ff]">
                         <a href="#">Forgot Password ?</a>
@@ -163,7 +161,7 @@ const RegisterPage = () => {
                         defaultValue="Sign Up"
                         type="submit"
                         disabled={recaptchaLoading || !recaptchaReady}
-                        className="block w-full font-bold bg-gradient-to-r from-[#1089d3] to-[#12b1d1] disabled:bg-gray-400 text-white py-4 mt-5 rounded-[20px] shadow-[0_20px_10px_-15px_rgba(133,189,215,0.88)] border-none transition-transform duration-200 ease-in-out hover:scale-[1.03] hover:shadow-[0_23px_10px_-20px_rgba(133,189,215,0.88)] active:scale-95 active:shadow-[0_15px_10px_-10px_rgba(133,189,215,0.88)]"
+                        className="block w-full font-bold bg-gradient-to-r from-[#1089d3] to-[#12b1d1] disabled:bg-gray-400 text-white py-3 sm:py-4 mt-5 rounded-xl sm:rounded-2xl lg:rounded-[20px] shadow-[0_20px_10px_-15px_rgba(133,189,215,0.88)] border-none transition-transform duration-200 ease-in-out hover:scale-[1.03] hover:shadow-[0_23px_10px_-20px_rgba(133,189,215,0.88)] active:scale-95 active:shadow-[0_15px_10px_-10px_rgba(133,189,215,0.88)] text-sm sm:text-base"
                     />
                     
                     {recaptchaError && (
@@ -200,25 +198,25 @@ const RegisterPage = () => {
                 </div>
 
                 <div className="mt-6">
-                    <span className="block text-center text-[10px] text-gray-400">Or Sign in with</span>
-                    <div className="flex justify-center gap-4 mt-1">
+                    <span className="block text-center text-xs sm:text-[10px] text-gray-400">Or Sign in with</span>
+                    <div className="flex justify-center gap-3 sm:gap-4 mt-1">
                         {providers.map(({ name, Icon }) => (
                           <button
                             key={name}
                             onClick={() => signIn(name)}
                             className="bg-gradient-to-br from-black to-gray-500 
-                                      border-4 border-white p-1.5 rounded-full 
-                                      w-10 aspect-square grid place-content-center 
+                                      border-2 sm:border-4 border-white p-1 sm:p-1.5 rounded-full 
+                                      w-8 h-8 sm:w-10 sm:h-10 grid place-content-center 
                                       shadow-[0_12px_10px_-8px_rgba(133,189,215,0.88)] 
                                       transition-transform duration-200 ease-in-out 
                                       hover:scale-110 active:scale-90"
                           >
-                            <Icon className="text-white w-4 h-4" />
+                            <Icon className="text-white w-3 h-3 sm:w-4 sm:h-4" />
                           </button>
                         ))}
                     </div>
                 </div>
-                <span className="block text-center mt-4 text-[#0099ff] text-[9px]">
+                <span className="block text-center mt-4 text-[#0099ff] text-xs sm:text-[9px]">
                     <a href="#">Learn user licence agreement</a>
                 </span>
             </div>

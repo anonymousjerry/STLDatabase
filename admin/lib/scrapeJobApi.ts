@@ -97,6 +97,24 @@ export const toggleScrapeJobActive = async (id: string, enabled: boolean): Promi
   }
 };
 
+// Get updates information (new models count)
+export const getUpdates = async (): Promise<{ newModelsCount: number }> => {
+  try {
+    const response = await axiosInstance.get('/getUpdates');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching updates:', error);
+    if (typeof error === 'object' && error !== null && 'response' in error) {
+      const err = error as { response?: any; request?: any };
+      throw new Error(err.response?.data?.message || `Failed to fetch updates: ${err.response?.status}`);
+    } else if (typeof error === 'object' && error !== null && 'request' in error) {
+      throw new Error('Network error: Unable to connect to server');
+    } else {
+      throw new Error('An unexpected error occurred while fetching updates');
+    }
+  }
+};
+
 // Update scrape job status
 export const updateScrapeJobStatus = async (id: string, status: ScrapeJob['status']): Promise<ScrapeJob> => {
   try {
@@ -114,63 +132,3 @@ export const updateScrapeJobStatus = async (id: string, status: ScrapeJob['statu
     }
   }
 };
-
-// // Get scrape jobs by platform
-// export const getScrapeJobsByPlatform = async (platform: string): Promise<ScrapeJob[]> => {
-//   try {
-//     console.log('Fetching scrape jobs by platform:', platform);
-//     const response = await axiosInstance.get(`/scrapeJob/platform/${encodeURIComponent(platform)}`);
-//     console.log('Platform scrape jobs fetched successfully:', response.data?.length ?? 0);
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error fetching scrape jobs by platform:', error);
-//     if (typeof error === 'object' && error !== null && 'response' in error) {
-//       const err = error as { response?: any; request?: any };
-//       throw new Error(err.response?.data?.message || `Failed to fetch scrape jobs by platform: ${err.response?.status}`);
-//     } else if (typeof error === 'object' && error !== null && 'request' in error) {
-//       throw new Error('Network error: Unable to connect to server');
-//     } else {
-//       throw new Error('An unexpected error occurred while fetching scrape jobs by platform');
-//     }
-//   }
-// };
-
-// // Get scrape jobs by status
-// export const getScrapeJobsByStatus = async (status: string): Promise<ScrapeJob[]> => {
-//   try {
-//     console.log('Fetching scrape jobs by status:', status);
-//     const response = await axiosInstance.get(`/scrapeJob/status/${encodeURIComponent(status)}`);
-//     console.log('Status scrape jobs fetched successfully:', response.data?.length ?? 0);
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error fetching scrape jobs by status:', error);
-//     if (typeof error === 'object' && error !== null && 'response' in error) {
-//       const err = error as { response?: any; request?: any };
-//       throw new Error(err.response?.data?.message || `Failed to fetch scrape jobs by status: ${err.response?.status}`);
-//     } else if (typeof error === 'object' && error !== null && 'request' in error) {
-//       throw new Error('Network error: Unable to connect to server');
-//     } else {
-//       throw new Error('An unexpected error occurred while fetching scrape jobs by status');
-//     }
-//   }
-// };
-
-// // Search scrape jobs
-// export const searchScrapeJobs = async (searchTerm: string): Promise<ScrapeJob[]> => {
-//   try {
-//     console.log('Searching scrape jobs:', searchTerm);
-//     const response = await axiosInstance.get(`/scrapeJob/search?q=${encodeURIComponent(searchTerm)}`);
-//     console.log('Scrape jobs search completed:', response.data?.length ?? 0);
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error searching scrape jobs:', error);
-//     if (typeof error === 'object' && error !== null && 'response' in error) {
-//       const err = error as { response?: any; request?: any };
-//       throw new Error(err.response?.data?.message || `Failed to search scrape jobs: ${err.response?.status}`);
-//     } else if (typeof error === 'object' && error !== null && 'request' in error) {
-//       throw new Error('Network error: Unable to connect to server');
-//     } else {
-//       throw new Error('An unexpected error occurred while searching scrape jobs');
-//     }
-//   }
-// };

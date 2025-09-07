@@ -23,7 +23,6 @@ const LikeFilter = () => {
 
   const handleCheckboxChange = (checked: boolean) => {
     if (isDisabled || !userId) return;
-    console.log("checked", checked)
     setliked(checked);
     setUserId(userId);
 

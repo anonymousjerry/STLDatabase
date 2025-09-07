@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { getAllCategories } from '@/lib/categoryApi';
 import CategoriesPageClient from '@/components/CategoriesPageClient';
-import Container from '@/components/Container';
 
 // Dynamic metadata generation
 export async function generateMetadata({ 
@@ -18,7 +17,7 @@ export async function generateMetadata({
   const categories = await getAllCategories();
 
   // Default metadata
-  let title = 'Categories STL Files | Download 3D Printable Models by Category - 3DDatabase';
+  let title = 'Browse 3D Models by Category - 3DDatabase';
   let description = 'Browse 3D printable models by category. Find STL files for 3D printing across all categories including household items, toys, art, tools, and more. Download free and premium 3D models.';
 
   // Category-specific metadata
@@ -62,12 +61,10 @@ const CategoriesPage = async ({ searchParams }: CategoriesPageProps) => {
   const categories = await getAllCategories();
 
   return (
-    // <Container>
-      <CategoriesPageClient 
-        categories={categories}
-        selectedCategory={category}
-      />
-    // </Container>
+    <CategoriesPageClient 
+      categories={categories}
+      selectedCategory={category}
+    />
   );
 };
 

@@ -14,7 +14,6 @@ const Footer = () => {
     getPlatforms().then(setPlatforms).catch(console.error);
     
   }, []);
-console.log(platforms)
   return (
     <footer className="bg-custom-light-maincolor flex flex-col" aria-labelledby="footer-heading">
       <div className="flex flex-col lg:flex-row justify-between px-4 sm:px-8 md:px-16 lg:px-32 xl:px-52 mb-8 lg:mb-[53px] gap-8 lg:gap-0">
@@ -58,7 +57,7 @@ console.log(platforms)
           </div>
           <div className="flex flex-row gap-2 lg:gap-1 items-center justify-start shrink-0 relative">
             <a
-              href="https://x.com/yourusername"
+              href="https://x.com/3ddatabase43941"
               target="_blank"
               rel="noopener noreferrer"
               className="text-white hover:text-gray-300 transition-colors duration-200"
@@ -66,7 +65,7 @@ console.log(platforms)
               <FaXTwitter size={20} className="lg:w-[24px] lg:h-[24px]" />
             </a>
             <a
-              href="https://www.facebook.com//yourusername"
+              href="https://www.facebook.com/profile.php?id=61579948366464"
               target="_blank"
               rel="noopener noreferrer"
               className="text-white hover:text-gray-300 transition-colors duration-200"
@@ -74,7 +73,7 @@ console.log(platforms)
               <FaSquareFacebook size={20} className="lg:w-[24px] lg:h-[24px]" />
             </a>
             <a
-              href="https://www.instagram.com/yourusername"
+              href="https://www.instagram.com/3ddatabase?igsh=MXRnZ2t0ZnI5Y2Q0ZA=="
               target="_blank"
               rel="noopener noreferrer"
               className="text-white hover:text-gray-300 transition-colors duration-200"

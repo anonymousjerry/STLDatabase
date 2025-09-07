@@ -6,7 +6,8 @@ import {
   createScrapeJob,
   updateScrapeJob,
   deleteScrapeJob,
-  toggleScrapeJobActive
+  toggleScrapeJobActive,
+  getUpdates
 } from '../lib/scrapeJobApi';
 import { ScrapeJob } from '../sanity/types';
 import { Plus, Search, Pencil, Trash2, Play, Pause } from 'lucide-react';
@@ -27,6 +28,8 @@ export default function ScrapeJobTable() {
   const [socketConnected, setSocketConnected] = useState(false);
   const [updatingJobs, setUpdatingJobs] = useState<Set<string>>(new Set());
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const [nextRefresh, setNextRefresh] = useState<Date | null>(null);
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
 
   const [formData, setFormData] = useState({
     platform: 'Printables' as ScrapeJob['platform'],
@@ -40,32 +43,126 @@ export default function ScrapeJobTable() {
 
   const showAlert = (type: 'success' | 'error', message: string) => {
     setAlert({ type, message });
-    setTimeout(() => setAlert(null), 1500);
+    setTimeout(() => setAlert(null), 3000);
+  };
+  
+  // Helper function to format time remaining
+  const formatTimeRemaining = (nextRefresh: Date) => {
+    const now = new Date();
+    const timeLeft = nextRefresh.getTime() - now.getTime();
+    
+    if (timeLeft <= 0) return 'Refreshing...';
+    
+    const minutes = Math.floor(timeLeft / 60000);
+    const seconds = Math.floor((timeLeft % 60000) / 1000);
+    
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+  
+  // Helper function to reset auto-refresh timer
+  const resetAutoRefreshTimer = () => {
+    if (autoRefreshEnabled) {
+      setNextRefresh(new Date(Date.now() + 60000));
+    }
   };
 
   const refreshJobs = async () => {
     setLoading(true);
     try {
-      const data = await getAllScrapeJobs();
-      setJobs(data);
+      
+      // Fetch both scrape jobs and updates
+      const [jobsData, updatesData] = await Promise.all([
+        getAllScrapeJobs(),
+        getUpdates()
+      ]);
+      
+      setJobs(jobsData);
       setLastRefresh(new Date());
+      
+      // Reset auto-refresh timer
+      resetAutoRefreshTimer();
+      
+      // Check for new models and show alarm if any
+      if (updatesData.newModelsCount > 0) {
+        showAlert('success', `${updatesData.newModelsCount} model added Successfully!`);
+      }
+      
     } catch (err) {
-      console.error('Error fetching scraping jobs:', err);
-      showAlert('error', err instanceof Error ? err.message : 'Failed to fetch scraping jobs');
+      console.error('Error fetching data:', err);
+      showAlert('error', err instanceof Error ? err.message : 'Failed to fetch data');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    // Initial data fetch
     refreshJobs();
-  }, []);
+    
+    // Set up auto-refresh every 1 minute (60000ms) only if enabled
+    let intervalId: NodeJS.Timeout | null = null;
+    
+    if (autoRefreshEnabled) {
+      intervalId = setInterval(async () => {
+        try {
+          // Fetch both scrape jobs and updates every 1 minute
+          const [jobsData, updatesData] = await Promise.all([
+            getAllScrapeJobs(),
+            getUpdates()
+          ]);
+          
+          setJobs(jobsData);
+          setLastRefresh(new Date());
+          
+          // Reset auto-refresh timer
+          setNextRefresh(new Date(Date.now() + 60000));
+          
+          // Check for new models and show alarm if any
+          if (updatesData.newModelsCount > 0) {
+            const count = updatesData.newModelsCount;
+            showAlert(
+              "success",
+              `Successfully ${count} model${count === 1 ? "" : "s"} added!`
+            );
+          }
+        } catch (err) {
+          console.error('Error during auto-refresh:', err);
+        }
+      }, 60000); // 1 minute
+      
+      // Set initial next refresh time
+      resetAutoRefreshTimer();
+    }
+    
+    // Cleanup interval on component unmount
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [autoRefreshEnabled]);
+  
+  // Countdown timer for next refresh
+  useEffect(() => {
+    if (!nextRefresh || !autoRefreshEnabled) return;
+    
+    const countdownInterval = setInterval(() => {
+      const now = new Date();
+      const timeLeft = nextRefresh.getTime() - now.getTime();
+      
+      if (timeLeft <= 0) {
+        // Next refresh time has passed, update it
+        setNextRefresh(new Date(now.getTime() + 60000));
+      }
+    }, 1000); // Update every second
+    
+    return () => clearInterval(countdownInterval);
+  }, [nextRefresh, autoRefreshEnabled]);
 
   // Socket integration for real-time status updates
   useEffect(() => {
     const handleStatusUpdate = (id: string, status: string, platform: string) => {
-      console.log(`Updating job ${id} status to ${status} for platform ${platform}`);
-      
+
       // Add job to updating set
       setUpdatingJobs(prev => new Set(prev).add(id));
       
@@ -133,7 +230,10 @@ export default function ScrapeJobTable() {
     try {
       setLoading(true);
       await createScrapeJob(formData);
+      
+      // Refresh data after creating job
       await refreshJobs();
+      
       setFormData({
         platform: 'Printables' as ScrapeJob['platform'],
         count: 10,
@@ -157,7 +257,10 @@ export default function ScrapeJobTable() {
     try {
       setLoading(true);
       await updateScrapeJob(editingJob.id, formData);
+      
+      // Refresh data after updating job
       await refreshJobs();
+      
       setEditingJob(null);
       setFormData({
         platform: 'Printables' as ScrapeJob['platform'],
@@ -181,7 +284,10 @@ export default function ScrapeJobTable() {
     try {
       setLoading(true);
       await deleteScrapeJob(id);
+      
+      // Refresh data after deleting job
       await refreshJobs();
+      
       showAlert('success', 'Scraping job deleted successfully!');
     } catch (err) {
       console.error('Error deleting scraping job:', err);
@@ -204,6 +310,9 @@ export default function ScrapeJobTable() {
       
       // Make API call in background
       await toggleScrapeJobActive(id, enabled);
+      
+      // Refresh data after toggling job status
+      await refreshJobs();
       
       // Show success message
       showAlert('success', `Job ${enabled ? 'activated' : 'deactivated'} successfully!`);
@@ -309,18 +418,54 @@ export default function ScrapeJobTable() {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             />
           </div>
-          <div className="flex flex-col items-end gap-1">
-            <button
-              onClick={refreshJobs}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
-            >
-              Refresh
-            </button>
-            {lastRefresh && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                Last updated: {lastRefresh.toLocaleTimeString()}
+          <div className="flex flex-col items-end">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={refreshJobs}
+                disabled={loading}
+                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Refreshing...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Refresh
+                  </>
+                )}
+              </button>
+              {/* <button
+                onClick={() => {
+                  const newState = !autoRefreshEnabled;
+                  setAutoRefreshEnabled(newState);
+                  if (newState) {
+                    showAlert('success', 'Auto-refresh resumed! Data will update every 1 minute.');
+                    // Set next refresh time when resuming
+                    resetAutoRefreshTimer();
+                  } else {
+                    showAlert('success', 'Auto-refresh paused! Click "Resume Auto-refresh" to enable.');
+                  }
+                }}
+                className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                  autoRefreshEnabled
+                    ? 'bg-green-100 text-green-700 border border-green-300 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700'
+                    : 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700'
+                }`}
+              >
+                {autoRefreshEnabled ? 'Pause Auto-refresh' : 'Resume Auto-refresh'}
+              </button> */}
+            </div>
+            {/* <div className="flex items-center gap-1 text-xs">
+              <div className={`w-2 h-2 rounded-full ${autoRefreshEnabled ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+              <span className={`font-medium ${autoRefreshEnabled ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {autoRefreshEnabled ? 'Auto-refresh ON' : 'Auto-refresh OFF'}
               </span>
-            )}
+            </div> */}
           </div>
         </div>
       </div>
@@ -434,6 +579,43 @@ export default function ScrapeJobTable() {
           </div>
         </div>
       )}
+
+      {/* Auto-refresh Status */}
+      {/* <div className={`px-6 py-3 border-b ${
+        autoRefreshEnabled 
+          ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700' 
+          : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+      }`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${
+              autoRefreshEnabled ? 'bg-green-500 animate-pulse' : 'bg-red-500'
+            }`}></div>
+            <span className={`text-sm font-medium ${
+              autoRefreshEnabled 
+                ? 'text-blue-700 dark:text-blue-300' 
+                : 'text-gray-600 dark:text-gray-400'
+            }`}>
+              {autoRefreshEnabled 
+                ? 'Auto-refresh active - Data updates every 1 minute' 
+                : 'Auto-refresh paused - Click "Resume Auto-refresh" to enable'
+              }
+            </span>
+          </div>
+          <div className="flex items-center gap-4 text-sm">
+            {lastRefresh && (
+              <span className="text-gray-600 dark:text-gray-400">
+                Last updated: {lastRefresh.toLocaleTimeString()}
+              </span>
+            )}
+            {autoRefreshEnabled && nextRefresh && (
+              <span className="text-blue-600 dark:text-blue-400 font-medium">
+                Next refresh: {formatTimeRemaining(nextRefresh)}
+              </span>
+            )}
+          </div>
+        </div>
+      </div> */}
 
       {/* Jobs Table */}
       <div className="overflow-x-auto">
